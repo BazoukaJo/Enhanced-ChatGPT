@@ -14,7 +14,7 @@ function App() {
   const [historyIndex , setHistoryIndex] = useState(0);
   const [currentModel, setCurrentModel] = useState("text-davinci-003");
   const [temperature, setTemperature] = useState(Number(0.5));
-  const [maxTokens, setMaxTokens] = useState(parseInt(1000));
+  const [maxTokens, setMaxTokens] = useState(parseInt(100));
   const [n , setN] = useState(Number(1));
   const [best_of , setBest_of] = useState(Number(1));
   //const Prism = require('prismjs');
