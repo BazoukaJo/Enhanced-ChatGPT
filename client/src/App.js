@@ -145,7 +145,7 @@ function App() {
         </div>
         <div>
           <div className="tool-text">TEMPERATURE</div>
-          <input  className="side-menu-button" type="number" max="1" min="0" rows="1" step="0.1" value={Number(temperature)} onChange={(e) => setTemperature(e.target.value)} />
+          <input  className="side-menu-button" type="number" max="1" min="0" rows="1" step="0.1" value={temperature} onChange={(e) => setTemperature(e.target.value)} />
           <div className="side-menu-button-text" onClick={() => setTemp(0)}>0 - Logical</div>
           <div className="side-menu-button-text" onClick={() => setTemp(0.5)}>0.5 - Balanced</div>
           <div className="side-menu-button-text" onClick={() => setTemp(1)}>1 - Creative</div>
