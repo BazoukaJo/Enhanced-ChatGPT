@@ -32,7 +32,7 @@ app.post('/', async (req, res) => {
         });
         let choices = response.data.choices.map(choice => choice.text)
         .join('\n ________________________________________________________________________________\n')
-        .trimStart().trimEnd()
+        .trimStart();
         res.json({ message: choices });
     }
     catch(error){

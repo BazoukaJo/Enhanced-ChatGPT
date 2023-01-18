@@ -1,7 +1,7 @@
 import './App.css';
 import './normal.css';
-//import './prism.css';
-//import Prism from "prismjs";
+import './prism.css';
+import Prism from "prismjs";
 import { useEffect, useState } from 'react';
 
 /**
@@ -26,6 +26,7 @@ function App() {
   const [maxTokens, setMaxTokens] = useState(parseInt(100));
   const [n , setN] = useState(Number(1));
   const [best_of , setBest_of] = useState(Number(1));
+
   //###################### Async Functions #######################
   /**
    * When the page loads, fetch the data from the server and then set the models state to the data that
@@ -36,7 +37,6 @@ function App() {
     .then(res => res.json())
     .then(data => setModels(data.models))
   }
-
 
   /**
    * It takes the input from the user, sends it to the server, and then displays the response from the
@@ -51,16 +51,16 @@ function App() {
     } else {
       chatLogNew.push({ user: "user", message: PLACE_HOLDER });
     }
-    const messages = chatLogNew.map((message) => message.message).join("\n").trimStart().trimEnd();
+    const messages = chatLogNew.map((message) => message.message).join("\n");
     setChatLog(chatLogNew);
-    console.log(historyIndex % 2 === 0);
-    if(historyIndex % 2 === 0)
-    {
-      setHistoryIndex(chatLogNew.length-1);
-      setHistory(chatLogNew);
-    }
+    setHistoryIndex(chatLogNew.length-1);
+    setHistory(chatLogNew);
     setInput("");
     showLoader();
+    // Scrool up
+    setTimeout(function(){
+      document.getElementsByClassName("chatbox")[0].scrollTo(0, document.getElementsByClassName("chat-log")[0].clientHeight);
+    }, 2);
     const response = await fetch("http://localhost:3080/", {
       method:"POST",
       headers: {"content-type": "application/json"},
@@ -75,11 +75,12 @@ function App() {
     });
     hideLoader();
     const data = await response.json();
-    // TODO: make the code highlight and colorcode
+    // TODO: make the code syntax highlight
     console.log(data.message);
     //let html = Prism.highlight(data.message, Prism.languages.javascript, 'javascript')
     //setChatLog([...chatLogNew,{user:"gpt", message:`${html}`}]);
     setChatLog([...chatLogNew,{user:"gpt", message:`${data.message}`}]);
+    // Scrool up
     setTimeout(function(){
       document.getElementsByClassName("chatbox")[0].scrollTo(0, document.getElementsByClassName("chat-log")[0].clientHeight);
     }, 200);
@@ -107,7 +108,7 @@ function App() {
   }
 
   //###################### History #######################
-  /* Listening for keydown events key up and key down to play with input history.*/
+  /* Listening for keydown events key up and key down to cycle input history.*/
   let timer;
   let keyEventHandler = function(key) {
     clearTimeout(timer);
@@ -183,7 +184,7 @@ function App() {
 /**
  * @returns A React component that renders a div with a class of chat-message.
  */
-const ChatMessage = ({ message }) => {
+const ChatMessage = ({message}) => {
   return (
     <div className={`chat-message ${message.user === "gpt" && "chatgpt"}`}>
       <div className="chat-message-center">
@@ -195,7 +196,7 @@ const ChatMessage = ({ message }) => {
         </div>
         <div className='precode-box'>
           {message.user === "gpt" &&
-            <pre ><code className={'language-javascript'}><span className="highlight-message">{message.message}</span></code></pre>}
+            <pre><code className={'language-javascript'}><span className="highlight-message">{message.message}</span></code></pre>}
         </div>
         <div className='nocode-box'>
           {message.user === "user" &&
