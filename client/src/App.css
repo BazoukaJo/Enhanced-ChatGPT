@@ -136,17 +136,16 @@
 
 .chat-message.chatgpt{
   background-color:#444654;
-  transition: ease 0.25s all;
-  padding-left: 12px;
+
 }
 
 .chat-message-center{
   display: flex;
-  padding: 12px;
-  padding-left: 24px;
-  padding-right: 24px;
+  padding: 20px;
+  padding-left: 30px;
+  padding-right: 30px;
   min-width: 400px;
-  transition: ease 0.25s all;
+  transition: ease 0.25s all
 }
 
 .you{
@@ -170,26 +169,30 @@
 .avatar.chatgpt{
   background: #0da37f;
 }
-
-.message{
+.precode-box{
   padding-left: 30px;
-  padding-right: 30px;
-  margin-top: -1px;
-  margin-bottom: -1px;
-  transition: ease 0.25s all;
-  white-space:break-spaces;
-  animation: messageAnimation 0.3s;
+  margin-top:-15px;
+  margin-bottom:-15px;
+  padding-top:-10px;
+}
+.nocode-box
+{
+  animation: messageAnimation 0.2s;
   transition: ease 0.25s all;
 }
 
-.message.over{
-  background-color: #222222;
+.highlight-message{
+  white-space:break-spaces;
+}
+
+.simple-message{
+  white-space:break-spaces;
 }
 
 .loader {
   background: #0da37f;
-  width: 41px;
-  height: 41px;
+  width: 40px;
+  height: 40px;
   bottom: 40px;
   right: 40px;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
@@ -222,7 +225,7 @@
   }
 
   50% {
-      font-size: 17px;
+      font-size: 15px;
   }
 
   100% {

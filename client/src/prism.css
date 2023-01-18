@@ -1,5 +1,5 @@
 /* PrismJS 1.29.0
-https://prismjs.com/download.html#themes=prism-tomorrow&languages=markup+css+clike+javascript+css-extras+diff&plugins=line-highlight+line-numbers+file-highlight+show-language+jsonp-highlight+highlight-keywords+previewers+keep-markup+command-line+normalize-whitespace+data-uri-highlight+toolbar+copy-to-clipboard+match-braces+diff-highlight+filter-highlight-all */
+https://prismjs.com/download.html#themes=prism-tomorrow&languages=markup+css+clike+javascript+c+csharp+cpp+css-extras+diff+java+markup-templating+maxscript+php+python+rust+typescript&plugins=line-highlight+line-numbers+autolinker+custom-class+file-highlight+show-language+jsonp-highlight+highlight-keywords+remove-initial-line-feed+previewers+keep-markup+command-line+unescaped-markup+normalize-whitespace+toolbar+copy-to-clipboard+match-braces+diff-highlight+filter-highlight-all */
 /**
  * prism.js tomorrow night eighties for JavaScript, CoffeeScript, CSS and HTML
  * Based on https://github.com/chriskempson/tomorrow-theme
@@ -235,6 +235,9 @@ pre[class*="language-"].line-numbers > code {
 			text-align: right;
 		}
 
+.token a {
+	color: inherit;
+}
 div.code-toolbar {
 	position: relative;
 }
@@ -586,6 +589,17 @@ div.code-toolbar > .toolbar > .toolbar-item > span:focus {
 .command-line span.token.output {
 	/* Make shell output lines a bit lighter to distinguish them from shell commands */
 	opacity: 0.7;
+}
+
+/* Fallback, in case JS does not run, to ensure the code is at least visible */
+[class*='lang-'] script[type='text/plain'],
+[class*='language-'] script[type='text/plain'],
+script[type='text/plain'][class*='lang-'],
+script[type='text/plain'][class*='language-'] {
+	display: block;
+	font: 100% Consolas, Monaco, monospace;
+	white-space: pre;
+	overflow: auto;
 }
 
 .token.punctuation.brace-hover,

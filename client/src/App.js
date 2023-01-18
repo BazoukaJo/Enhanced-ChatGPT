@@ -1,6 +1,7 @@
 import './App.css';
 import './normal.css';
-//import ReactHtmlParser from 'react-html-parser';
+//import './prism.css';
+//import Prism from "prismjs";
 import { useEffect, useState } from 'react';
 
 /**
@@ -25,11 +26,6 @@ function App() {
   const [maxTokens, setMaxTokens] = useState(parseInt(100));
   const [n , setN] = useState(Number(1));
   const [best_of , setBest_of] = useState(Number(1));
-  //const Prism = require('prismjs');
-  //const loadLanguages = require('prismjs/components/');
-  //loadLanguages(['html', 'js', 'css', 'jsx', 'c#', 'c++', 'python', 'javascript', 'xml', 'json', 'java', 'rust', 'ruby', 'react', 'php']);
-  var divElement = document.getElementsByClassName('prismin');
-  divElement.innerHTML = true;
   //###################### Async Functions #######################
   /**
    * When the page loads, fetch the data from the server and then set the models state to the data that
@@ -57,13 +53,10 @@ function App() {
     }
     const messages = chatLogNew.map((message) => message.message).join("\n").trimStart().trimEnd();
     setChatLog(chatLogNew);
-    //console.log(historyIndex);
-    //console.log(historyIndex % 2 === 0);
-    // TODO: make the modulo work.
+    console.log(historyIndex % 2 === 0);
     if(historyIndex % 2 === 0)
     {
-      setHistoryIndex(chatLogNew.length);
-      //console.log("pass the MODULO");
+      setHistoryIndex(chatLogNew.length-1);
       setHistory(chatLogNew);
     }
     setInput("");
@@ -84,8 +77,8 @@ function App() {
     const data = await response.json();
     // TODO: make the code highlight and colorcode
     console.log(data.message);
-    //console.log(`${Prism.highlight(data.message, Prism.languages.javascript, "javascript")}`);
-    //setChatLog([...chatLogNew,{user:"gpt", message:`${Prism.highlight(data.message, Prism.languages.javascript, "javascript")}`}]);
+    //let html = Prism.highlight(data.message, Prism.languages.javascript, 'javascript')
+    //setChatLog([...chatLogNew,{user:"gpt", message:`${html}`}]);
     setChatLog([...chatLogNew,{user:"gpt", message:`${data.message}`}]);
     setTimeout(function(){
       document.getElementsByClassName("chatbox")[0].scrollTo(0, document.getElementsByClassName("chat-log")[0].clientHeight);
@@ -200,11 +193,14 @@ const ChatMessage = ({ message }) => {
           {message.user === "user" &&
             <div className='you'>You</div>}
         </div>
-        <pre className="message">
-          <code class='language-javascript' className={`prismin ${message.user === "gpt" && "chatgpt"}`}>
-            {message.message/* {ReactHtmlParser(message.message)} */}
-          </code>
-        </pre>
+        <div className='precode-box'>
+          {message.user === "gpt" &&
+            <pre ><code className={'language-javascript'}><span className="highlight-message">{message.message}</span></code></pre>}
+        </div>
+        <div className='nocode-box'>
+          {message.user === "user" &&
+            <span className='simple-message'>{message.message}</span>}
+        </div>
       </div>
     </div>
   );
