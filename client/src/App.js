@@ -14,11 +14,12 @@ import { useEffect, useState } from 'react';
 function App() {
   const MAX_TOKENS = parseInt(4096);
   const PLACE_HOLDER = "What is the answer to Life, the Universe, and Everything?";
+  const DEFAULT_QUERY = "Ask me anything...";
 
   useEffect(() => {getEngines();}, []);
   const [input, setInput] = useState("");
   const [models, setModels] = useState([]);
-  const [chatLog, setChatLog] = useState([{user:"gpt",  message :"Ask me anything..."}]);
+  const [chatLog, setChatLog] = useState([{user:"gpt",  message :DEFAULT_QUERY}]);
   const [history, setHistory] = useState([{user:"gpt",  message :""}]);
   const [historyIndex , setHistoryIndex] = useState(0);
   const [currentModel, setCurrentModel] = useState("text-davinci-003");
@@ -71,6 +72,7 @@ function App() {
         maxTokens:parseInt(maxTokens),
         n:Number(n),
         best_of:Number(best_of),
+        frequency_penalty:1.0,
       })
     });
     hideLoader();
@@ -88,7 +90,7 @@ function App() {
   //###################### END Async Functions #######################
 
   function clearChat() {
-    setChatLog([{user:"gpt",  message :"Ask me anything you want"}])
+    setChatLog([{user:"gpt",  message :{DEFAULT_QUERY}}])
   }
 
   function setTemp(numb){

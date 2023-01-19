@@ -1,8 +1,17 @@
+/**
+ * App backend: Enanced ChatGPT
+ *
+ * @license MIT <https://opensource.org/licenses/MIT>
+ * @author Jonathan Pratte <https://jonathanpratte.com>
+ * @public
+ */
+
 const CONNECTION_ERROR_MESSAGE = ":( The connection to the server failed. Press [+ New Chat], to retry if possible o7" ;
 const COMPATIBILITY_ERROR_MESSAGE = ":( This model is not compatible or the connection failed du to high bendwidth demand. Please change the model or Press [+ New Chat]. o7"
 const PREFIX = "";
 //const SUFIX = " if the answer is short, explain your answer";
 const SUFIX = "";
+
 const { Configuration, OpenAIApi } = require("openai");
 const express = require('express');
 const bodyParser = require("body-parser");

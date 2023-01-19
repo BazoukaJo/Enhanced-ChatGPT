@@ -1,3 +1,11 @@
+/**
+ * App css: Enanced ChatGPT
+ *
+ * @license MIT <https://opensource.org/licenses/MIT>
+ * @author Jonathan Pratte <https://jonathanpratte.com>
+ * @public
+ */
+
 .App {
   display: flex;
   color: white;
