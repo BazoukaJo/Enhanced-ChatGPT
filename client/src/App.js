@@ -24,7 +24,7 @@ function App() {
   const [historyIndex , setHistoryIndex] = useState(0);
   const [currentModel, setCurrentModel] = useState("text-davinci-003");
   const [temperature, setTemperature] = useState(Number(0.5));
-  const [maxTokens, setMaxTokens] = useState(parseInt(100));
+  const [maxTokens, setMaxTokens] = useState(parseInt(1000));
   const [n , setN] = useState(Number(1));
   const [best_of , setBest_of] = useState(Number(1));
 
@@ -90,7 +90,7 @@ function App() {
   //###################### END Async Functions #######################
 
   function clearChat() {
-    setChatLog([{user:"gpt",  message :{DEFAULT_QUERY}}])
+    setChatLog([{user:"gpt",  message :`${DEFAULT_QUERY}`}])
   }
 
   function setTemp(numb){
@@ -137,7 +137,7 @@ function App() {
           </div>
         <div className="models">
         <div className="tool-text">MODELS</div>
-          <select className="slection" onChange={(e)=> {setCurrentModel(e.target.value); clearChat();}}>
+          <select className="model-slection" onChange={(e)=> {setCurrentModel(e.target.value); clearChat();}}>
             {models.map((model, index) => (
               <option key={model.id} value={model.id} selected={model.id === currentModel ? model.id : ""}>
                 {model.id}
