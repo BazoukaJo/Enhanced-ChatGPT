@@ -5,7 +5,7 @@ import Prism from "prismjs";
 import { useEffect, useState } from 'react';
 
 /**
- * App: Enanced ChatGPT
+ * App frontend: Enanced ChatGPT
  *
  * @license MIT <https://opensource.org/licenses/MIT>
  * @author Jonathan Pratte <https://jonathanpratte.com>
