@@ -18,10 +18,10 @@
 
 .sidemenu {
   background-color: #202123;
-  max-width: 200px;
-  min-width: 200px;
-  padding-left: 20px;
-  padding-top: 20px;
+  max-width: 300px;
+  min-width: 300px;
+  padding-left: 30px;
+  padding-top: 30px;
   transition: ease 0.2s all;
 }
 
@@ -39,7 +39,7 @@
 }
 
 .side-menu-button-text {
-  background-color: #40414F;
+  background-color: #282830;
   border-radius: 8px;
   border: 1px solid white;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
@@ -114,8 +114,8 @@
   font-size: 1.25em;
   height: 40px;
   left: 40px;
-  margin-left: 200px;
-  min-width: 200px;
+  margin-left: 300px;
+  min-width: 300px;
   padding: 12px;
   position: fixed;
   right: 94px;
