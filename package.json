@@ -15,9 +15,11 @@
     "highlight.js": "^11.7.0",
     "highlightjs": "^9.16.2",
     "morgan": "^1.10.0",
+    "node-wav": "^0.0.2",
     "openai": "^3.1.0",
     "prismjs": "^1.29.0",
     "react-highlight.js": "^1.0.0",
-    "react-html-parser": "^2.0.2"
+    "react-html-parser": "^2.0.2",
+    "speaker": "^0.5.4"
   }
 }
