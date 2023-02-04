@@ -1,5 +1,5 @@
 /**
- * App backend: Enanced ChatGPT
+ * App Backend: Enhhanced ChatGPT
  *
  * @license MIT <https://opensource.org/licenses/MIT>
  * @author Jonathan Pratte <https://jonathanpratte.com>
@@ -8,9 +8,6 @@
 
 const CONNECTION_ERROR_MESSAGE = ":( The connection to the server failed. Press [+ New Chat], to retry if possible o7" ;
 const COMPATIBILITY_ERROR_MESSAGE = ":( This model is not compatible with nthis implementation. Please change the model. o7"
-const PREFIX = "";
-//const SUFIX = " if the answer is short, explain your answer";
-const SUFIX = ", explain your answer if the answer does not contain an explanation.";
 
 const { Configuration, OpenAIApi } = require("openai");
 const express = require('express');
@@ -31,16 +28,16 @@ const port = 3080;
 app.post('/', async (req, res) => {
     const {currentModel, message, temperature, maxTokens, best_of, n} = req.body;
     try {
-        console.log(`${PREFIX+message+SUFIX}`);
+        console.log(`${message}`);
         response = await openai.createCompletion({
             model: `${currentModel}`,// "text-davinci-003",
-            prompt: `${PREFIX+message+SUFIX}`,
+            prompt: `${message}`,
             temperature: Number(`${temperature}`),
             max_tokens: parseInt(`${maxTokens}`),
             n: Number(`${n}`),
             best_of: Number(`${best_of}`),
         });
-        let choices = response.data.choices.map(choice => choice.text)
+        let choices = response.data.choices?.map(choice => choice.text)
         .join('\n ________________________________________________________________________________\n')
         .trimStart();
         res.json({ message: choices });

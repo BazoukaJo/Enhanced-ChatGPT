@@ -1,11 +1,9 @@
 import './App.css';
 import './normal.css';
-import './prism.css';
-//import Prism from "prismjs";
 import { useEffect, useState } from 'react';
 
 /**
- * App frontend: Enanced ChatGPT
+ * App Frontend: Enhanced ChatGPT
  *
  * @license MIT <https://opensource.org/licenses/MIT>
  * @author Jonathan Pratte <https://jonathanpratte.com>
@@ -18,6 +16,8 @@ function App() {
 
   useEffect(() => {getEngines();}, []);
   const [input, setInput] = useState("");
+  const [prefix, setPrefix] = useState("");
+  const [suffix, setSuffix] = useState("");
   const [models, setModels] = useState([]);
   const [chatLog, setChatLog] = useState([{user:"gpt",  message :DEFAULT_QUERY}]);
   const [history, setHistory] = useState([{user:"gpt",  message :""}]);
@@ -48,11 +48,11 @@ function App() {
     e.preventDefault();
     let chatLogNew = [...chatLog];
     if (input !== "") {
-      chatLogNew.push({ user: "user", message: `${input}` });
+      chatLogNew.push({ user: "user", message: `${prefix + input + suffix}` });
     } else {
       chatLogNew.push({ user: "user", message: PLACE_HOLDER });
     }
-    const messages = chatLogNew.map((message) => message.message).join("\n");
+    const messages = chatLogNew?.map((message) => message.message).join("\n");
     setChatLog(chatLogNew);
     setHistoryIndex(chatLogNew.length-1);
     setHistory(chatLogNew);
@@ -77,10 +77,7 @@ function App() {
     });
     hideLoader();
     const data = await response.json();
-    // TODO: make the code syntax highlight
     console.log(data.message);
-    //let html = Prism.highlight(data.message, Prism.languages.javascript, 'javascript')
-    //setChatLog([...chatLogNew,{user:"gpt", message:`${html}`}]);
     setChatLog([...chatLogNew,{user:"gpt", message:`${data.message}`}]);
     // Scrool up
     setTimeout(function(){
@@ -91,10 +88,6 @@ function App() {
 
   function clearChat() {
     setChatLog([{user:"gpt",  message :`${DEFAULT_QUERY}`}])
-  }
-
-  function setTemp(numb){
-      setTemperature(Number(numb));
   }
 
   function showLoader() {
@@ -138,7 +131,7 @@ function App() {
         <div className="models">
         <div className="tool-text">MODELS</div>
           <select className="model-slection" onChange={(e)=> {setCurrentModel(e.target.value); clearChat();}}>
-            {models.map((model, index) => (
+            {models?.map((model, index) => (
               <option key={model.id} value={model.id} selected={model.id === currentModel ? model.id : ""}>
                 {model.id}
               </option>
@@ -147,32 +140,34 @@ function App() {
         </div>
         <div>
           <div className="tool-text">TEMPERATURE</div>
-          <input className="side-menu-button" type="number" max="1" min="0" rows="1" step="0.1" value={temperature} onChange={(e) => setTemperature(e.target.value)} />
-          <div className="side-menu-button-text" onClick={() => setTemp(0)}>0 - Logical</div>
-          <div className="side-menu-button-text" onClick={() => setTemp(0.5)}>0.5 - Balanced</div>
-          <div className="side-menu-button-text" onClick={() => setTemp(1)}>1 - Creative</div>
+          <input className="side-menu-button-input" type="number" max="1" min="0" rows="1" step="0.1" value={temperature} onChange={(e) => setTemperature(e.target.value)} />
+          <div className='min-max-infos'>0 - Logical&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Creative - 1</div>
         </div>
         <div>
-          <div className="tool-text">TOKENS</div>
-          <input className="side-menu-button" type="number" max={MAX_TOKENS} min="0" rows="1" step="10" value={maxTokens} onChange={(e) => setMaxTokens(e.target.value)} />
+          <div className="tool-text">TOKENS - Text Lenght</div>
+          <input className="side-menu-button-input" type="number" max={MAX_TOKENS} min="10" rows="1" step="10" value={maxTokens} onChange={(e) => setMaxTokens(e.target.value)} />
+          <div className='min-max-infos'>10 - Low&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;High - {MAX_TOKENS}</div>
         </div>
         <div>
           <div className="tool-text">COMPLETIONS</div>
-          <input className="side-menu-button"  type="number" max="5" min="1" rows="1" step="1" value={n} onChange={(e) => {setN(e.target.value); setBest_of(e.target.value);}}/>
+          <input className="side-menu-button-input"  type="number" max="5" min="1" rows="1" step="1" value={n} onChange={(e) => {setN(e.target.value); setBest_of(e.target.value);}}/>
+          <div className='min-max-infos'>1 -&nbsp;&nbsp;&nbsp;Number Of Answers&nbsp;&nbsp;&nbsp;- 5</div>
         </div>
       </aside>
       <section className="chatbox">
         <div className="chat-log">
-          {chatLog.map((message, index) => (
+          {chatLog?.map((message, index) => (
             <ChatMessage key={index} message={message} />
           ))}
         </div>
         <div className="Chat-input-holder">
           <form onSubmit={handleSubmit}>
+            <input className="chat-input-textarea-prefix" placeholder='Prefix' onChange={(e) => setPrefix(e.target.value)}/>
             <input className="chat-input-textarea" placeholder={PLACE_HOLDER} autoFocus rows="1" value={input} onChange={(e) => setInput(e.target.value)} />
             <button className='send-button' type="button" onClick={handleSubmit} tabIndex="-1" onFocus={focusTheTextArea}>
-              <svg version="1.1" xmlns="http://www.w3.org/2000/svg"><polygon points="4,6 22,18 4,30" fill="white" /></svg>
+              <svg version="1.1" xmlns="http://www.w3.org/2000/svg"><polygon points="0,2 18,13 0,24" fill="white" /></svg>
             </button>
+            <input className="chat-input-textarea-suffix" placeholder='Suffix' onChange={(e) => setSuffix(e.target.value)}/>
           </form>
         </div>
       </section>
