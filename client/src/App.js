@@ -37,7 +37,7 @@ function App() {
   useEffect(() => {handleListen();}, [isListening]);
   const [isReading, setIsReading] = useState(false);
   // eslint-disable-next-line
-  useEffect(() => {handleReading(0);}, [isReading]);
+  useEffect(() => {handleReading(chatLog[chatLog.length-1].message);}, [isReading]);
   const {speak, voices} = useSpeechSynthesis();
 
   //###################### Async Functions #######################
@@ -87,10 +87,11 @@ function App() {
     hideLoader();
     const data = await response.json();
     setChatLog([...chatLogNew,{user:"gpt", message:`${data.message}`}]);
+    console.log(`${data.message}`);
+    handleReading(`${data.message}`);
     // Scrool up and read
     setTimeout(function(){
       document.getElementsByClassName("chatbox")[0].scrollTo(0, document.getElementsByClassName("chat-log")[0].clientHeight);
-      handleReading(`${data.message}`);
     }, 200);
   }
   //###################### END Async Functions #######################
