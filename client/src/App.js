@@ -93,7 +93,7 @@ function App() {
    * The updated chatLog & an empty input value is set in state.
    * showLoader() is called to indicate that some processing is happening.
    * After calling the function to scroll up the chatlog window, a post request is made to a locally hosted endpoint with certain parameters to get a response from the GPT language model.
-   * The data received from the post request is processed& then a update to the chatlog with the latest informative message from "gpt" is added.
+   * The data received from the post request is processed & then a update to the chatlog with the latest informative message from "gpt" is added.
    * Finally, the UI is scrolled up and function handleReading is called to read the latest chat message.
    * After 200 milliseconds delay.
    * @param e - the event object
@@ -147,9 +147,9 @@ function App() {
   }
 
   /*
-  * This code is a function that will show a loader and disable certain buttons. 
-  * The function first sets the visibility of the element with the class 'loader' to visible. 
-  * Then, it disables the elements with classes 'record-voice-button', 'copy-button', 'read-button', and 'send-button'. 
+  * This code is a function that will show a loader and disable certain buttons.
+  * The function first sets the visibility of the element with the class 'loader' to visible.
+  * Then, it disables the elements with classes 'record-voice-button', 'copy-button', 'read-button', and 'send-button'.
   * This code is likely used to indicate that an action is being processed and prevent further user interaction until it is complete.
   */
   function showLoader() {
@@ -278,6 +278,9 @@ function App() {
     }
   }
 
+  /*
+  * This function handles the copy to clipboard by selecting the textarea and executing the os copy.
+  */
   function copyToClipboard(){
     document.getElementsByClassName("chat-input-textarea")[0].select();
     document.execCommand("copy");
