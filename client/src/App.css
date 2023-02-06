@@ -18,8 +18,8 @@
 
 .sidemenu {
   background-color: #202123;
-  max-width: 260px;
-  min-width: 260px;
+  max-width: 220px;
+  min-width: 220px;
   padding-left: 30px;
   padding-top: 30px;
 }
@@ -83,7 +83,7 @@
   bottom: 40px;
   height: 30px;
   position: fixed;
-  right: 55px;
+  right: 45px;
   transition: ease 0.2s all;
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
@@ -99,7 +99,7 @@
   border-radius: 8px;
   bottom: 40px;
   height: 30px;
-  left:300px;
+  left:270px;
   position: fixed;
   transition: ease 0.2s all;
   width: 30px;
@@ -115,9 +115,9 @@
 .read-button{
   background-color: #40414f;
   border-radius: 8px;
-  top: 25px;
+  bottom: 75px;
   height: 30px;
-  right:25px;
+  left: 270px;
   position: fixed;
   transition: ease 0.2s all;
   width: 30px;
@@ -135,7 +135,7 @@
   border-radius: 8px;
   bottom: 5px;
   height: 30px;
-  left:300px;
+  left:270px;
   position: fixed;
   transition: ease 0.2s all;
   width: 30px;
@@ -171,11 +171,11 @@
   font-size: 1.25em;
   height: 30px;
   left: 40px;
-  margin-left: 300px;
-  min-width: 300px;
+  margin-left: 265px;
+  min-width: 270px;
   padding: 12px;
   position: fixed;
-  right: 94px;
+  right: 80px;
   transition: ease 0.2s all;
   outline: 1px solid rgb(111, 111, 111);
 }
@@ -191,8 +191,8 @@
   font-size: 1.25em;
   height: 30px;
   left: 40px;
-  margin-left: 300px;
-  min-width: 300px;
+  margin-left: 265px;
+  min-width: 265px;
   padding: 12px;
   position: fixed;
   width: 35%;
@@ -210,8 +210,8 @@
   font-size: 1.25em;
   height: 30px;
   left: 40px;
-  margin-left: 300px;
-  min-width: 300px;
+  margin-left: 265px;
+  min-width: 265px;
   padding: 12px;
   position: fixed;
   width: 35%;
@@ -306,7 +306,7 @@
   position:fixed;
   bottom: 37px;
   height: 30px;
-  left:303px;
+  left:274px;
 }
 
 .mute{

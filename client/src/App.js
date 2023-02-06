@@ -199,17 +199,17 @@ function App() {
         <div>
           <div className="tool-text">TEMPERATURE</div>
           <input className="side-menu-button-input" type="number" max="1" min="0" rows="1" step="0.1" value={temperature} onChange={(e) => setTemperature(e.target.value)} />
-          <div className='min-max-infos'>0 - Logical&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Creative - 1</div>
+          <div className='min-max-infos'>0 - Logical&nbsp;&nbsp;&nbsp;&nbsp;Creative - 1</div>
         </div>
         <div>
-          <div className="tool-text">TOKENS - Text Lenght</div>
+          <div className="tool-text">TOKENS - LENGTH</div>
           <input className="side-menu-button-input" type="number" max={MAX_TOKENS} min="10" rows="1" step="10" value={maxTokens} onChange={(e) => setMaxTokens(e.target.value)} />
-          <div className='min-max-infos'>10 - Low&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;High - {MAX_TOKENS}</div>
+          <div className='min-max-infos'>10 - Low&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;High - {MAX_TOKENS}</div>
         </div>
         <div>
           <div className="tool-text">COMPLETIONS</div>
           <input className="side-menu-button-input"  type="number" max="5" min="1" rows="1" step="1" value={n} onChange={(e) => {setN(e.target.value); setBest_of(e.target.value);}}/>
-          <div className='min-max-infos'>1 -&nbsp;&nbsp;&nbsp;Number Of Answers&nbsp;&nbsp;&nbsp;- 5</div>
+          <div className='min-max-infos'>1 -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Answers&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 5</div>
         </div>
       </aside>
       <section className="chatbox">
