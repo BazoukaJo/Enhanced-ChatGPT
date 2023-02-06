@@ -7,7 +7,7 @@
  * This script sets up a Node.js server that uses the OpenAI API to connect to OpenAI's language model.
  */
 
-// Mmessages for display in case of connectivity or compatibility errors.
+// Messages for display in case of connectivity or compatibility errors.
 const CONNECTION_ERROR_MESSAGE = ":( The connection to the server failed. Press [+ New Chat], to retry if possible o7" ;
 const COMPATIBILITY_ERROR_MESSAGE = ":( This model is not compatible with nthis implementation. Please change the model. o7"
 

@@ -268,22 +268,21 @@ function App() {
   const handleReading = (message) => {
     if (isReading) {
       //console.log(message);
-      speak({text:message, voice: voices[2]});
+      speak({text:message, voice:voices[2]});
       showMute();
     }
     else{
       //console.log("stopReading");
-      speak({ text: '', stop: true });
+      speak({text:'', stop:true});
       hideMute();
     }
   }
 
   /*
-  * This function handles the copy to clipboard by selecting the textarea and executing the os copy.
+  * This function handles the copy to clipboard by navigator copy.
   */
   function copyToClipboard(){
-    document.getElementsByClassName("chat-input-textarea")[0].select();
-    document.execCommand("copy");
+    navigator.clipboard.writeText(chatLog[chatLog.length-1].message);
   }
 
   //###################### Return HTML ########################
@@ -334,7 +333,8 @@ function App() {
             <button className='send-button' type="button" title="Send Prompt" onClick={handleSubmit} tabIndex="-1" onFocus={focusTheTextArea}>
               <svg width="16" height="27" fill="currentColor" viewBox="0 0 16 16"><path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/></svg>
             </button>
-            <button className='record-voice-button' type="button" title="Record Voice"onClick={() => setIsListening(prevState => !prevState)}>
+          </form>
+          <button className='record-voice-button' type="button" title="Record Voice"onClick={() => setIsListening(prevState => !prevState)}>
               <svg width="16" height="27" fill="currentColor" viewBox="0 0 16 16"><path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"/><path d="M10 8a2 2 0 1 1-4 0V3a2 2 0 1 1 4 0v5zM8 0a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V3a3 3 0 0 0-3-3z"/></svg>
               <div className="recorder">
                 <svg height="24" width="24"><circle cx="12" cy="12" r="10" stroke="black" fill="red" /></svg>
@@ -353,7 +353,6 @@ function App() {
                 <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06zM6 5.04 4.312 6.39A.5.5 0 0 1 4 6.5H2v3h2a.5.5 0 0 1 .312.11L6 10.96V5.04zm7.854.606a.5.5 0 0 1 0 .708L12.207 8l1.647 1.646a.5.5 0 0 1-.708.708L11.5 8.707l-1.646 1.647a.5.5 0 0 1-.708-.708L10.793 8 9.146 6.354a.5.5 0 1 1 .708-.708L11.5 7.293l1.646-1.647a.5.5 0 0 1 .708 0z"/></svg>
               </div>
             </button>
-          </form>
         </div>
       </section>
       <div className="loader">
