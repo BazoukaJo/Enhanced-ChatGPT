@@ -27,7 +27,6 @@
 .side-menu-button {
   background-color: #40414F;
   border-radius: 8px;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
   color: white;
   height: 30px;
   margin-bottom: 5px;
@@ -40,13 +39,11 @@
 .side-menu-button-input {
   background-color: #40414F;
   border-radius: 8px;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
   color: white;
   height: 30px;
   margin-bottom: 5px;
   padding-left: 10px;
   width: 90%;
-  outline: 1px solid rgb(111, 111, 111);
 }
 
 .min-max-infos{
@@ -80,18 +77,73 @@
 }
 
 .send-button {
+  color:white;
   background-color: #40414f;
   border-radius: 8px;
   bottom: 40px;
   height: 30px;
   position: fixed;
-  right: 50px;
+  right: 55px;
   transition: ease 0.2s all;
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
 }
 
 .send-button:hover {
+  background-color: #222222;
+  transition: ease 0.2s all;
+}
+
+.record-voice-button{
+  background-color: #40414f;
+  border-radius: 8px;
+  bottom: 40px;
+  height: 30px;
+  left:300px;
+  position: fixed;
+  transition: ease 0.2s all;
+  width: 30px;
+  outline: 1px solid rgb(111, 111, 111);
+  color:white;
+}
+
+.record-voice-button:hover {
+  background-color: #222222;
+  transition: ease 0.2s all;
+}
+
+.read-button{
+  background-color: #40414f;
+  border-radius: 8px;
+  top: 25px;
+  height: 30px;
+  right:25px;
+  position: fixed;
+  transition: ease 0.2s all;
+  width: 30px;
+  outline: 1px solid rgb(111, 111, 111);
+  color:white;
+}
+
+.read-button:hover {
+  background-color: #222222;
+  transition: ease 0.2s all;
+}
+
+.copy-button{
+  background-color: #40414f;
+  border-radius: 8px;
+  bottom: 5px;
+  height: 30px;
+  left:300px;
+  position: fixed;
+  transition: ease 0.2s all;
+  width: 30px;
+  outline: 1px solid rgb(111, 111, 111);
+  color:white;
+}
+
+.copy-button:hover{
   background-color: #222222;
   transition: ease 0.2s all;
 }
@@ -143,7 +195,7 @@
   min-width: 300px;
   padding: 12px;
   position: fixed;
-  right: 400px;
+  width: 35%;
   transition: ease 0.2s all;
   outline: 1px solid rgb(111, 111, 111);
 }
@@ -162,7 +214,7 @@
   min-width: 300px;
   padding: 12px;
   position: fixed;
-  right: 400px;
+  width: 35%;
   transition: ease 0.2s all;
   outline: 1px solid rgb(111, 111, 111);
 }
@@ -249,6 +301,25 @@
   white-space: break-spaces;
 }
 
+.recorder{
+  visibility: hidden;
+  position:fixed;
+  bottom: 37px;
+  height: 30px;
+  left:303px;
+}
+
+.mute{
+  visibility: hidden;
+  margin-top: -22px;
+  margin-left: -2px;
+}
+
+.unmute{
+  visibility:visible;
+  margin-top: 2px;
+}
+
 .loader {
   animation-delay: 0s;
   animation-direction: left;
@@ -264,7 +335,7 @@
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
   height: 40px;
   position: fixed;
-  right: 45px;
+  right: 50px;
   transition: ease 0.2s all;
   visibility: hidden;
   width: 40px;

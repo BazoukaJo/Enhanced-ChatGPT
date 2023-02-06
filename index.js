@@ -28,7 +28,6 @@ const port = 3080;
 app.post('/', async (req, res) => {
     const {currentModel, message, temperature, maxTokens, best_of, n} = req.body;
     try {
-        console.log(`${message}`);
         response = await openai.createCompletion({
             model: `${currentModel}`,// "text-davinci-003",
             prompt: `${message}`,
