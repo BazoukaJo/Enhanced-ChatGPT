@@ -148,6 +148,24 @@
   transition: ease 0.2s all;
 }
 
+.copy-current-button{
+  background-color: #40414f;
+  border-radius: 8px;
+  height: 30px;
+  position:relative;
+  transition: ease 0.2s all;
+  width: 30px;
+  outline: 1px solid rgb(111, 111, 111);
+  color:white;
+  top:-4px;
+  left:5px;
+}
+
+.copy-current-button:hover{
+  background-color: #222222;
+  transition: ease 0.2s all;
+}
+
 .chat-log {
   text-align: left;
   transition: ease 0.2s all;

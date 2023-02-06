@@ -38,13 +38,13 @@ function App() {
 
   // chatLog set with state hook useState
   // with initial value an array of an object consisting of "user" and message property
-  const [chatLog, setChatLog] = useState([{
-  user:"gpt",
-  message :DEFAULT_QUERY
-  }]);
+  const [chatLog, setChatLog] = useState([{user:"gpt", message :DEFAULT_QUERY}]);
 
   // Set currentModel with default value 'DEFAULT_MODEL' using state hook useState
   const [currentModel, setCurrentModel] = useState(DEFAULT_MODEL);
+
+  // Set History Index to cycle trough history 
+  const [historyIndex, setHistoryIndex] = useState(0);
 
   // temperature is set with state hook with 0.5 as the initial value
   const [temperature, setTemperature] = useState(Number(0.5));
@@ -150,7 +150,6 @@ function App() {
   * This code is a function that will show a loader and disable certain buttons.
   * The function first sets the visibility of the element with the class 'loader' to visible.
   * Then, it disables the elements with classes 'record-voice-button', 'copy-button', 'read-button', and 'send-button'.
-  * This code is likely used to indicate that an action is being processed and prevent further user interaction until it is complete.
   */
   function showLoader() {
     document.querySelector('.loader').style.visibility = "visible";
@@ -278,11 +277,40 @@ function App() {
     }
   }
 
+  //navigator.clipboard.writeText(chatLog[chatLog.length-1].message);
+
   /*
   * This function handles the copy to clipboard by navigator copy.
   */
-  function copyToClipboard(){
-    navigator.clipboard.writeText(chatLog[chatLog.length-1].message);
+  function copyToClipboard(message){
+    navigator.clipboard.writeText(message);
+  }
+
+  // This function handle key down and up to cycle through history
+  let timer;
+  let keyEventHandler = function(key) {
+    clearTimeout(timer);
+    timer = setTimeout(function(){
+      if (key.keyCode === 38) {
+        cycleHistory(1);
+      } else if (key.keyCode === 40) {
+        cycleHistory(-1);
+      }
+    },0.001);
+  };
+  document.addEventListener("keydown", keyEventHandler);
+
+  // This function cycle through history
+  function cycleHistory(index){
+    let nextIndex = historyIndex + index;
+    if(nextIndex < 0){
+      nextIndex = chatLog.length-1;
+    }
+    else if(nextIndex > chatLog.length-1){
+      nextIndex = 0;
+    }
+    setHistoryIndex(nextIndex);
+    setInput(chatLog[nextIndex].message);
   }
 
   //###################### Return HTML ########################
@@ -340,7 +368,7 @@ function App() {
                 <svg height="24" width="24"><circle cx="12" cy="12" r="10" stroke="black" fill="red" /></svg>
               </div>
             </button>
-            <button className="copy-button" title="Copy To Clipboard"onClick={() => copyToClipboard()}>
+            <button className="copy-button" title="Copy Input To Clipboard"onClick={() => copyToClipboard(document.getElementsByClassName("chat-input-textarea")[0].value)}>
               <div>
                 <svg width="16" height="16" fill="currentColor" viewBox="-2 -4 20 20"><path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
               </div>
@@ -383,6 +411,11 @@ const ChatMessage = ({message}) => {
           {message.user === "user" &&
             <span className='simple-message'>{message.message}</span>}
         </div>
+        <button className="copy-current-button" title="Copy To Clipboard" onClick={navigator.clipboard.writeText(message.message)}>
+          <div>
+            <svg width="16" height="16" fill="currentColor" viewBox="-2 -4 20 20"><path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+          </div>
+        </button>
       </div>
     </div>
   );

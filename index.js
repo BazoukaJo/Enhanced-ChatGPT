@@ -17,7 +17,7 @@ const express = require('express');
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
-/* 
+/*
 * OpenAI key stored in an environment file, ".env".
 */
 let key = process.env.OPENAI_KEY;//store your key in the .env file, create it with OPENAI_KEY='YourKey' if don't exist.
