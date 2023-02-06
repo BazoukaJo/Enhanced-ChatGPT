@@ -17,7 +17,7 @@ mic.lang = 'en-US';
  */
 function App() {
   const MAX_TOKENS = parseInt(4096);
-  const PLACE_HOLDER = "Question";
+  const PLACE_HOLDER = "Prompt";
   const DEFAULT_QUERY = "Ask me anything...";
   const DEFAULT_MODEL = "text-davinci-003";
 
@@ -37,7 +37,7 @@ function App() {
   useEffect(() => {handleListen();}, [isListening]);
   const [isReading, setIsReading] = useState(false);
   // eslint-disable-next-line
-  useEffect(() => {handleReading(`${chatLog[chatLog.length-1]?.message}`);}, [isReading]);
+  useEffect(() => {handleReading(0);}, [isReading]);
   const {speak, voices} = useSpeechSynthesis();
 
   //###################### Async Functions #######################
@@ -101,10 +101,18 @@ function App() {
 
   function showLoader() {
     document.querySelector('.loader').style.visibility = "visible";
+    document.querySelector('.record-voice-button').disabled = true;
+    document.querySelector('.copy-button').disabled = true;
+    document.querySelector('.read-button').disabled = true;
+    document.querySelector('.send-button').disabled = true;
   }
 
   function hideLoader() {
     document.querySelector('.loader').style.visibility = "hidden";
+    document.querySelector('.record-voice-button').disabled = false;
+    document.querySelector('.copy-button').disabled = false;
+    document.querySelector('.read-button').disabled = false;
+    document.querySelector('.send-button').disabled = false;
   }
 
   function showRecorder() {

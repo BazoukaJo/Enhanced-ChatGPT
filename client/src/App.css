@@ -180,6 +180,11 @@
   outline: 1px solid rgb(111, 111, 111);
 }
 
+.chat-input-textarea:hover {
+  background-color: #222222;
+  transition: ease 0.2s all;
+}
+
 .chat-input-textarea-prefix {
   background-color: #373744;
   border-radius: 8px;
@@ -200,6 +205,11 @@
   outline: 1px solid rgb(111, 111, 111);
 }
 
+.chat-input-textarea-prefix:hover {
+  background-color: #222222;
+  transition: ease 0.2s all;
+}
+
 .chat-input-textarea-suffix {
   background-color: #373744;
   border-radius: 8px;
@@ -217,6 +227,11 @@
   width: 35%;
   transition: ease 0.2s all;
   outline: 1px solid rgb(111, 111, 111);
+}
+
+.chat-input-textarea-suffix:hover {
+  background-color: #222222;
+  transition: ease 0.2s all;
 }
 
 .model-slection {
@@ -335,7 +350,7 @@
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
   height: 40px;
   position: fixed;
-  right: 50px;
+  right: 40px;
   transition: ease 0.2s all;
   visibility: hidden;
   width: 40px;
