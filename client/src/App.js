@@ -16,28 +16,62 @@ mic.lang = 'en-US';
  * @public
  */
 function App() {
+  // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
   const MAX_TOKENS = parseInt(4096);
+
+  // PLACE_HOLDER set to "Prompt".
   const PLACE_HOLDER = "Prompt";
+
+  // DEFAULT_QUERY set to text "Ask me anything...".
   const DEFAULT_QUERY = "Ask me anything...";
+
+  // DEFAULT_MODEL set to "text-davinci-003".
   const DEFAULT_MODEL = "text-davinci-003";
 
+  // declare input, prefix and suffix with state hook useState
   const [input, setInput] = useState("");
   const [prefix, setPrefix] = useState("");
   const [suffix, setSuffix] = useState("");
+
+  // models set with list of objects using state hook useState
   const [models, setModels] = useState([]);
-  const [chatLog, setChatLog] = useState([{user:"gpt",  message :DEFAULT_QUERY}]);
+
+  // chatLog set with state hook useState
+  // with initial value an array of an object consisting of "user" and message property
+  const [chatLog, setChatLog] = useState([{
+  user:"gpt",
+  message :DEFAULT_QUERY
+  }]);
+
+  // Set currentModel with default value 'DEFAULT_MODEL' using state hook useState
   const [currentModel, setCurrentModel] = useState(DEFAULT_MODEL);
+
+  // temperature is set with state hook with 0.5 as the initial value
   const [temperature, setTemperature] = useState(Number(0.5));
+
+  // maxTokens is set with state hook with 1000 parsed to an integer as the initial value
   const [maxTokens, setMaxTokens] = useState(parseInt(1000));
+
+  // declare 'n' with state hook with 1 as initial value
   const [n , setN] = useState(Number(1));
+
+  // declare 'best_of' with state hook with 1 as initial value
   const [best_of , setBest_of] = useState(Number(1));
+
+  // call getEngines() when component is mounted
   useEffect(() => {getEngines();}, []);
+
+  // declare isListening as false with state hook, toggle when handleListen() called
   const [isListening, setIsListening] = useState(false);
   // eslint-disable-next-line
   useEffect(() => {handleListen();}, [isListening]);
+
+  // declare isReading as false with state hook toggle isReading() when called
   const [isReading, setIsReading] = useState(false);
   // eslint-disable-next-line
   useEffect(() => {handleReading(chatLog[chatLog.length-1].message);}, [isReading]);
+
+  // voice synthesis hook
   const {speak, voices} = useSpeechSynthesis();
 
   //###################### Async Functions #######################
@@ -52,8 +86,16 @@ function App() {
   }
 
   /**
-   * It takes the input from the user, sends it to the server, and then displays the response from the
-   * server.
+   * This code is a messaging platform where a user can chat with a chatbot powered by OpenAI's language model.
+   * A copy of current chatlog, chatLog, is made and assigned to chatLogNew.
+   * If the input value is not an empty string, a new message object is created and added to chatLogNew
+   * The messages are mapped to their respective messages and joined into a single text string.
+   * The updated chatLog & an empty input value is set in state.
+   * showLoader() is called to indicate that some processing is happening.
+   * After calling the function to scroll up the chatlog window, a post request is made to a locally hosted endpoint with certain parameters to get a response from the GPT language model.
+   * The data received from the post request is processed& then a update to the chatlog with the latest informative message from "gpt" is added.
+   * Finally, the UI is scrolled up and function handleReading is called to read the latest chat message.
+   * After 200 milliseconds delay.
    * @param e - the event object
    */
   async function handleSubmit(){
@@ -87,7 +129,7 @@ function App() {
     hideLoader();
     const data = await response.json();
     setChatLog([...chatLogNew,{user:"gpt", message:`${data.message}`}]);
-    console.log(`${data.message}`);
+    //console.log(`${data.message}`);
     handleReading(`${data.message}`);
     // Scrool up and read
     setTimeout(function(){
@@ -96,10 +138,20 @@ function App() {
   }
   //###################### END Async Functions #######################
 
+  /*
+  * function to clear the chat messages
+  * set chatLog to an array with one object containing a message from "gpt" with value "DEFAULT_QUERY"
+  */
   function clearChat() {
     setChatLog([{user:"gpt",  message :`${DEFAULT_QUERY}`}])
   }
 
+  /*
+  * This code is a function that will show a loader and disable certain buttons. 
+  * The function first sets the visibility of the element with the class 'loader' to visible. 
+  * Then, it disables the elements with classes 'record-voice-button', 'copy-button', 'read-button', and 'send-button'. 
+  * This code is likely used to indicate that an action is being processed and prevent further user interaction until it is complete.
+  */
   function showLoader() {
     document.querySelector('.loader').style.visibility = "visible";
     document.querySelector('.record-voice-button').disabled = true;
@@ -108,6 +160,12 @@ function App() {
     document.querySelector('.send-button').disabled = true;
   }
 
+  /*
+  * This function hides the loader and enables all the buttons on the page.
+  * It uses document.querySelector() to select elements with the class 'loader',
+  * 'record-voice-button', 'copy-button', 'read-button', and 'send-button'
+  * and sets their visibility to hidden and disabled property to false.
+  */
   function hideLoader() {
     document.querySelector('.loader').style.visibility = "hidden";
     document.querySelector('.record-voice-button').disabled = false;
@@ -116,28 +174,59 @@ function App() {
     document.querySelector('.send-button').disabled = false;
   }
 
+  /*
+  * This function shows the recorder by making it visible. It uses the document.
+  * querySelector() method to select the element with the class of 'recorder' and then sets its
+  * style.visibility property to "visible".
+  */
   function showRecorder() {
     document.querySelector('.recorder').style.visibility = "visible";
   }
 
+  /*
+  * This function hides an element with the class of "recorder" by changing its visibility to "hidden".
+  * It uses the querySelector() method to select the element and then sets its
+  * style.visibility property to "hidden".
+  */
   function hideRecorder() {
     document.querySelector('.recorder').style.visibility = "hidden";
   }
 
+  /*
+  * This function hides or shows an element with the class of "mute" and "unmute" by changing its visibility to "hidden" or "visible".
+  * It uses the querySelector() method to select the element and then sets its
+  * style.visibility property to "hidden" or "visible".
+  */
   function showMute() {
     document.querySelector('.mute').style.visibility = "visible";
     document.querySelector('.unmute').style.visibility = "hidden";
   }
 
+  /*
+  * This function hides or shows an element with the class of "mute" and "unmute" by changing its visibility to "hidden" or "visible".
+  * It uses the querySelector() method to select the element and then sets its
+  * style.visibility property to "hidden" or "visible".
+  */
   function hideMute() {
     document.querySelector('.mute').style.visibility = "hidden";
     document.querySelector('.unmute').style.visibility = "visible";
   }
 
+  /*
+  * This function focuses the text area element with the class name "chat-input-textarea".
+  * It uses the getElementsByClassName() method to select the element and then calls the focus() method on it.
+  */
   function focusTheTextArea(){
     document.getElementsByClassName("chat-input-textarea")[0].focus();
   }
 
+  /*
+  * This code is a function that handles listening with a microphone.
+  * It checks if the microphone is listening, and if it is, it starts the microphone and sets an 'onend' event listener.
+  * If the microphone is not listening, it stops the microphone and sets an 'onend' event listener.
+  * It also sets an 'onstart' event listener which shows the recorder, and an 'onresult'
+  * event listener which sets the input to the transcript of what was said. Finally, it sets an 'onerror' event listener which logs any errors that occur.
+  */
   const handleListen = () => {
     if (isListening) {
       mic.start();
@@ -169,6 +258,13 @@ function App() {
     }
   }
 
+  /*
+  * This function handles the reading of a message.
+  * If the boolean variable isReading is true, the message will be
+  * spoken using the third voice in the voices array and the showMute()
+  * function will be called. If isReading is false, an empty string will 
+  * be spoken and the hideMute() function will be called.
+  */
   const handleReading = (message) => {
     if (isReading) {
       //console.log(message);
