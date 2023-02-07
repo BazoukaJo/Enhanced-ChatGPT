@@ -166,6 +166,60 @@
   transition: ease 0.2s all;
 }
 
+.clear-button{
+  color:white;
+  background-color: #40414f;
+  border-radius: 8px;
+  bottom: 40px;
+  height: 30px;
+  position: fixed;
+  right: 80px;
+  transition: ease 0.2s all;
+  width: 30px;
+  outline: 1px solid rgb(111, 111, 111);
+}
+
+.clear-button:hover{
+  background-color: #222222;
+  transition: ease 0.2s all;
+}
+
+.clear-button-prefix{
+  color:white;
+  background-color: #40414f;
+  border-radius: 8px;
+  bottom: 75px;
+  height: 30px;
+  position: fixed;
+  right: 80px;
+  transition: ease 0.2s all;
+  width: 30px;
+  outline: 1px solid rgb(111, 111, 111);
+}
+
+.clear-button-prefix:hover{
+  background-color: #222222;
+  transition: ease 0.2s all;
+}
+
+.clear-button-suffix{
+  color:white;
+  background-color: #40414f;
+  border-radius: 8px;
+  bottom: 5px;
+  height: 30px;
+  position: fixed;
+  right: 80px;
+  transition: ease 0.2s all;
+  width: 30px;
+  outline: 1px solid rgb(111, 111, 111);
+}
+
+.clear-button-suffix:hover{
+  background-color: #222222;
+  transition: ease 0.2s all;
+}
+
 .chat-log {
   text-align: left;
   transition: ease 0.2s all;
@@ -193,7 +247,7 @@
   min-width: 270px;
   padding: 12px;
   position: fixed;
-  right: 80px;
+  right: 116px;
   transition: ease 0.2s all;
   outline: 1px solid rgb(111, 111, 111);
 }
@@ -218,7 +272,7 @@
   min-width: 265px;
   padding: 12px;
   position: fixed;
-  width: 35%;
+  right: 116px;
   transition: ease 0.2s all;
   outline: 1px solid rgb(111, 111, 111);
 }
@@ -242,7 +296,7 @@
   min-width: 265px;
   padding: 12px;
   position: fixed;
-  width: 35%;
+  right: 116px;
   transition: ease 0.2s all;
   outline: 1px solid rgb(111, 111, 111);
 }

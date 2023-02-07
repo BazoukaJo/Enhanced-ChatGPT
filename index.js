@@ -9,7 +9,7 @@
 
 // Messages for display in case of connectivity or compatibility errors.
 const CONNECTION_ERROR_MESSAGE = ":( The connection to the server failed. Press [+ New Chat], to retry if possible o7" ;
-const COMPATIBILITY_ERROR_MESSAGE = ":( This model is not compatible with nthis implementation. Please change the model. o7"
+const COMPATIBILITY_ERROR_MESSAGE = ":( This model is not compatible with nthis implementation or has failed to connect. Please change the model or press + New Chat. o7"
 
 //NPM packages: openai, express, bodyParser and cors.
 const { Configuration, OpenAIApi } = require("openai");
