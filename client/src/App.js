@@ -105,7 +105,7 @@ function App() {
     if(input === "") return;
     let chatLogNew = [...chatLog];
     if (input !== "") {
-      chatLogNew.push({ user:"user", message:`${prefix + (prefix === "" ? "" : " ; ") + input + (suffix === "" ? "" : " ; ") + suffix}` });
+      chatLogNew.push({ user:"user", message:`${prefix + (prefix === "" ? "" : "\n") + input + (suffix === "" ? "" : "\n") + suffix}` });
     } else {
       chatLogNew.push({ user:"user", message:"Prompt"});
     }
@@ -336,7 +336,7 @@ function App() {
           </div>
         <div className="models">
         <div className="tool-text">MODELS</div>
-          <select className="model-slection" onChange={(e)=> {setCurrentModel(e.target.value); clearChat();}} value={DEFAULT_MODEL}>
+          <select className="model-slection" onChange={(e)=> {setCurrentModel(e.target.value); clearChat();}} value={currentModel}>
             {models?.map((model, index) => (
               <option key={model.id} value={model.id}>
                 {model.id}
@@ -363,12 +363,12 @@ function App() {
           <div className='infos'>Delete : New Prompts</div>
           <div className='infos'>Home : Speak To GPT</div>
           <div className='infos'>End : Read By GPT</div>
+          <div className='infos'>Up Down : History</div>
           <div className='infos'>&nbsp;</div>
           <div className='infos'>Keywords :</div>
           <div className='infos'>[INSTUCTIONS] text=""</div>
           <div className='infos'>generate - {"{text}"} - {"{code}"}</div>
           <div className='infos'>correct - provide - table</div>
-          <div className='infos'>...</div>
         </div>
       </aside>
       <section className="chatbox">
