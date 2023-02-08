@@ -16,7 +16,14 @@ mic.lang = 'en-US';
  * @public
  */
 function App() {
+  // ERROR_MESSAGE define the default message error.
   const ERROR_MESSAGE = "Connection Or Compatibility Error";
+
+  // DEFAULT_MAX_TOLKEN define the default max tolkens.
+  const DEFAULT_MAX_TOLKEN = 1000;
+
+  // DEFAULT_TEMPERATURE define the value of the default temperature.
+  const DEFAULT_TEMPERATURE = 0.7;
 
   // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
   const MAX_TOKENS = parseInt(4096);
@@ -46,10 +53,10 @@ function App() {
   const [historyIndex, setHistoryIndex] = useState(0);
 
   // temperature is set with state hook with 0.5 as the initial value
-  const [temperature, setTemperature] = useState(Number(0.5));
+  const [temperature, setTemperature] = useState(Number(DEFAULT_TEMPERATURE));
 
   // maxTokens is set with state hook with 100 parsed to an integer as the initial value
-  const [maxTokens, setMaxTokens] = useState(parseInt(100));
+  const [maxTokens, setMaxTokens] = useState(parseInt(DEFAULT_MAX_TOLKEN));
 
   // declare 'n' with state hook with 1 as initial value
   const [n, setN] = useState(Number(1));
@@ -103,12 +110,9 @@ function App() {
   async function handleSubmit(){
     //console.log("**handleSubmit**");
     if(input === "") return;
+    //Pre request
     let chatLogNew = [...chatLog];
-    if (input !== "") {
-      chatLogNew.push({ user:"user", message:`${prefix + (prefix === "" ? "" : "\n") + input + (suffix === "" ? "" : "\n") + suffix}` });
-    } else {
-      chatLogNew.push({ user:"user", message:"Prompt"});
-    }
+    chatLogNew.push({ user:"user", message:`${prefix + (prefix === "" ? "" : "\n") + input + (suffix === "" ? "" : "\n") + suffix}` });
     setChatLog(chatLogNew);
     const messages = chatLogNew?.map((message) => message.message).join("\n");
     setInput("");
@@ -117,6 +121,8 @@ function App() {
     setTimeout(function(){
       document.getElementsByClassName("chatbox")[0].scrollTo(0, document.getElementsByClassName("chat-log")[0].clientHeight);
     }, 2);
+
+    // POST request
     const response = await fetch("http://localhost:3080/", {
       method:"POST",
       headers: {"content-type": "application/json"},
@@ -131,6 +137,8 @@ function App() {
       })
     });
     const data = await response.json();
+
+    // Post
     if(data.message !== ERROR_MESSAGE){
       setChatLog([...chatLogNew,{user:"gpt", message:`${data.message}`}]);
       //console.log(`${data.message}`);
@@ -292,28 +300,28 @@ function App() {
     }
   }
 
-  // This function will handle Enter, Home, End, Up and Down key press
+  // This function will handle Delete Home, End, Up and Down key press
   let timer;
   let keyEventHandler = function(event) {
     clearTimeout(timer);
     timer = setTimeout(function(){
       //console(event.keyCode);
-      if (event.keyCode === 38) {//up key
+      if (event.keyCode === 38) {//Up key, cycle history in text input
         cycleHistory(1);
-      } else if (event.keyCode === 40) {//down key
+      } else if (event.keyCode === 40) {//Down key, cycle history in text input
         cycleHistory(-1);
-      } else if (event.keyCode === 36) {//end key
+      } else if (event.keyCode === 36) {//End key, toggle GPT read the text
         setIsListening(prevState => !prevState);
-      } else if (event.keyCode === 35) {//home key
+      } else if (event.keyCode === 35) {//Home key, toggle speack to GPT
         setIsReading(prevState => !prevState);
-      } else if (event.keyCode === 46) {//home key
+      } else if (event.keyCode === 46) {//Delete key, new prompt
         clearChat();
       }
     },0.0001);
   };
   document.addEventListener("keydown", keyEventHandler);
 
-  // This function cycle through history
+  // This function cycle through history display in the input text.
   function cycleHistory(index){
     let nextIndex = historyIndex + index;
     if(nextIndex < 0){
@@ -336,7 +344,7 @@ function App() {
           </div>
         <div className="models">
         <div className="tool-text">MODELS</div>
-          <select className="model-slection" onChange={(e)=> {setCurrentModel(e.target.value); clearChat();}} value={currentModel}>
+          <select className="model-slection" onChange={(e) => {setCurrentModel(e.target.value); clearChat();}} value={currentModel}>
             {models?.map((model, index) => (
               <option key={model.id} value={model.id}>
                 {model.id}
@@ -379,14 +387,14 @@ function App() {
         </div>
         <div className="Chat-input-holder">
           <div className="form1" onKeyDown={(e) => {e.keyCode === 13 && handleSubmit()}}>
-            <input type="text" className="chat-input-textarea" placeholder="Prompt" autoFocus rows="1" value={input} onChange={(e) => setInput(e.target.value)} />
+            <input type="text" className="chat-input-textarea" onChange={(e) => setInput(e.target.value)} placeholder="Prompt" autoFocus rows="1" value={input} />
           </div>
           <input className="chat-input-textarea-prefix" onChange={(e) => setPrefix(e.target.value)} placeholder='Prefix' value={prefix} />
           <input className="chat-input-textarea-suffix" onChange={(e) => setSuffix(e.target.value)} placeholder='Suffix' value={suffix} />
-          <button className='send-button' onClick={(e)=>{handleSubmit()}} tabIndex="-1" onFocus={(e) => {focusTheTextArea()}}type="button"  title="Send Prompt to GPT" >
+          <button className='send-button' onClick={(e) => {handleSubmit()}} tabIndex="-1" onFocus={(e) => {focusTheTextArea()}}type="button"  title="Send Prompt to GPT" >
             <svg width="16" height="27" fill="currentColor" viewBox="0 0 16 16"><path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/></svg>
           </button>
-          <button className='record-voice-button' type="button" title="Record Voice To Prompt - Shortcut : Home"onClick={() => setIsListening(prevState => !prevState)}>
+          <button className='record-voice-button' onClick={() => setIsListening(prevState => !prevState)} type="button" title="Record Voice To Prompt - Shortcut : Home">
             <svg width="16" height="27" fill="currentColor" viewBox="0 0 16 16"><path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"/><path d="M10 8a2 2 0 1 1-4 0V3a2 2 0 1 1 4 0v5zM8 0a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V3a3 3 0 0 0-3-3z"/></svg>
             <div className="recorder">
               <svg height="24" width="24"><circle cx="12" cy="12" r="10" stroke="black" fill="red" /></svg>
@@ -397,7 +405,7 @@ function App() {
             <svg width="18" height="18" fill="currentColor" viewBox="1 -1 16 17"><path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
             </div>
           </button>
-          <button className='read-button' title="Answers Read By AI - Shorcut : End" type="button" onClick={(e) => setIsReading(prevState => !prevState)}>
+          <button className='read-button' onClick={(e) => setIsReading(prevState => !prevState)} title="Answers Read By AI - Shorcut : End" type="button"  >
             <div className="unmute">
               <svg width="20" height="20" fill="currentColor" viewBox="1.5 -1 16 16"><path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/><path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"/><path d="M10.025 8a4.486 4.486 0 0 1-1.318 3.182L8 10.475A3.489 3.489 0 0 0 9.025 8c0-.966-.392-1.841-1.025-2.475l.707-.707A4.486 4.486 0 0 1 10.025 8zM7 4a.5.5 0 0 0-.812-.39L3.825 5.5H1.5A.5.5 0 0 0 1 6v4a.5.5 0 0 0 .5.5h2.325l2.363 1.89A.5.5 0 0 0 7 12V4zM4.312 6.39 6 5.04v5.92L4.312 9.61A.5.5 0 0 0 4 9.5H2v-3h2a.5.5 0 0 0 .312-.11z"/></svg>
             </div>
@@ -409,10 +417,10 @@ function App() {
           <button className='clear-button' onClick={(e)=> {setInput("")}} onFocus={focusTheTextArea} type="button" title="Clear Input" >
             <svg width="20" height="20" fill="currentColor" viewBox="0 -4 20 20"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
           </button>
-          <button className='clear-button-prefix' onClick={(e)=> {setPrefix("")}} onFocus={focusTheTextArea} type="button" title="Clear Input" >
+          <button className='clear-button-prefix' onClick={(e) => {setPrefix("")}} onFocus={focusTheTextArea} type="button" title="Clear Input" >
             <svg width="20" height="20" fill="currentColor" viewBox="0 -4 20 20"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
           </button>
-          <button className='clear-button-suffix' onClick={(e)=> {setSuffix("")}} onFocus={focusTheTextArea} type="button" title="Clear Input" >
+          <button className='clear-button-suffix' onClick={(e) => {setSuffix("")}} onFocus={focusTheTextArea} type="button" title="Clear Input" >
             <svg width="20" height="20" fill="currentColor" viewBox="0 -4 20 20"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
           </button>
         </div>
