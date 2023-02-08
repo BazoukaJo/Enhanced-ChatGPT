@@ -8,8 +8,7 @@
  */
 
 // Messages for display in case of connectivity or compatibility errors.
-const CONNECTION_ERROR_MESSAGE = ":( The connection to the server failed. Press [+ New Chat], to retry if possible o7" ;
-const COMPATIBILITY_ERROR_MESSAGE = ":( This model is not compatible with nthis implementation or has failed to connect. Please change the model or press + New Chat. o7"
+const ERROR_MESSAGE = "Connection Or Compatibility Error";
 
 //NPM packages: openai, express, bodyParser and cors.
 const { Configuration, OpenAIApi } = require("openai");
@@ -49,12 +48,12 @@ app.post('/', async (req, res) => {
             best_of: Number(`${best_of}`),
         });
         let choices = response.data.choices?.map(choice => choice.text)
-        .join('\n ________________________________________________________________________________\n')
+        .join('\n_________________________________')
         .trimStart();
         res.json({ message: choices });
     }
     catch(error){
-        res.json({ message: COMPATIBILITY_ERROR_MESSAGE });
+        res.json({ message: ERROR_MESSAGE });
     }
 });
 
@@ -65,7 +64,7 @@ app.get('/models', async (req, res) => {
         res.json({models: response.data.data});
     }
     catch (error) {
-        res.json({ message: CONNECTION_ERROR_MESSAGE });
+        res.json({ message: ERROR_MESSAGE });
     }
 });
 

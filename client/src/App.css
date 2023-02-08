@@ -46,8 +46,22 @@
   width: 90%;
 }
 
-.min-max-infos{
+.infos{
   color:#616378;
+}
+
+.errors{
+  color:#a92626;
+  border-radius: 8px;
+  bottom: 110px;
+  left: 320px;
+  position: fixed;
+  transition: ease 0.2s all;
+  animation: errorsAnimation 0.2s;
+  animation-delay: 0s;
+  animation-duration: 0.5s;
+  animation-iteration-count: infinite;
+  animation-play-state: running;
 }
 
 .side-menu-button-text:hover {
@@ -451,5 +465,20 @@
     font-size: 16px;
   }
 }
+
+@keyframes errorsAnimation {
+  0% {
+    opacity: 100%;
+  }
+
+  50% {
+    opacity: 50%;
+  }
+
+  100% {
+    opacity: 100%;
+  }
+}
+
 
 /**/

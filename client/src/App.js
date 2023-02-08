@@ -16,6 +16,8 @@ mic.lang = 'en-US';
  * @public
  */
 function App() {
+  const ERROR_MESSAGE = "Connection Or Compatibility Error";
+
   // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
   const MAX_TOKENS = parseInt(4096);
 
@@ -73,10 +75,6 @@ function App() {
   // voice synthesis hook
   const {speak, voices} = useSpeechSynthesis();
 
-  const isBooted = false;
-  // eslint-disable-next-line
-  useEffect(() => {handleEventListerner();}, [isBooted]);
-
   //###################### Async Functions #######################
   /**
    * When the page loads, fetch the data from the server and then set the models state to the data that
@@ -104,14 +102,15 @@ function App() {
    */
   async function handleSubmit(){
     //console.log("**handleSubmit**");
+    if(input === "") return;
     let chatLogNew = [...chatLog];
     if (input !== "") {
       chatLogNew.push({ user:"user", message:`${prefix + (prefix === "" ? "" : " ; ") + input + (suffix === "" ? "" : " ; ") + suffix}` });
     } else {
       chatLogNew.push({ user:"user", message:"Prompt"});
     }
-    const messages = chatLogNew?.map((message) => message.message).join("\n");
     setChatLog(chatLogNew);
+    const messages = chatLogNew?.map((message) => message.message).join("\n");
     setInput("");
     showLoader();
     // Scrool up
@@ -131,15 +130,24 @@ function App() {
         frequency_penalty:1.0,
       })
     });
-    hideLoader();
     const data = await response.json();
-    setChatLog([...chatLogNew,{user:"gpt", message:`${data.message}`}]);
-    //console.log(`${data.message}`);
-    handleReading(`${data.message}`);
-    // Scrool up and read
-    setTimeout(function(){
-      document.getElementsByClassName("chatbox")[0].scrollTo(0, document.getElementsByClassName("chat-log")[0].clientHeight);
-    }, 200);
+    if(data.message !== ERROR_MESSAGE){
+      setChatLog([...chatLogNew,{user:"gpt", message:`${data.message}`}]);
+      //console.log(`${data.message}`);
+      handleReading(`${data.message}`);
+      // Scrool up
+      setTimeout(function(){
+        document.getElementsByClassName("chatbox")[0].scrollTo(0, document.getElementsByClassName("chat-log")[0].clientHeight);
+      }, 200);
+    }
+    else{
+        console.log(ERROR_MESSAGE);
+        document.getElementsByClassName("errors")[0].value = ERROR_MESSAGE;
+        setTimeout(function(){
+          document.getElementsByClassName("errors")[0].value = "";
+        }, 2000);
+    }
+    hideLoader();
   }
   //###################### END Async Functions #######################
 
@@ -231,7 +239,7 @@ function App() {
   * It also sets an 'onstart' event listener which shows the recorder, and an 'onresult'
   * event listener which sets the input to the transcript of what was said. Finally, it sets an 'onerror' event listener which logs any errors that occur.
   */
-  const handleIsListening = (e) => {
+  const handleIsListening = () => {
     //console.log("handleIsListening passed");
     if (isListening) {
       mic.start();
@@ -298,14 +306,12 @@ function App() {
         setIsListening(prevState => !prevState);
       } else if (event.keyCode === 35) {//home key
         setIsReading(prevState => !prevState);
+      } else if (event.keyCode === 46) {//home key
+        clearChat();
       }
     },0.0001);
   };
-
-  function handleEventListerner() {
-    //console.log('addEventListernerCalled called!');
-    document.addEventListener("keydown", keyEventHandler);
-  }
+  document.addEventListener("keydown", keyEventHandler);
 
   // This function cycle through history
   function cycleHistory(index){
@@ -326,7 +332,7 @@ function App() {
     <div className="App">
       <aside className="sidemenu">
           <div className="side-menu-button" onClick={(e) => {clearChat()}}>
-            <span>+ </span>New Chat
+            <span>+ </span>New Prompts
           </div>
         <div className="models">
         <div className="tool-text">MODELS</div>
@@ -340,18 +346,29 @@ function App() {
         </div>
         <div>
           <div className="tool-text">TEMPERATURE</div>
-          <input className="side-menu-button-input" type="number" max="1" min="0" rows="1" step="0.1" value={temperature} onChange={(e) => setTemperature(e.target.value)} />
-          <div className='min-max-infos'>0 - Logical&nbsp;&nbsp;&nbsp;&nbsp;Creative - 1</div>
+          <input className="side-menu-button-input" onChange={(e) => setTemperature(e.target.value)} value={temperature} type="number" max="1" min="0" rows="1" step="0.1" />
+          <div className='infos'>0 - Logical&nbsp;&nbsp;&nbsp;&nbsp;Creative - 1</div>
         </div>
         <div>
           <div className="tool-text">TOKENS - LENGTH</div>
-          <input className="side-menu-button-input" type="number" max={MAX_TOKENS} min="10" rows="1" step="10" value={maxTokens} onChange={(e) => setMaxTokens(e.target.value)} />
-          <div className='min-max-infos'>10 - Low&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;High - {MAX_TOKENS}</div>
+          <input className="side-menu-button-input" onChange={(e) => setMaxTokens(e.target.value)} type="number" max={MAX_TOKENS} min="10" rows="1" step="10" value={maxTokens}  />
+          <div className='infos'>10 - Low&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;High - {MAX_TOKENS}</div>
         </div>
         <div>
           <div className="tool-text">COMPLETIONS</div>
-          <input className="side-menu-button-input"  type="number" max="5" min="1" rows="1" step="1" value={n} onChange={(e) => {setN(e.target.value); setBest_of(e.target.value);}}/>
-          <div className='min-max-infos'>1 -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Answers&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 5</div>
+          <input className="side-menu-button-input" onChange={(e) => {setN(e.target.value); setBest_of(e.target.value);}}  type="number" max="5" min="1" rows="1" step="1" value={n} />
+          <div className='infos'>1 -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Answers&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 5</div>
+          <div className='infos'>&nbsp;</div>
+          <div className='infos'>Shortcuts :</div>
+          <div className='infos'>Delete : New Prompts</div>
+          <div className='infos'>Home : Speak To GPT</div>
+          <div className='infos'>End : Read By GPT</div>
+          <div className='infos'>&nbsp;</div>
+          <div className='infos'>Keywords :</div>
+          <div className='infos'>[INSTUCTIONS] text=""</div>
+          <div className='infos'>generate - {"{text}"} - {"{code}"}</div>
+          <div className='infos'>correct - provide - table</div>
+          <div className='infos'>...</div>
         </div>
       </aside>
       <section className="chatbox">
@@ -364,9 +381,9 @@ function App() {
           <div className="form1" onKeyDown={(e) => {e.keyCode === 13 && handleSubmit()}}>
             <input type="text" className="chat-input-textarea" placeholder="Prompt" autoFocus rows="1" value={input} onChange={(e) => setInput(e.target.value)} />
           </div>
-          <input className="chat-input-textarea-prefix" placeholder='Prefix' value={prefix} onChange={(e) => setPrefix(e.target.value)}/>
-          <input className="chat-input-textarea-suffix" placeholder='Suffix' value={suffix} onChange={(e) => setSuffix(e.target.value)}/>
-          <button className='send-button' type="button"  title="Send Prompt to GPT" onClick={(e)=>{handleSubmit()}} tabIndex="-1" onFocus={(e) => {focusTheTextArea()}}>
+          <input className="chat-input-textarea-prefix" onChange={(e) => setPrefix(e.target.value)} placeholder='Prefix' value={prefix} />
+          <input className="chat-input-textarea-suffix" onChange={(e) => setSuffix(e.target.value)} placeholder='Suffix' value={suffix} />
+          <button className='send-button' onClick={(e)=>{handleSubmit()}} tabIndex="-1" onFocus={(e) => {focusTheTextArea()}}type="button"  title="Send Prompt to GPT" >
             <svg width="16" height="27" fill="currentColor" viewBox="0 0 16 16"><path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/></svg>
           </button>
           <button className='record-voice-button' type="button" title="Record Voice To Prompt - Shortcut : Home"onClick={() => setIsListening(prevState => !prevState)}>
@@ -388,13 +405,14 @@ function App() {
               <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06zM6 5.04 4.312 6.39A.5.5 0 0 1 4 6.5H2v3h2a.5.5 0 0 1 .312.11L6 10.96V5.04zm7.854.606a.5.5 0 0 1 0 .708L12.207 8l1.647 1.646a.5.5 0 0 1-.708.708L11.5 8.707l-1.646 1.647a.5.5 0 0 1-.708-.708L10.793 8 9.146 6.354a.5.5 0 1 1 .708-.708L11.5 7.293l1.646-1.647a.5.5 0 0 1 .708 0z"/></svg>
             </div>
           </button>
-          <button className='clear-button' type="button" title="Clear Input" onClick={(e)=> {setInput("")}} onFocus={focusTheTextArea}>
+          <div className='errors'></div>
+          <button className='clear-button' onClick={(e)=> {setInput("")}} onFocus={focusTheTextArea} type="button" title="Clear Input" >
             <svg width="20" height="20" fill="currentColor" viewBox="0 -4 20 20"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
           </button>
-          <button className='clear-button-prefix' type="button" title="Clear Input" onClick={(e)=> {setPrefix("")}} onFocus={focusTheTextArea}>
+          <button className='clear-button-prefix' onClick={(e)=> {setPrefix("")}} onFocus={focusTheTextArea} type="button" title="Clear Input" >
             <svg width="20" height="20" fill="currentColor" viewBox="0 -4 20 20"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
           </button>
-          <button className='clear-button-suffix' type="button" title="Clear Input" onClick={(e)=> {setSuffix("")}} onFocus={focusTheTextArea}>
+          <button className='clear-button-suffix' onClick={(e)=> {setSuffix("")}} onFocus={focusTheTextArea} type="button" title="Clear Input" >
             <svg width="20" height="20" fill="currentColor" viewBox="0 -4 20 20"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
           </button>
         </div>
@@ -428,7 +446,7 @@ const ChatMessage = ({message}) => {
           {message.user === "user" &&
             <span className='simple-message'>{message.message}</span>}
         </div>
-        <button className="copy-current-button" title="Copy To Clipboard" onClick={(e)=> {navigator.clipboard.writeText(message.message)}}>
+        <button className="copy-current-button" onClick={(e)=> {navigator.clipboard.writeText(message.message)}} title="Copy To Clipboard" >
           <div>
             <svg width="18" height="18" fill="currentColor" viewBox="1 -1 16 17"><path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
           </div>
