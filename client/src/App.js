@@ -142,9 +142,9 @@ function App() {
     }
     else{
         console.log(ERROR_MESSAGE);
-        document.getElementsByClassName("errors")[0].value = ERROR_MESSAGE;
+        document.getElementsByClassName("errors")[0].innerHTML = ERROR_MESSAGE;
         setTimeout(function(){
-          document.getElementsByClassName("errors")[0].value = "";
+          document.getElementsByClassName("errors")[0].innerHTML = "";
         }, 2000);
     }
     hideLoader();
