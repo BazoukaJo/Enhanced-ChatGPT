@@ -19,14 +19,14 @@ function App() {
   // ERROR_MESSAGE define the default message error.
   const ERROR_MESSAGE = "Connection Or Compatibility Error";
 
-  // DEFAULT_MAX_TOLKEN define the default max tolkens.
-  const DEFAULT_MAX_TOLKEN = 1000;
+  // DEFAULT_TOLKEN define the default max tolkens.
+  const DEFAULT_TOLKEN = 1000;
 
   // DEFAULT_TEMPERATURE define the value of the default temperature.
   const DEFAULT_TEMPERATURE = 0.7;
 
   // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
-  const MAX_TOKENS = parseInt(4096);
+  const MAX_TOKENS = 4096;
 
   // DEFAULT_QUERY set to text "Ask me anything...".
   const DEFAULT_QUERY = "Ask me anything...";
@@ -34,17 +34,26 @@ function App() {
   // DEFAULT_MODEL set to "text-davinci-003".
   const DEFAULT_MODEL = "text-davinci-003";
 
+  // DEFAULT_RESOLUTION set to image generation resolution
+  const DEFAULT_RESOLUTION = "256x256";
+
   // declare input, prefix and suffix with state hook useState
   const [input, setInput] = useState("");
   const [prefix, setPrefix] = useState("");
   const [suffix, setSuffix] = useState("");
 
+  const resolutions = [{id:"256x256"}, {id:"512x512"}, {id:"1024x1024"}, {id:"2048x2048"}];
+  // Set currentModel with default value 'DEFAULT_MODEL' using state hook useState
+  const [currentResolution, setCurrentResolution] = useState(DEFAULT_RESOLUTION);
+
   // models set with list of objects using state hook useState
   const [models, setModels] = useState([]);
 
   // chatLog set with state hook useState
-  // with initial value an array of an object consisting of "user" and message property
-  const [chatLog, setChatLog] = useState([{user:"gpt", message :DEFAULT_QUERY}]);
+  const [chatLog, setChatLog] = useState([{user:"gpt", message:DEFAULT_QUERY}]);
+
+  // History set with state hook useState
+  const [history, setHistory] = useState([]);
 
   // Set currentModel with default value 'DEFAULT_MODEL' using state hook useState
   const [currentModel, setCurrentModel] = useState(DEFAULT_MODEL);
@@ -56,13 +65,13 @@ function App() {
   const [temperature, setTemperature] = useState(Number(DEFAULT_TEMPERATURE));
 
   // maxTokens is set with state hook with 100 parsed to an integer as the initial value
-  const [maxTokens, setMaxTokens] = useState(parseInt(DEFAULT_MAX_TOLKEN));
+  const [maxTokens, setMaxTokens] = useState(parseInt(DEFAULT_TOLKEN));
 
   // declare 'n' with state hook with 1 as initial value
   const [n, setN] = useState(Number(1));
 
-  // declare 'best_of' with state hook with 1 as initial value
-  const [best_of, setBest_of] = useState(Number(1));
+  // declare 'bestOf' with state hook with 1 as initial value
+  const [bestOf, setBestOf] = useState(Number(1));
 
   // call getEngines() once when component is mounted
   useEffect(() => {getEngines();}, []);
@@ -77,7 +86,7 @@ function App() {
   const [isReading, setIsReading] = useState(false);
 
   // eslint-disable-next-line
-  useEffect(() => {handleReading(chatLog[chatLog.length-1].message);}, [isReading]);
+  useEffect(() => {handleIsReading(chatLog[chatLog.length-1].message);}, [isReading]);
 
   // voice synthesis hook
   const {speak, voices} = useSpeechSynthesis();
@@ -103,8 +112,8 @@ function App() {
    * showLoader() is called to indicate that some processing is happening.
    * After calling the function to scroll up the chatlog window, a post request is made to a locally hosted endpoint with certain parameters to get a response from the GPT language model.
    * The data received from the post request is processed & then a update to the chatlog with the latest informative message from "gpt" is added.
-   * Finally, the UI is scrolled up and function handleReading is called to read the latest chat message.
-   * After 200 milliseconds delay.
+   * Finally, the UI is scrolled up and function handleIsReading is called to read the latest chat message.
+   * After 3000 milliseconds delay.
    * @param e - the event object
    */
   async function handleSubmit(){
@@ -112,7 +121,9 @@ function App() {
     if(input === "") return;
     //Pre request
     let chatLogNew = [...chatLog];
-    chatLogNew.push({ user:"user", message:`${prefix + (prefix === "" ? "" : "\n") + input + (suffix === "" ? "" : "\n") + suffix}` });
+    let currentMessage = { user:"user", message:`${prefix + (prefix === "" ? "" : "\n") + input + (suffix === "" ? "" : "\n") + suffix}` };
+    chatLogNew.push(currentMessage);
+    history.push(currentMessage);
     setChatLog(chatLogNew);
     const messages = chatLogNew?.map((message) => message.message).join("\n");
     setInput("");
@@ -121,7 +132,7 @@ function App() {
     setTimeout(function(){
       document.getElementsByClassName("chatbox")[0].scrollTo(0, document.getElementsByClassName("chat-log")[0].clientHeight);
     }, 2);
-
+    let currentPrompt = chatLogNew[chatLogNew.length-1]?.message.substr(0, 7) === "imagine" ? chatLogNew[chatLogNew.length-1]?.message : "";
     // POST request
     const response = await fetch("http://localhost:3080/", {
       method:"POST",
@@ -132,17 +143,22 @@ function App() {
         temperature:Number(temperature),
         maxTokens:parseInt(maxTokens),
         n:Number(n),
-        best_of:Number(best_of),
+        bestOf:Number(bestOf),
         frequency_penalty:1.0,
-      })
-    });
-    const data = await response.json();
+        prompt:currentPrompt,
+        size:currentResolution,
+    })
+  });
+  const data = await response.json();
 
-    // Post
+    // Post request
     if(data.message !== ERROR_MESSAGE){
-      setChatLog([...chatLogNew,{user:"gpt", message:`${data.message}`}]);
+      if(currentPrompt === ""){
+        handleIsReading(`${data.message}`);
+        setChatLog([...chatLogNew,{user:"gpt", message:data.message}]);
+      }
+      setChatLog([...chatLogNew,{user:"gpt", message:data.message}]);
       //console.log(`${data.message}`);
-      handleReading(`${data.message}`);
       // Scrool up
       setTimeout(function(){
         document.getElementsByClassName("chatbox")[0].scrollTo(0, document.getElementsByClassName("chat-log")[0].clientHeight);
@@ -153,7 +169,7 @@ function App() {
         document.getElementsByClassName("errors")[0].innerHTML = ERROR_MESSAGE;
         setTimeout(function(){
           document.getElementsByClassName("errors")[0].innerHTML = "";
-        }, 2000);
+        }, 3000);
     }
     hideLoader();
   }
@@ -164,7 +180,7 @@ function App() {
   * set chatLog to an array with one object containing a message from "gpt" with value "DEFAULT_QUERY"
   */
   function clearChat() {
-    setChatLog([{user:"gpt",  message :`${DEFAULT_QUERY}`}])
+    setChatLog([{user:"gpt",  message:`${DEFAULT_QUERY}`}])
   }
 
   /*
@@ -286,8 +302,8 @@ function App() {
   * function will be called. If isReading is false, an empty string will
   * be spoken and the hideMute() function will be called.
   */
-  const handleReading = (message) => {
-    //console.log("handleReading passed");
+  const handleIsReading = (message) => {
+    //console.log("handleIsReading passed");
     if (isReading) {
       //console.log(message);
       speak({text:message, voice:voices[2]});
@@ -325,13 +341,13 @@ function App() {
   function cycleHistory(index){
     let nextIndex = historyIndex + index;
     if(nextIndex < 0){
-      nextIndex = chatLog.length-1;
-    }
-    else if(nextIndex > chatLog.length-1){
       nextIndex = 0;
     }
+    else if(nextIndex > history.length-1){
+      nextIndex = history.length-1;
+    }
     setHistoryIndex(nextIndex);
-    setInput(chatLog[nextIndex].message);
+    setInput(history[nextIndex]?.message);
   }
 
   //###################### Return HTML ########################
@@ -339,11 +355,11 @@ function App() {
   return (
     <div className="App">
       <aside className="sidemenu">
-          <div className="side-menu-button" onClick={(e) => {clearChat()}}>
-            <span>+ </span>New Prompts
-          </div>
+        <div className="side-menu-button" onClick={(e) => {clearChat(); focusTheTextArea();}}>
+          <span>+ </span>New Prompts
+        </div>
         <div className="models">
-        <div className="tool-text">MODELS</div>
+          <div className="tool-text">MODELS</div>
           <select className="model-slection" onChange={(e) => {setCurrentModel(e.target.value); clearChat();}} value={currentModel}>
             {models?.map((model, index) => (
               <option key={model.id} value={model.id}>
@@ -355,29 +371,34 @@ function App() {
         <div>
           <div className="tool-text">TEMPERATURE</div>
           <input className="side-menu-button-input" onChange={(e) => setTemperature(e.target.value)} value={temperature} type="number" max="1" min="0" rows="1" step="0.1" />
-          <div className='infos'>0 - Logical&nbsp;&nbsp;&nbsp;&nbsp;Creative - 1</div>
+          <div className='infos'>0 - Logical&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Creative - 1</div>
         </div>
         <div>
-          <div className="tool-text">TOKENS - LENGTH</div>
+          <div className="tool-text">LENGTH</div>
           <input className="side-menu-button-input" onChange={(e) => setMaxTokens(e.target.value)} type="number" max={MAX_TOKENS} min="10" rows="1" step="10" value={maxTokens}  />
-          <div className='infos'>10 - Low&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;High - {MAX_TOKENS}</div>
+          <div className='infos'>10 - Low&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;High - {MAX_TOKENS}</div>
         </div>
         <div>
           <div className="tool-text">COMPLETIONS</div>
-          <input className="side-menu-button-input" onChange={(e) => {setN(e.target.value); setBest_of(e.target.value);}}  type="number" max="5" min="1" rows="1" step="1" value={n} />
-          <div className='infos'>1 -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Answers&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 5</div>
-          <div className='infos'>&nbsp;</div>
-          <div className='infos'>Shortcuts :</div>
-          <div className='infos'>Delete : New Prompts</div>
-          <div className='infos'>Home : Speak To GPT</div>
-          <div className='infos'>End : Read By GPT</div>
-          <div className='infos'>Up Down : History</div>
-          <div className='infos'>&nbsp;</div>
-          <div className='infos'>Keywords :</div>
-          <div className='infos'>[INSTUCTIONS] text=""</div>
-          <div className='infos'>generate - {"{text}"} - {"{code}"}</div>
-          <div className='infos'>correct - provide - table</div>
+          <input className="side-menu-button-input" onChange={(e) => {setN(e.target.value); setBestOf(e.target.value);}}  type="number" max="4" min="1" rows="1" step="1" value={n} />
+          <div className='infos'>1 -&nbsp;&nbsp;&nbsp;#Prompt-Image&nbsp;&nbsp;&nbsp;- 4</div>
         </div>
+        <div className="resolution">
+          <div className="tool-text">RESOLUTION</div>
+          <select className="resolution-slection" onChange={(e) => {setCurrentResolution(e.target.value);}} value={currentResolution}>
+            {resolutions?.map((resolution, index) => (
+              <option key={resolution.id} value={resolution.id}>
+                {resolution.id}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className='infos'>"imagine" Create images</div>
+        <div className='infos'>&nbsp;</div>
+        <div className='infos'>Delete : New Prompts</div>
+        <div className='infos'>Home : Speak To GPT</div>
+        <div className='infos'>End : Read By GPT</div>
+        <div className='infos'>Up - Down : History</div>
       </aside>
       <section className="chatbox">
         <div className="chat-log">
@@ -385,7 +406,7 @@ function App() {
             <ChatMessage key={index} message={message} />
           ))}
         </div>
-        <div className="Chat-input-holder">
+        <div className="chat-input-holder">
           <div className="form1" onKeyDown={(e) => {e.keyCode === 13 && handleSubmit()}}>
             <input type="text" className="chat-input-textarea" onChange={(e) => setInput(e.target.value)} placeholder="Prompt" autoFocus rows="1" value={input} />
           </div>
@@ -446,19 +467,14 @@ const ChatMessage = ({message}) => {
           {message.user === "user" &&
             <div className='you'>You</div>}
         </div>
-        <div className='precode-box'>
+        <div className='gpt-box'>
           {message.user === "gpt" &&
-            <pre><code className={'language-javascript'}><span className="highlight-message">{message.message}</span></code></pre>}
+            <span className="highlight-message" dangerouslySetInnerHTML={{__html:message.message}}></span>}
         </div>
-        <div className='nocode-box'>
+        <div className='player-box'>
           {message.user === "user" &&
             <span className='simple-message'>{message.message}</span>}
         </div>
-        <button className="copy-current-button" onClick={(e)=> {navigator.clipboard.writeText(message.message)}} title="Copy To Clipboard" >
-          <div>
-            <svg width="18" height="18" fill="currentColor" viewBox="1 -1 16 17"><path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
-          </div>
-        </button>
       </div>
     </div>
   );

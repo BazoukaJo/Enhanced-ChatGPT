@@ -18,10 +18,9 @@
 
 .sidemenu {
   background-color: #202123;
-  max-width: 220px;
-  min-width: 220px;
-  padding-left: 30px;
-  padding-top: 30px;
+  max-width: 240px;
+  min-width: 240px;
+  padding: 30px;
 }
 
 .side-menu-button {
@@ -32,7 +31,7 @@
   margin-bottom: 5px;
   padding-left: 10px;
   padding-top: 5px;
-  width: 90%;
+  width: 100%;
   outline: 1px solid rgb(111, 111, 111);
 }
 
@@ -43,7 +42,7 @@
   height: 30px;
   margin-bottom: 5px;
   padding-left: 10px;
-  width: 90%;
+  width: 100%;
 }
 
 .infos{
@@ -113,7 +112,7 @@
   border-radius: 8px;
   bottom: 40px;
   height: 30px;
-  left:270px;
+  left:290px;
   position: fixed;
   transition: ease 0.2s all;
   width: 30px;
@@ -131,7 +130,7 @@
   border-radius: 8px;
   bottom: 75px;
   height: 30px;
-  left: 270px;
+  left: 290px;
   position: fixed;
   transition: ease 0.2s all;
   width: 30px;
@@ -149,7 +148,7 @@
   border-radius: 8px;
   bottom: 5px;
   height: 30px;
-  left:270px;
+  left:290px;
   position: fixed;
   transition: ease 0.2s all;
   width: 30px;
@@ -256,9 +255,9 @@
   color: white;
   font-size: 1.25em;
   height: 30px;
-  left: 40px;
+  left: 60px;
   margin-left: 265px;
-  min-width: 270px;
+  min-width: 90px;
   padding: 12px;
   position: fixed;
   right: 116px;
@@ -281,9 +280,9 @@
   color: white;
   font-size: 1.25em;
   height: 30px;
-  left: 40px;
+  left: 60px;
   margin-left: 265px;
-  min-width: 265px;
+  min-width: 90px;
   padding: 12px;
   position: fixed;
   right: 116px;
@@ -305,9 +304,9 @@
   color: white;
   font-size: 1.25em;
   height: 30px;
-  left: 40px;
+  left: 60px;
   margin-left: 265px;
-  min-width: 265px;
+  min-width: 90px;
   padding: 12px;
   position: fixed;
   right: 116px;
@@ -328,10 +327,27 @@
   color: white;
   height: 30px;
   padding-left: 10px;
-  width: 90%;
+  width: 100%;
 }
 
 .model-slection:hover {
+  background-color: #222222;
+  transition: ease 0.2s all;
+}
+
+.resolution-slection {
+  background-color: #40414F;
+  border-radius: 8px;
+  outline: 1px solid rgb(111, 111, 111);
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+  color: white;
+  height: 30px;
+  padding-left: 10px;
+  margin-bottom: 5px;
+  width: 100%;
+}
+
+.resolution-slection:hover {
   background-color: #222222;
   transition: ease 0.2s all;
 }
@@ -342,9 +358,7 @@
 
 .chat-message-center {
   display: flex;
-  min-width: 400px;
-  padding-left: 30px;
-  padding-right: 30px;
+  min-width: 300px;
   padding: 20px;
   transition: ease 0.2s all
 }
@@ -364,32 +378,31 @@
   height: 40px;
   transition: ease 0.2s all;
   width: 40px;
+  padding-left:-20px;
 }
 
 .avatar.chatgpt {
   background: #0da37f;
 }
 
-.precode-box {
+.player-box {
   animation: messageAnimation 0.2s;
-  margin-bottom: -15px;
-  margin-top: -15px;
-  padding-left: 30px;
-  padding-top: -10px;
   transition: ease 0.2s all;
 }
 
-.precode-box:hover {
+.player-box:hover {
   font-size: 18px;
   transition: ease 0.2s all;
 }
 
-.nocode-box {
+.gpt-box {
   animation: messageAnimation 0.2s;
   transition: ease 0.2s all;
+  margin-left:20px;
+  display:block;
 }
 
-.nocode-box:hover {
+.gpt-box:hover {
   font-size: 18px;
   transition: ease 0.2s all;
 }
@@ -440,6 +453,18 @@
   transition: ease 0.2s all;
   visibility: hidden;
   width: 40px;
+}
+
+.form1{
+  background-color: #202123;
+  height:30px;
+  position:inherit;
+  left:241px;
+  bottom:0px;
+  height: 110px;
+  position: fixed;
+  right: 0px;
+  transition: ease 0.2s all;
 }
 
 @keyframes loader {

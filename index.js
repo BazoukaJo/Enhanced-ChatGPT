@@ -37,23 +37,37 @@ const port = 3080;
 
 /* A POST request message to the server. */
 app.post('/', async (req, res) => {
-    const {currentModel, message, temperature, maxTokens, best_of, n} = req.body;
+    const {currentModel, message, temperature, maxTokens, bestOf, n, prompt, size} = req.body;
     try {
-        response = await openai.createCompletion({
-            model: `${currentModel}`,// "text-davinci-003",
-            prompt: `${message}`,
-            temperature: Number(`${temperature}`),
-            max_tokens: parseInt(`${maxTokens}`),
-            n: Number(`${n}`),
-            best_of: Number(`${best_of}`),
-        });
-        let choices = response.data.choices?.map(choice => choice.text)
-        .join('\n_________________________________')
-        .trimStart();
-        res.json({ message: choices });
+        let response;
+        //console.log("prompt = '"+prompt+"'");
+        if (prompt !== ""){
+            response = await openai.createImage({// Images prompt
+                prompt:prompt,
+                n: n,
+                size: size,
+            });
+            console.log(response.data);
+            let imageURLs = response.data.data.map(url => "<img src='" + url.url + "'/>")
+            res.json({message:imageURLs});
+        }
+        else {
+            response = await openai.createCompletion({// Texts prompt
+                model: `${currentModel}`,// "text-davinci-003",
+                prompt: `${message}`,
+                temperature: Number(`${temperature}`),
+                max_tokens: parseInt(`${maxTokens}`),
+                n: Number(`${n}`),
+                best_of: Number(`${bestOf}`),
+            });
+            let choices = response.data.choices?.map(choice => choice.text)
+            .join('\n_________________________________')
+            .trimStart();
+            res.json({ message:choices });
+        }
     }
     catch(error){
-        res.json({ message: ERROR_MESSAGE });
+        res.json({ message:ERROR_MESSAGE });
     }
 });
 
@@ -61,10 +75,10 @@ app.post('/', async (req, res) => {
 app.get('/models', async (req, res) => {
     try {
         const response = await openai.listModels();
-        res.json({models: response.data.data});
+        res.json({models:response.data.data});
     }
     catch (error) {
-        res.json({ message: ERROR_MESSAGE });
+        res.json({ message:ERROR_MESSAGE });
     }
 });
 
