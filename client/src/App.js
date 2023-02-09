@@ -42,7 +42,7 @@ function App() {
   const [prefix, setPrefix] = useState("");
   const [suffix, setSuffix] = useState("");
 
-  const resolutions = [{id:"256x256"}, {id:"512x512"}, {id:"1024x1024"}, {id:"2048x2048"}];
+  const resolutions = [{id:"256x256"}, {id:"512x512"}, {id:"1024x1024"}];
   // Set currentModel with default value 'DEFAULT_MODEL' using state hook useState
   const [currentResolution, setCurrentResolution] = useState(DEFAULT_RESOLUTION);
 
@@ -164,8 +164,7 @@ function App() {
         document.getElementsByClassName("chatbox")[0].scrollTo(0, document.getElementsByClassName("chat-log")[0].clientHeight);
       }, 200);
     }
-    else{
-        console.log(ERROR_MESSAGE);
+    else{// show warning in flashing red
         document.getElementsByClassName("errors")[0].innerHTML = ERROR_MESSAGE;
         setTimeout(function(){
           document.getElementsByClassName("errors")[0].innerHTML = "";

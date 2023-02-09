@@ -47,7 +47,7 @@ app.post('/', async (req, res) => {
                 n: n,
                 size: size,
             });
-            console.log(response.data);
+            //console.log(response.data);
             let imageURLs = response.data.data.map(url => "<img src='" + url.url + "'/>")
             res.json({message:imageURLs});
         }
@@ -68,6 +68,12 @@ app.post('/', async (req, res) => {
     }
     catch(error){
         res.json({ message:ERROR_MESSAGE });
+        if (error.response) {
+            console.log(error.response.status);
+            console.log(error.response.data);
+        } else {
+            console.log(error.message);
+        }
     }
 });
 
