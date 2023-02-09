@@ -2,8 +2,8 @@ import './App.css';
 import './normal.css';
 import React, { useState, useEffect } from 'react'
 import { useSpeechSynthesis } from 'react-speech-kit';
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-const mic = new SpeechRecognition();
+const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const mic = new speechRecognition();
 mic.continuous = true;
 mic.interimResults = true;
 mic.lang = 'en-US';
@@ -42,8 +42,10 @@ function App() {
   const [prefix, setPrefix] = useState("");
   const [suffix, setSuffix] = useState("");
 
+  // Image resolution settings
   const resolutions = [{id:"256x256"}, {id:"512x512"}, {id:"1024x1024"}];
-  // Set currentModel with default value 'DEFAULT_MODEL' using state hook useState
+
+  // Set current resolution with default value 'DEFAULT_RESOLUTION' using state hook useState
   const [currentResolution, setCurrentResolution] = useState(DEFAULT_RESOLUTION);
 
   // models set with list of objects using state hook useState
@@ -97,7 +99,7 @@ function App() {
    * was fetched.
    */
   async function getEngines(){
-    fetch("http://localhost:3080/models")
+    fetch("http://10.0.0.75:3080/models")
     .then(res => res.json())
     .then(data => setModels(data.models));
     //console.log("getEngine passed");
@@ -134,7 +136,7 @@ function App() {
     }, 2);
     let currentPrompt = chatLogNew[chatLogNew.length-1]?.message.substr(0, 7) === "imagine" ? chatLogNew[chatLogNew.length-1]?.message : "";
     // POST request
-    const response = await fetch("http://localhost:3080/", {
+    const response = await fetch("http://10.0.0.75:3080/", {
       method:"POST",
       headers: {"content-type": "application/json"},
       body: JSON.stringify({
