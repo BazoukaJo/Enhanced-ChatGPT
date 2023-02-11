@@ -126,9 +126,9 @@ function App() {
     if(input === "" && suffix === "" && prefix === "") return;
     //Pre request
     let chatLogNew = [...chatLog];
-    let currentMessage = { user:"user", message:`${prefix + (prefix === "" ? "" : " :\n") + input + (suffix === "" ? "" : " :\n") + suffix}`, type:"string" };
+    let currentMessage = { user:"user", message:`${prefix + (prefix === "" ? "" : " :\n") + input + (suffix === "" ? "" : "\n: ") + suffix}`, type:"string" };
     chatLogNew.push(currentMessage);
-    history.push(currentMessage);
+    history.push({ user:"user", message:input, type:"string" });
     setChatLog(chatLogNew);
     const messages = chatLogNew?.map((message) => message.message).join("\n");
     setInput("");

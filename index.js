@@ -48,7 +48,7 @@ app.post('/', async (req, res) => {
                 size: size,
             });
             //console.log(response.data);
-            let imageURLs = response.data.data.map(url => "<img src='" + url.url + "' className='images'/>")
+            let imageURLs = response.data.data.map(url => "<img src='" + url.url + "' className='images' onload=''/>")
             res.json({message:imageURLs});
         }
         else {
