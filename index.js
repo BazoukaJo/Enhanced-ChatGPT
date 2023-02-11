@@ -48,7 +48,7 @@ app.post('/', async (req, res) => {
                 size: size,
             });
             //console.log(response.data);
-            let imageURLs = response.data.data.map(url => "<img src='" + url.url + "'/>")
+            let imageURLs = response.data.data.map(url => "<img src='" + url.url + "' className='images'/>")
             res.json({message:imageURLs});
         }
         else {
@@ -92,3 +92,11 @@ app.get('/models', async (req, res) => {
 app.listen(port,() => {
     console.log(`app listen at http://10.0.0.75:${port}`);
 });
+
+function createCookie(message) {
+    // Create a new cookie and set the expiration date to 1 day
+    let d = new Date();
+    d.setTime(d.getTime() + (1*24*60*60*1000));
+    let expires = "expires="+ d.toUTCString();
+    document.cookie = "message=" + message + ";" + expires + ";path=/";
+}

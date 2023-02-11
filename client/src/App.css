@@ -18,9 +18,9 @@
 
 .sidemenu {
   background-color: #202123;
-  max-width: 240px;
-  min-width: 240px;
-  padding: 30px;
+  max-width: 170px;
+  min-width: 170px;
+  padding: 10px;
 }
 
 .side-menu-button {
@@ -47,6 +47,7 @@
 
 .infos{
   color:#616378;
+  font-size: 16px;
 }
 
 .errors{
@@ -96,7 +97,7 @@
   bottom: 40px;
   height: 30px;
   position: fixed;
-  right: 45px;
+  right: 10px;
   transition: ease 0.2s all;
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
@@ -112,7 +113,7 @@
   border-radius: 8px;
   bottom: 40px;
   height: 30px;
-  left:290px;
+  left:184px;
   position: fixed;
   transition: ease 0.2s all;
   width: 30px;
@@ -130,7 +131,7 @@
   border-radius: 8px;
   bottom: 75px;
   height: 30px;
-  left: 290px;
+  left: 184px;
   position: fixed;
   transition: ease 0.2s all;
   width: 30px;
@@ -148,7 +149,7 @@
   border-radius: 8px;
   bottom: 5px;
   height: 30px;
-  left:290px;
+  left:184px;
   position: fixed;
   transition: ease 0.2s all;
   width: 30px;
@@ -171,7 +172,7 @@
   outline: 1px solid rgb(111, 111, 111);
   color:white;
   top:-4px;
-  left:5px;
+  left:80%;
 }
 
 .copy-current-button:hover{
@@ -186,7 +187,7 @@
   bottom: 40px;
   height: 30px;
   position: fixed;
-  right: 80px;
+  right: 45px;
   transition: ease 0.2s all;
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
@@ -204,7 +205,7 @@
   bottom: 75px;
   height: 30px;
   position: fixed;
-  right: 80px;
+  right: 45px;
   transition: ease 0.2s all;
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
@@ -222,7 +223,7 @@
   bottom: 5px;
   height: 30px;
   position: fixed;
-  right: 80px;
+  right: 45px;
   transition: ease 0.2s all;
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
@@ -239,7 +240,7 @@
 }
 
 .tool-text {
-  font-size: large;
+  font-size: medium;
   margin: 10px;
   margin-top: 8%;
   transition: ease 0.2s all;
@@ -250,19 +251,24 @@
   border-radius: 8px;
   border-width: 1px;
   border: none;
-  bottom: 40px;
+  bottom: 75px;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
   color: white;
   font-size: 1.25em;
   height: 30px;
-  left: 60px;
-  margin-left: 265px;
+  left: 20px;
+  margin-left: 200px;
   min-width: 90px;
   padding: 12px;
   position: fixed;
-  right: 116px;
+  right: 81px;
   transition: ease 0.2s all;
   outline: 1px solid rgb(111, 111, 111);
+  width: calc(100% - 302px); 
+  resize: vertical;
+  min-height:47px;
+  max-height:200px;
+  white-space:pre;
 }
 
 .chat-input-textarea:hover {
@@ -275,17 +281,17 @@
   border-radius: 8px;
   border-width: 1px;
   border: none;
-  bottom: 75px;
+  bottom: 40px;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
   color: white;
   font-size: 1.25em;
   height: 30px;
-  left: 60px;
-  margin-left: 265px;
+  left: 20px;
+  margin-left: 200px;
   min-width: 90px;
   padding: 12px;
   position: fixed;
-  right: 116px;
+  right: 81px;
   transition: ease 0.2s all;
   outline: 1px solid rgb(111, 111, 111);
 }
@@ -304,12 +310,12 @@
   color: white;
   font-size: 1.25em;
   height: 30px;
-  left: 60px;
-  margin-left: 265px;
+  left: 20px;
+  margin-left: 200px;
   min-width: 90px;
   padding: 12px;
   position: fixed;
-  right: 116px;
+  right: 81px;
   transition: ease 0.2s all;
   outline: 1px solid rgb(111, 111, 111);
 }
@@ -449,7 +455,7 @@
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
   height: 40px;
   position: fixed;
-  right: 40px;
+  right: 5px;
   transition: ease 0.2s all;
   visibility: hidden;
   width: 40px;
@@ -457,11 +463,9 @@
 
 .form1{
   background-color: #202123;
-  height:30px;
-  position:inherit;
-  left:241px;
+  left:171px;
   bottom:0px;
-  height: 110px;
+  height: 130px;
   position: fixed;
   right: 0px;
   transition: ease 0.2s all;

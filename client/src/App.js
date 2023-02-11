@@ -35,7 +35,10 @@ function App() {
   const DEFAULT_MODEL = "text-davinci-003";
 
   // DEFAULT_RESOLUTION set to image generation resolution
-  const DEFAULT_RESOLUTION = "256x256";
+  const DEFAULT_RESOLUTION = "512x512";
+
+  //MAX_ITERATION set the number of answers and images generation to be used, OpenAI suport a maximum of 10.
+  const MAX_ITERATION = 10;
 
   // declare input, prefix and suffix with state hook useState
   const [input, setInput] = useState("");
@@ -52,10 +55,10 @@ function App() {
   const [models, setModels] = useState([]);
 
   // chatLog set with state hook useState
-  const [chatLog, setChatLog] = useState([{user:"gpt", message:DEFAULT_QUERY}]);
+  const [chatLog, setChatLog] = useState([{user:"gpt", message:DEFAULT_QUERY, type:'string'}]);
 
   // History set with state hook useState
-  const [history, setHistory] = useState([]);
+  const [history] = useState([]);
 
   // Set currentModel with default value 'DEFAULT_MODEL' using state hook useState
   const [currentModel, setCurrentModel] = useState(DEFAULT_MODEL);
@@ -120,10 +123,10 @@ function App() {
    */
   async function handleSubmit(){
     //console.log("**handleSubmit**");
-    if(input === "") return;
+    if(input === "" && suffix === "" && prefix === "") return;
     //Pre request
     let chatLogNew = [...chatLog];
-    let currentMessage = { user:"user", message:`${prefix + (prefix === "" ? "" : "\n") + input + (suffix === "" ? "" : "\n") + suffix}` };
+    let currentMessage = { user:"user", message:`${prefix + (prefix === "" ? "" : " :\n") + input + (suffix === "" ? "" : " :\n") + suffix}`, type:"string" };
     chatLogNew.push(currentMessage);
     history.push(currentMessage);
     setChatLog(chatLogNew);
@@ -134,14 +137,17 @@ function App() {
     setTimeout(function(){
       document.getElementsByClassName("chatbox")[0].scrollTo(0, document.getElementsByClassName("chat-log")[0].clientHeight);
     }, 2);
+
+    // look for the word imagine to define the image prompt.
     let currentPrompt = chatLogNew[chatLogNew.length-1]?.message.substr(0, 7) === "imagine" ? chatLogNew[chatLogNew.length-1]?.message : "";
+
     // POST request
     const response = await fetch("http://10.0.0.75:3080/", {
       method:"POST",
       headers: {"content-type": "application/json"},
       body: JSON.stringify({
         currentModel,
-        message: messages,
+        message:messages,
         temperature:Number(temperature),
         maxTokens:parseInt(maxTokens),
         n:Number(n),
@@ -157,9 +163,10 @@ function App() {
     if(data.message !== ERROR_MESSAGE){
       if(currentPrompt === ""){
         handleIsReading(`${data.message}`);
-        setChatLog([...chatLogNew,{user:"gpt", message:data.message}]);
+        setChatLog([...chatLogNew,{user:"gpt", message:data.message, type:"string"}]);
+      }else {
+        setChatLog([...chatLogNew,{user:"gpt", message:data.message, type:"image"}]);
       }
-      setChatLog([...chatLogNew,{user:"gpt", message:data.message}]);
       //console.log(`${data.message}`);
       // Scrool up
       setTimeout(function(){
@@ -181,7 +188,7 @@ function App() {
   * set chatLog to an array with one object containing a message from "gpt" with value "DEFAULT_QUERY"
   */
   function clearChat() {
-    setChatLog([{user:"gpt",  message:`${DEFAULT_QUERY}`}])
+    setChatLog([{user:"gpt",  message:`${DEFAULT_QUERY}`, type:"string"}])
   }
 
   /*
@@ -324,8 +331,10 @@ function App() {
     timer = setTimeout(function(){
       //console(event.keyCode);
       if (event.keyCode === 38) {//Up key, cycle history in text input
+        //getNextHistory();
         cycleHistory(1);
       } else if (event.keyCode === 40) {//Down key, cycle history in text input
+        //getPreviousHistory();
         cycleHistory(-1);
       } else if (event.keyCode === 36) {//End key, toggle GPT read the text
         setIsListening(prevState => !prevState);
@@ -351,12 +360,17 @@ function App() {
     setInput(history[nextIndex]?.message);
   }
 
+  function changeTextareaHeight(){
+    document.getElementsByClassName("chat-input-textarea")[0].style.height = "auto";
+    document.getElementsByClassName("chat-input-textarea")[0].style.height = document.getElementsByClassName("chat-input-textarea")[0].scrollHeight + "px";
+  }
+
   //###################### Return HTML ########################
   /* The above code is a React component that renders the chatbot UI in HTML. */
   return (
     <div className="App">
       <aside className="sidemenu">
-        <div className="side-menu-button" onClick={(e) => {clearChat(); focusTheTextArea();}}>
+        <div className="side-menu-button" onClick={(e) => {clearChat(); focusTheTextArea();}} title="Copy Input To Clipboard" >
           <span>+ </span>New Prompts
         </div>
         <div className="models">
@@ -372,17 +386,17 @@ function App() {
         <div>
           <div className="tool-text">TEMPERATURE</div>
           <input className="side-menu-button-input" onChange={(e) => setTemperature(e.target.value)} value={temperature} type="number" max="1" min="0" rows="1" step="0.1" />
-          <div className='infos'>0 - Logical&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Creative - 1</div>
+          <div className='infos'>0 - Logic&nbsp;Creative - 1</div>
         </div>
         <div>
           <div className="tool-text">LENGTH</div>
           <input className="side-menu-button-input" onChange={(e) => setMaxTokens(e.target.value)} type="number" max={MAX_TOKENS} min="10" rows="1" step="10" value={maxTokens}  />
-          <div className='infos'>10 - Low&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;High - {MAX_TOKENS}</div>
+          <div className='infos'>10 - Low High - {MAX_TOKENS}</div>
         </div>
         <div>
           <div className="tool-text">COMPLETIONS</div>
-          <input className="side-menu-button-input" onChange={(e) => {setN(e.target.value); setBestOf(e.target.value);}}  type="number" max="4" min="1" rows="1" step="1" value={n} />
-          <div className='infos'>1 -&nbsp;&nbsp;&nbsp;#Prompt-Image&nbsp;&nbsp;&nbsp;- 4</div>
+          <input className="side-menu-button-input" onChange={(e) => {setN(e.target.value); setBestOf(e.target.value);}}  type="number" max="10" min="1" rows="1" step="1" value={n} />
+          <div className='infos'>1 - &nbsp;&nbsp;&nbsp;#Prompt&nbsp;&nbsp;&nbsp;&nbsp; - {MAX_ITERATION}</div>
         </div>
         <div className="resolution">
           <div className="tool-text">RESOLUTION</div>
@@ -394,12 +408,12 @@ function App() {
             ))}
           </select>
         </div>
-        <div className='infos'>"imagine" Create images</div>
+        <div className='infos'>"imagine" Generate DALL-E 2 images</div>
         <div className='infos'>&nbsp;</div>
-        <div className='infos'>Delete : New Prompts</div>
-        <div className='infos'>Home : Speak To GPT</div>
-        <div className='infos'>End : Read By GPT</div>
-        <div className='infos'>Up - Down : History</div>
+        <div className='infos'>Delete : New Prompt</div>
+        <div className='infos'>Home :Speak To GPT</div>
+        <div className='infos'>End : &nbsp;&nbsp;&nbsp;&nbsp;Read By GPT</div>
+        <div className='infos'>Up Down : &nbsp;&nbsp;&nbsp;History</div>
       </aside>
       <section className="chatbox">
         <div className="chat-log">
@@ -408,12 +422,12 @@ function App() {
           ))}
         </div>
         <div className="chat-input-holder">
-          <div className="form1" onKeyDown={(e) => {e.keyCode === 13 && handleSubmit()}}>
-            <input type="text" className="chat-input-textarea" onChange={(e) => setInput(e.target.value)} placeholder="Prompt" autoFocus rows="1" value={input} />
+          <div className="form1" onKeyDown={(e) => {!e.getModifierState("Shift") && e.keyCode === 13 && handleSubmit() && e.preventDefault(); changeTextareaHeight();  }}>
+            <textarea type="text" className="chat-input-textarea" onChange={(e) => {setInput(e.target.value); }} placeholder="Prompt" autoFocus rows="1" value={input} />
           </div>
           <input className="chat-input-textarea-prefix" onChange={(e) => setPrefix(e.target.value)} placeholder='Prefix' value={prefix} />
           <input className="chat-input-textarea-suffix" onChange={(e) => setSuffix(e.target.value)} placeholder='Suffix' value={suffix} />
-          <button className='send-button' onClick={(e) => {handleSubmit()}} tabIndex="-1" onFocus={(e) => {focusTheTextArea()}}type="button"  title="Send Prompt to GPT" >
+          <button className='send-button' onClick={() => {handleSubmit()}} tabIndex="-1" onFocus={() => {focusTheTextArea()}} type="button"  title="Send Prompt to GPT" >
             <svg width="16" height="27" fill="currentColor" viewBox="0 0 16 16"><path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/></svg>
           </button>
           <button className='record-voice-button' onClick={() => setIsListening(prevState => !prevState)} type="button" title="Record Voice To Prompt - Shortcut : Home">
@@ -422,12 +436,12 @@ function App() {
               <svg height="24" width="24"><circle cx="12" cy="12" r="10" stroke="black" fill="red" /></svg>
             </div>
           </button>
-          <button className="copy-button" title="Copy Input To Clipboard" onClick={(e)=> {navigator.clipboard.writeText(document.getElementsByClassName("chat-input-textarea")[0].value)}}>
+          <button className="copy-button" onClick={()=> {navigator.clipboard.writeText(document.getElementsByClassName("chat-input-textarea")[0].value)}}>
             <div>
-            <svg width="18" height="18" fill="currentColor" viewBox="1 -1 16 17"><path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+              <svg width="18" height="18" fill="currentColor" viewBox="1 -1 16 17"><path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
             </div>
           </button>
-          <button className='read-button' onClick={(e) => setIsReading(prevState => !prevState)} title="Answers Read By AI - Shorcut : End" type="button"  >
+          <button className='read-button' onClick={() => setIsReading(prevState => !prevState)} title="Answers Read By AI - Shorcut : End" type="button"  >
             <div className="unmute">
               <svg width="20" height="20" fill="currentColor" viewBox="1.5 -1 16 16"><path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/><path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"/><path d="M10.025 8a4.486 4.486 0 0 1-1.318 3.182L8 10.475A3.489 3.489 0 0 0 9.025 8c0-.966-.392-1.841-1.025-2.475l.707-.707A4.486 4.486 0 0 1 10.025 8zM7 4a.5.5 0 0 0-.812-.39L3.825 5.5H1.5A.5.5 0 0 0 1 6v4a.5.5 0 0 0 .5.5h2.325l2.363 1.89A.5.5 0 0 0 7 12V4zM4.312 6.39 6 5.04v5.92L4.312 9.61A.5.5 0 0 0 4 9.5H2v-3h2a.5.5 0 0 0 .312-.11z"/></svg>
             </div>
@@ -436,13 +450,13 @@ function App() {
             </div>
           </button>
           <div className='errors'></div>
-          <button className='clear-button' onClick={(e)=> {setInput("")}} onFocus={focusTheTextArea} type="button" title="Clear Input" >
+          <button className='clear-button' onClick={()=> {setInput("")}} onFocus={focusTheTextArea} type="button" title="Clear Input" >
             <svg width="20" height="20" fill="currentColor" viewBox="0 -4 20 20"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
           </button>
-          <button className='clear-button-prefix' onClick={(e) => {setPrefix("")}} onFocus={focusTheTextArea} type="button" title="Clear Input" >
+          <button className='clear-button-prefix' onClick={() => {setPrefix("")}} onFocus={focusTheTextArea} type="button" title="Clear Input" >
             <svg width="20" height="20" fill="currentColor" viewBox="0 -4 20 20"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
           </button>
-          <button className='clear-button-suffix' onClick={(e) => {setSuffix("")}} onFocus={focusTheTextArea} type="button" title="Clear Input" >
+          <button className='clear-button-suffix' onClick={() => {setSuffix("")}} onFocus={focusTheTextArea} type="button" title="Clear Input" >
             <svg width="20" height="20" fill="currentColor" viewBox="0 -4 20 20"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
           </button>
         </div>
@@ -469,8 +483,10 @@ const ChatMessage = ({message}) => {
             <div className='you'>You</div>}
         </div>
         <div className='gpt-box'>
-          {message.user === "gpt" &&
+          {message.user === "gpt" && message.type === "image" &&
             <span className="highlight-message" dangerouslySetInnerHTML={{__html:message.message}}></span>}
+          {message.user === "gpt" && message.type === "string" &&
+            <span className="highlight-message" >{message.message}</span>}
         </div>
         <div className='player-box'>
           {message.user === "user" &&

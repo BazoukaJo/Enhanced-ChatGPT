@@ -173,7 +173,13 @@ sup {
  */
 
 img {
-    border-style: none;
+    border-style:ridge;
+    max-width:fit-content; 
+    min-width: 256px;
+    border-color:rgb(59, 59, 59);
+    color-scheme: rgb(82, 82, 82);
+    width: 100%;
+    height: auto;
 }
 
 /* Forms
