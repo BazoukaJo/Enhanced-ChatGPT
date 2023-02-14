@@ -93,10 +93,5 @@ app.listen(port,() => {
     console.log(`app listen at http://10.0.0.75:${port}`);
 });
 
-function createCookie(message) {
-    // Create a new cookie and set the expiration date to 1 day
-    let d = new Date();
-    d.setTime(d.getTime() + (1*24*60*60*1000));
-    let expires = "expires="+ d.toUTCString();
-    document.cookie = "message=" + message + ";" + expires + ";path=/";
-}
+
+

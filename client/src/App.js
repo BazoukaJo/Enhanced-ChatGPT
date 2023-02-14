@@ -157,8 +157,8 @@ function App() {
         size:currentResolution,
     })
   });
-  const data = await response.json();
 
+  const data = await response.json();
     // Post request
     if(data.message !== ERROR_MESSAGE){
       if(currentPrompt === ""){
@@ -331,10 +331,8 @@ function App() {
     timer = setTimeout(function(){
       //console(event.keyCode);
       if (event.keyCode === 38) {//Up key, cycle history in text input
-        //getNextHistory();
         cycleHistory(1);
       } else if (event.keyCode === 40) {//Down key, cycle history in text input
-        //getPreviousHistory();
         cycleHistory(-1);
       } else if (event.keyCode === 36) {//End key, toggle GPT read the text
         setIsListening(prevState => !prevState);
@@ -357,7 +355,7 @@ function App() {
       nextIndex = history.length-1;
     }
     setHistoryIndex(nextIndex);
-    setInput(history[nextIndex]?.message);
+    setPrefix(history[nextIndex]?.message);
   }
 
   function changeTextareaHeight(){
@@ -425,7 +423,7 @@ function App() {
           <div className="form1" onKeyDown={(e) => {!e.getModifierState("Shift") && e.keyCode === 13 && handleSubmit() && e.preventDefault(); changeTextareaHeight();  }}>
             <textarea type="text" className="chat-input-textarea" onChange={(e) => {setInput(e.target.value); }} placeholder="Prompt" autoFocus rows="1" value={input} />
           </div>
-          <input className="chat-input-textarea-prefix" onChange={(e) => setPrefix(e.target.value)} placeholder='Prefix' value={prefix} />
+          <input className="chat-input-textarea-prefix" onChange={(e) => setPrefix(e.target.value)} placeholder='Prefix And History' value={prefix} />
           <input className="chat-input-textarea-suffix" onChange={(e) => setSuffix(e.target.value)} placeholder='Suffix' value={suffix} />
           <button className='send-button' onClick={() => {handleSubmit()}} tabIndex="-1" onFocus={() => {focusTheTextArea()}} type="button"  title="Send Prompt to GPT" >
             <svg width="16" height="27" fill="currentColor" viewBox="0 0 16 16"><path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/></svg>
@@ -436,7 +434,7 @@ function App() {
               <svg height="24" width="24"><circle cx="12" cy="12" r="10" stroke="black" fill="red" /></svg>
             </div>
           </button>
-          <button className="copy-button" onClick={()=> {navigator.clipboard.writeText(document.getElementsByClassName("chat-input-textarea")[0].value)}}>
+          <button className="copy-button" onClick={()=> {navigator.clipboard.writeText(document.getElementsByClassName("chat-input-textarea")[0].value)}} title="Copy Input To Clipboard">
             <div>
               <svg width="18" height="18" fill="currentColor" viewBox="1 -1 16 17"><path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
             </div>
@@ -451,13 +449,13 @@ function App() {
           </button>
           <div className='errors'></div>
           <button className='clear-button' onClick={()=> {setInput("")}} onFocus={focusTheTextArea} type="button" title="Clear Input" >
-            <svg width="20" height="20" fill="currentColor" viewBox="0 -4 20 20"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
+            <svg width="19" height="20" fill="currentColor" viewBox="0 -4 20 20"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
           </button>
-          <button className='clear-button-prefix' onClick={() => {setPrefix("")}} onFocus={focusTheTextArea} type="button" title="Clear Input" >
-            <svg width="20" height="20" fill="currentColor" viewBox="0 -4 20 20"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
+          <button className='clear-button-prefix' onClick={() => {setPrefix("")}} onFocus={focusTheTextArea} type="button" title="Clear Prefix" >
+            <svg width="19" height="20" fill="currentColor" viewBox="0 -4 20 20"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
           </button>
-          <button className='clear-button-suffix' onClick={() => {setSuffix("")}} onFocus={focusTheTextArea} type="button" title="Clear Input" >
-            <svg width="20" height="20" fill="currentColor" viewBox="0 -4 20 20"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
+          <button className='clear-button-suffix' onClick={() => {setSuffix("")}} onFocus={focusTheTextArea} type="button" title="Clear Suffix" >
+            <svg width="19" height="20" fill="currentColor" viewBox="0 -4 20 20"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
           </button>
         </div>
       </section>
@@ -492,6 +490,12 @@ const ChatMessage = ({message}) => {
           {message.user === "user" &&
             <span className='simple-message'>{message.message}</span>}
         </div>
+        <button title='Clear Message' className='clear-message' onClick={e => e.target.parentNode.parentNode.remove()}>
+          <svg width="16" height="16" fill="currentColor" viewBox="1 -3 18 19"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
+        </button>
+        <button title="Copy Message To Clipboard" className="copy-current-button" onClick={(e)=> {navigator.clipboard.writeText(message.message)}}>
+          <svg width="16" height="16" fill="currentColor" viewBox="1 -3 19 19"><path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"/><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+        </button>
       </div>
     </div>
   );
