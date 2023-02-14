@@ -53,8 +53,9 @@
 .errors{
   color:#a92626;
   border-radius: 8px;
-  bottom: 110px;
-  left: 320px;
+  padding:4px;
+  bottom: 130px;
+  left: 220px;
   position: fixed;
   transition: ease 0.2s all;
   animation: errorsAnimation 0.2s;
@@ -62,6 +63,8 @@
   animation-duration: 0.5s;
   animation-iteration-count: infinite;
   animation-play-state: running;
+  font-size:large;
+  font-weight: 600;
 }
 
 .side-menu-button-text:hover {
