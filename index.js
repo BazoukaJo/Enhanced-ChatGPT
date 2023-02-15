@@ -17,9 +17,9 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 
 /*
-* OpenAI key stored in an environment file, ".env".
+* OpenAI key stored in an environment variable.
 */
-let key = process.env.OPENAI_KEY;//store your key in the .env file, create it with OPENAI_KEY='YourKey' if don't exist.
+let key = process.env.OPENAI_KEY;//store your key in the environement variable OPENAI_KEY='YourKey'.
 const configuration = new Configuration({
     organization: "org-ZIGnH4RbSIOqCjHUzsSsMWA7",
     apiKey:key,
@@ -90,7 +90,7 @@ app.get('/models', async (req, res) => {
 
 /* Listening to the port 3080. */
 app.listen(port,() => {
-    console.log(`app listen at http://10.0.0.75:${port}`);
+    console.log(`app listen at http://localhost:${port}`);
 });
 
 

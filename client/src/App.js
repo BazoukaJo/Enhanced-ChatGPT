@@ -102,7 +102,7 @@ function App() {
    * was fetched.
    */
   async function getEngines(){
-    fetch("http://10.0.0.75:3080/models")
+    fetch("http://localhost:3080/models")
     .then(res => res.json())
     .then(data => setModels(data.models));
     //console.log("getEngine passed");
@@ -142,7 +142,7 @@ function App() {
     let currentPrompt = chatLogNew[chatLogNew.length-1]?.message.substr(0, 7) === "imagine" ? chatLogNew[chatLogNew.length-1]?.message : "";
 
     // POST request
-    const response = await fetch("http://10.0.0.75:3080/", {
+    const response = await fetch("http://localhost:3080/", {
       method:"POST",
       headers: {"content-type": "application/json"},
       body: JSON.stringify({
