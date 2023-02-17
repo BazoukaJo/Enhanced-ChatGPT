@@ -33,6 +33,7 @@
   padding-top: 5px;
   width: 100%;
   outline: 1px solid rgb(111, 111, 111);
+  border-style:none;
 }
 
 .side-menu-button-input {
@@ -43,6 +44,7 @@
   margin-bottom: 5px;
   padding-left: 10px;
   width: 100%;
+  border-style:groove;
 }
 
 .infos{
@@ -104,6 +106,7 @@
   transition: ease 0.2s all;
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
+  border-style:none;
 }
 
 .send-button:hover {
@@ -122,6 +125,7 @@
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
   color:white;
+  border-style:none;
 }
 
 .record-voice-button:hover {
@@ -140,6 +144,7 @@
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
   color:white;
+  border-style:none;
 }
 
 .read-button:hover {
@@ -158,6 +163,7 @@
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
   color:white;
+  border-style:none;
 }
 
 .copy-button:hover{
@@ -176,6 +182,7 @@
   outline: 1px solid rgb(111, 111, 111);
   position:relative;
   right:-10px;
+  border-style:none;
 }
 
 .copy-current-button:hover{
@@ -194,6 +201,7 @@
   transition: ease 0.2s all;
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
+  border-style:none;
 }
 
 .clear-button:hover{
@@ -212,6 +220,7 @@
   transition: ease 0.2s all;
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
+  border-style:none;
 }
 
 .clear-button-prefix:hover{
@@ -230,6 +239,7 @@
   transition: ease 0.2s all;
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
+  border-style:none;
 }
 
 .clear-button-suffix:hover{
@@ -247,6 +257,7 @@
   width: 25px;
   outline: 1px solid rgb(111, 111, 111);
   position:relative;
+  border-style:none;
 }
 
 .clear-message:hover{
@@ -288,6 +299,7 @@
   resize: vertical;
   max-height:200px;
   white-space:pre;
+  border-style:none;
 }
 
 .chat-input-textarea:hover {
@@ -313,6 +325,7 @@
   right: 46px;
   transition: ease 0.2s all;
   outline: 1px solid rgb(111, 111, 111);
+  border-style:none;
 }
 
 .chat-input-textarea-prefix:hover {
@@ -337,6 +350,7 @@
   right: 46px;
   transition: ease 0.2s all;
   outline: 1px solid rgb(111, 111, 111);
+  border-style:none;
 }
 
 .chat-input-textarea-suffix:hover {
@@ -353,6 +367,7 @@
   height: 30px;
   padding-left: 10px;
   width: 100%;
+  border-style:none;
 }
 
 .model-slection:hover {
@@ -370,6 +385,7 @@
   padding-left: 10px;
   margin-bottom: 5px;
   width: 100%;
+  border-style:none;
 }
 
 .resolution-slection:hover {
