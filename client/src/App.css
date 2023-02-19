@@ -33,7 +33,7 @@
   padding-top: 5px;
   width: 100%;
   outline: 1px solid rgb(111, 111, 111);
-  border-style:none;
+  border-style: none;
 }
 
 .side-menu-button-input {
@@ -44,18 +44,18 @@
   margin-bottom: 5px;
   padding-left: 10px;
   width: 100%;
-  border-style:groove;
+  border-style: groove;
 }
 
-.infos{
-  color:#616378;
+.infos {
+  color: #616378;
   font-size: 16px;
 }
 
-.errors{
-  color:#a92626;
+.errors {
+  color: #a92626;
   border-radius: 8px;
-  padding:4px;
+  padding: 4px;
   bottom: 130px;
   left: 220px;
   position: fixed;
@@ -65,7 +65,7 @@
   animation-duration: 0.5s;
   animation-iteration-count: infinite;
   animation-play-state: running;
-  font-size:large;
+  font-size: large;
   font-weight: 600;
 }
 
@@ -96,7 +96,7 @@
 }
 
 .send-button {
-  color:white;
+  color: white;
   background-color: #40414f;
   border-radius: 8px;
   bottom: 75px;
@@ -106,7 +106,7 @@
   transition: ease 0.2s all;
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
-  border-style:none;
+  border-style: none;
 }
 
 .send-button:hover {
@@ -114,18 +114,18 @@
   transition: ease 0.2s all;
 }
 
-.record-voice-button{
+.record-voice-button {
   background-color: #40414f;
   border-radius: 8px;
   bottom: 40px;
   height: 30px;
-  left:184px;
+  left: 184px;
   position: fixed;
   transition: ease 0.2s all;
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
-  color:white;
-  border-style:none;
+  color: white;
+  border-style: none;
 }
 
 .record-voice-button:hover {
@@ -133,7 +133,7 @@
   transition: ease 0.2s all;
 }
 
-.read-button{
+.read-button {
   background-color: #40414f;
   border-radius: 8px;
   bottom: 5px;
@@ -143,8 +143,8 @@
   transition: ease 0.2s all;
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
-  color:white;
-  border-style:none;
+  color: white;
+  border-style: none;
 }
 
 .read-button:hover {
@@ -152,27 +152,27 @@
   transition: ease 0.2s all;
 }
 
-.copy-button{
+.copy-button {
   background-color: #40414f;
   border-radius: 8px;
   bottom: 75px;
   height: 30px;
-  left:184px;
+  left: 184px;
   position: fixed;
   transition: ease 0.2s all;
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
-  color:white;
-  border-style:none;
+  color: white;
+  border-style: none;
 }
 
-.copy-button:hover{
+.copy-button:hover {
   background-color: #222222;
   transition: ease 0.2s all;
 }
 
-.copy-current-button{
-  color:white;
+.copy-current-button {
+  color: white;
   background-color: #40414f;
   border-radius: 8px;
   height: 25px;
@@ -180,18 +180,18 @@
   transition: ease 0.2s all;
   width: 25px;
   outline: 1px solid rgb(111, 111, 111);
-  position:relative;
-  right:-10px;
-  border-style:none;
+  position: relative;
+  right: -10px;
+  border-style: none;
 }
 
-.copy-current-button:hover{
+.copy-current-button:hover {
   background-color: #222222;
   transition: ease 0.2s all;
 }
 
-.clear-button{
-  color:white;
+.clear-button {
+  color: white;
   background-color: #40414f;
   border-radius: 8px;
   bottom: 75px;
@@ -201,16 +201,16 @@
   transition: ease 0.2s all;
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
-  border-style:none;
+  border-style: none;
 }
 
-.clear-button:hover{
+.clear-button:hover {
   background-color: #222222;
   transition: ease 0.2s all;
 }
 
-.clear-button-prefix{
-  color:white;
+.clear-button-prefix {
+  color: white;
   background-color: #40414f;
   border-radius: 8px;
   bottom: 40px;
@@ -220,16 +220,16 @@
   transition: ease 0.2s all;
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
-  border-style:none;
+  border-style: none;
 }
 
-.clear-button-prefix:hover{
+.clear-button-prefix:hover {
   background-color: #222222;
   transition: ease 0.2s all;
 }
 
-.clear-button-suffix{
-  color:white;
+.clear-button-suffix {
+  color: white;
   background-color: #40414f;
   border-radius: 8px;
   bottom: 5px;
@@ -239,16 +239,16 @@
   transition: ease 0.2s all;
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
-  border-style:none;
+  border-style: none;
 }
 
-.clear-button-suffix:hover{
+.clear-button-suffix:hover {
   background-color: #222222;
   transition: ease 0.2s all;
 }
 
-.clear-message{
-  color:white;
+.clear-message {
+  color: white;
   background-color: #40414f;
   border-radius: 8px;
   height: 25px;
@@ -256,11 +256,11 @@
   transition: ease 0.2s all;
   width: 25px;
   outline: 1px solid rgb(111, 111, 111);
-  position:relative;
-  border-style:none;
+  position: relative;
+  border-style: none;
 }
 
-.clear-message:hover{
+.clear-message:hover {
   background-color: #222222;
   transition: ease 0.2s all;
 }
@@ -297,9 +297,9 @@
   outline: 1px solid rgb(111, 111, 111);
   width: calc(100% - 301px);
   resize: vertical;
-  max-height:200px;
-  white-space:pre;
-  border-style:none;
+  max-height: 200px;
+  white-space: pre;
+  border-style: none;
 }
 
 .chat-input-textarea:hover {
@@ -325,7 +325,7 @@
   right: 46px;
   transition: ease 0.2s all;
   outline: 1px solid rgb(111, 111, 111);
-  border-style:none;
+  border-style: none;
 }
 
 .chat-input-textarea-prefix:hover {
@@ -350,7 +350,7 @@
   right: 46px;
   transition: ease 0.2s all;
   outline: 1px solid rgb(111, 111, 111);
-  border-style:none;
+  border-style: none;
 }
 
 .chat-input-textarea-suffix:hover {
@@ -367,7 +367,7 @@
   height: 30px;
   padding-left: 10px;
   width: 100%;
-  border-style:none;
+  border-style: none;
 }
 
 .model-slection:hover {
@@ -385,7 +385,7 @@
   padding-left: 10px;
   margin-bottom: 5px;
   width: 100%;
-  border-style:none;
+  border-style: none;
 }
 
 .resolution-slection:hover {
@@ -419,7 +419,7 @@
   height: 40px;
   transition: ease 0.2s all;
   width: 40px;
-  padding-left:-20px;
+  padding-left: -20px;
 }
 
 .avatar.chatgpt {
@@ -439,8 +439,8 @@
 .gpt-box {
   animation: messageAnimation 0.2s;
   transition: ease 0.2s all;
-  margin-left:20px;
-  display:block;
+  margin-left: 20px;
+  display: block;
 }
 
 .gpt-box:hover {
@@ -456,22 +456,22 @@
   white-space: break-spaces;
 }
 
-.recorder{
+.recorder {
   visibility: hidden;
-  position:fixed;
+  position: fixed;
   bottom: 37px;
   height: 30px;
-  left:187px;
+  left: 187px;
 }
 
-.mute{
+.mute {
   visibility: hidden;
   margin-top: -22px;
   margin-left: -2px;
 }
 
-.unmute{
-  visibility:visible;
+.unmute {
+  visibility: visible;
   margin-top: 2px;
 }
 
@@ -490,16 +490,16 @@
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
   height: 40px;
   position: fixed;
-  right:calc(50% - 100px);
+  right: calc(50% - 100px);
   transition: ease 0.2s all;
   visibility: hidden;
   width: 40px;
 }
 
-.form1{
+.form1 {
   background-color: #202123;
-  left:171px;
-  bottom:0px;
+  left: 171px;
+  bottom: 0px;
   height: 130px;
   position: fixed;
   right: 0px;
