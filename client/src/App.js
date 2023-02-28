@@ -1,7 +1,10 @@
 import "./App.css";
 import "./normal.css";
-import React, { useState, useEffect } from "react";
+
+import React, { useEffect, useState } from "react";
+
 import { useSpeechSynthesis } from "react-speech-kit";
+
 const speechRecognition =
   window.SpeechRecognition || window.webkitSpeechRecognition;
 const mic = new speechRecognition();
@@ -21,16 +24,13 @@ function App() {
   const ERROR_MESSAGE = "Connection Or Compatibility Error";
 
   // DEFAULT_TOLKEN define the default max tolkens.
-  const DEFAULT_TOLKEN = 1000;
+  const DEFAULT_TOLKEN = 100;
 
   // DEFAULT_TEMPERATURE define the value of the default temperature.
   const DEFAULT_TEMPERATURE = 0.7;
 
   // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
   const MAX_TOKENS = 4096;
-
-  // DEFAULT_QUERY set to text "Ask me anything...".
-  const DEFAULT_QUERY = "Ask me anything...";
 
   // DEFAULT_MODEL set to "text-davinci-003".
   const DEFAULT_MODEL = "text-davinci-003";
@@ -62,9 +62,7 @@ function App() {
   const [models, setModels] = useState([]);
 
   // chatLog set with state hook useState
-  const [chatLog, setChatLog] = useState([
-    { user: "gpt", message: DEFAULT_QUERY, type: "string" },
-  ]);
+  const [chatLog, setChatLog] = useState([{}]);
 
   // History set with state hook useState
   const [history] = useState([]);
@@ -223,10 +221,10 @@ function App() {
 
   /*
    * function to clear the chat messages
-   * set chatLog to an array with one object containing a message from "gpt" with value "DEFAULT_QUERY"
+   * set chatLog to an array with one object containing nothing
    */
   function clearChat() {
-    setChatLog([{ user: "gpt", message: `${DEFAULT_QUERY}`, type: "string" }]);
+    setChatLog([{}]);
   }
 
   /*
@@ -425,6 +423,7 @@ function App() {
         <div className="models">
           <div className="tool-text">MODELS</div>
           <select
+            title="Model Selection"
             className="model-slection"
             onChange={(e) => {
               setCurrentModel(e.target.value);
@@ -442,6 +441,7 @@ function App() {
         <div>
           <div className="tool-text">TEMPERATURE</div>
           <input
+            title="TEMPERATURE"
             className="side-menu-button-input"
             onChange={(e) => setTemperature(e.target.value)}
             value={temperature}
@@ -456,6 +456,7 @@ function App() {
         <div>
           <div className="tool-text">LENGTH</div>
           <input
+            title="LENGTH"
             className="side-menu-button-input"
             onChange={(e) => setMaxTokens(e.target.value)}
             type="number"
@@ -470,6 +471,7 @@ function App() {
         <div>
           <div className="tool-text">COMPLETIONS</div>
           <input
+            title="COMPLETIONS"
             className="side-menu-button-input"
             onChange={(e) => {
               setN(e.target.value);
@@ -490,6 +492,7 @@ function App() {
         <div className="resolution">
           <div className="tool-text">RESOLUTION</div>
           <select
+            title="RESOLUTION"
             className="resolution-slection"
             onChange={(e) => {
               setCurrentResolution(e.target.value);
@@ -512,7 +515,7 @@ function App() {
       </aside>
       <section className="chatbox">
         <div className="chat-log">
-          {chatLog?.map((message, index) => (
+          {chatLog?.map((message, index) => (index !== 0 &&
             <ChatMessage key={index} message={message} />
           ))}
         </div>
@@ -728,17 +731,17 @@ const ChatMessage = ({ message }) => {
         <div className="gpt-box">
           {message.user === "gpt" && message.type === "image" && (
             <span
-              className="highlight-message"
+              className="gpt-message"
               dangerouslySetInnerHTML={{ __html: message.message }}
             ></span>
           )}
           {message.user === "gpt" && message.type === "string" && (
-            <span className="highlight-message">{message.message}</span>
+            <span className="gpt-message">{message.message}</span>
           )}
         </div>
-        <div className="player-box">
+        <div className="user-box">
           {message.user === "user" && (
-            <span className="simple-message">{message.message}</span>
+            <span className="-message">{message.message}</span>
           )}
         </div>
         <button

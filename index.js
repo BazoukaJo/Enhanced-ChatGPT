@@ -49,7 +49,7 @@ app.post("/", async (req, res) => {
   } = req.body;
   try {
     let response;
-    //console.log("prompt = '"+prompt+"'");
+    console.log("prompt = "+prompt);
     if (prompt !== "") {
       response = await openai.createImage({
         // Images prompt
@@ -57,11 +57,12 @@ app.post("/", async (req, res) => {
         n: n,
         size: size,
       });
-      //console.log(response.data);
+      console.log(response.data);
       let imageURLs = response.data.data.map(
         (url) => "<img src='" + url.url + "' className='images' onload=''/>"
       );
       res.json({ message: imageURLs });
+      console.log("message = "+imageURLs);
     } else {
       response = await openai.createCompletion({
         // Texts prompt
@@ -78,6 +79,7 @@ app.post("/", async (req, res) => {
         .join("\n_________________________________")
         .trimStart();
       res.json({ message: choices });
+      console.log("message = "+choices);
     }
   } catch (error) {
     res.json({ message: ERROR_MESSAGE });
