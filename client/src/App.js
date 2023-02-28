@@ -177,7 +177,7 @@ function App() {
         maxTokens: parseInt(maxTokens),
         n: Number(n),
         bestOf: Number(bestOf),
-        frequency_penalty: 1.0,
+        frequency_penalty: 0.1,
         prompt: currentPrompt,
         size: currentResolution,
       }),

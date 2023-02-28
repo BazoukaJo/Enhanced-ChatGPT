@@ -67,12 +67,11 @@ app.post("/", async (req, res) => {
       response = await openai.createCompletion({
         // Texts prompt
         model: `${currentModel}`, // "text-davinci-003",
-        prompt: `${message}`,
         temperature: Number(`${temperature}`),
         max_tokens: parseInt(`${maxTokens}`),
         n: Number(`${n}`),
         best_of: Number(`${bestOf}`),
-        stop: "\n",
+        stop: "\n\n",
       });
       let choices = response.data.choices
         ?.map((choice) => choice.text)
