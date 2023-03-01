@@ -80,10 +80,16 @@ function App() {
   const [maxTokens, setMaxTokens] = useState(parseInt(DEFAULT_TOLKEN));
 
   // declare 'n' with state hook with 1 as initial value
-  const [n, setN] = useState(Number(1));
+  const [n, setN] = useState(1);
 
   // declare 'bestOf' with state hook with 1 as initial value
-  const [bestOf, setBestOf] = useState(Number(1));
+  const [bestOf, setBestOf] = useState(1);
+
+  // declare 'presencePenality' with state hook with 0 as initial value
+  const [presencePenality, setPresencePenality] = useState(0);
+
+  // declare 'frequencyPenalty' with state hook with 0 as initial value
+  const [frequencyPenalty, setFrequencyPenalty] = useState(0);
 
   // call getEngines() once when component is mounted
   useEffect(() => {
@@ -178,6 +184,8 @@ function App() {
         maxTokens: maxTokens,
         n: n,
         bestOf: bestOf,
+        frequencyPenalty: frequencyPenalty,
+        presencePenality: presencePenality,
         prompt: currentPrompt,
         size: currentResolution,
       }),
@@ -487,6 +495,44 @@ function App() {
           <div className="infos">
             1 - &nbsp;&nbsp;&nbsp;#Prompt&nbsp;&nbsp;&nbsp;&nbsp; -{" "}
             {MAX_ITERATION}
+          </div>
+        </div>
+        <div>
+          <div className="tool-text">PRESENCE</div>
+          <input
+            title="PRESENCE PENALITY"
+            className="side-menu-button-input"
+            onChange={(e) => {
+              setPresencePenality(e.target.value);
+            }}
+            type="number"
+            max="2"
+            min="-2"
+            rows="1"
+            step="0.1"
+            value={presencePenality}
+          />
+          <div className="infos">
+            -2 - &nbsp;&nbsp;&nbsp;&nbsp;Penality&nbsp;&nbsp;&nbsp;&nbsp; - 2
+          </div>
+        </div>
+        <div>
+          <div className="tool-text">FREQUENCE</div>
+          <input
+            title="FREQUENCE PENALITY"
+            className="side-menu-button-input"
+            onChange={(e) => {
+              setFrequencyPenalty(e.target.value);
+            }}
+            type="number"
+            max="2"
+            min="-2"
+            rows="1"
+            step="0.1"
+            value={frequencyPenalty}
+          />
+          <div className="infos">
+            -2 - &nbsp;&nbsp;&nbsp;&nbsp;Penality&nbsp;&nbsp;&nbsp;&nbsp; - 2
           </div>
         </div>
         <div className="resolution">

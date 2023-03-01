@@ -44,6 +44,8 @@ app.post("/", async (req, res) => {
     maxTokens,
     bestOf,
     n,
+    frequencePenalty,
+    presencePenalty,
     prompt,
     size,
   } = req.body;
@@ -73,7 +75,9 @@ app.post("/", async (req, res) => {
         temperature: Number(temperature),
         max_tokens: parseInt(maxTokens),
         n: Number(n),
-        best_of: Number(bestOf)
+        best_of: Number(bestOf),
+        presence_penalty: Number(presencePenalty),
+        frequency_penalty: Number(frequencePenalty)
       });
       let choices = response.data.choices
         ?.map((choice) => choice.text)
