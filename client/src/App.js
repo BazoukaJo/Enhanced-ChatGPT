@@ -24,10 +24,10 @@ function App() {
   const ERROR_MESSAGE = "Connection Or Compatibility Error";
 
   // DEFAULT_TOLKEN define the default max tolkens.
-  const DEFAULT_TOLKEN = 100;
+  const DEFAULT_TOLKEN = 500;
 
   // DEFAULT_TEMPERATURE define the value of the default temperature.
-  const DEFAULT_TEMPERATURE = 0.7;
+  const DEFAULT_TEMPERATURE = 0.5;
 
   // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
   const MAX_TOKENS = 4096;
@@ -166,18 +166,19 @@ function App() {
         ? chatLogNew[chatLogNew.length - 1]?.message
         : "";
 
+        console.log("sent messages = "+messages);
+
     // POST request
     const response = await fetch("http://localhost:3080/", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        currentModel,
-        message: messages,
-        temperature: Number(temperature),
-        maxTokens: parseInt(maxTokens),
-        n: Number(n),
-        bestOf: Number(bestOf),
-        frequency_penalty: 0.1,
+        model: currentModel,
+        messages: messages,
+        temperature: temperature,
+        maxTokens: maxTokens,
+        n: n,
+        bestOf: bestOf,
         prompt: currentPrompt,
         size: currentResolution,
       }),
@@ -185,6 +186,7 @@ function App() {
 
     const data = await response.json();
     // Post request
+    console.log("recieved data.message = "+data.message);
     if (data.message !== ERROR_MESSAGE) {
       if (currentPrompt === "") {
         handleIsReading(`${data.message}`);
@@ -198,7 +200,6 @@ function App() {
           { user: "gpt", message: data.message, type: "image" },
         ]);
       }
-      //console.log(`${data.message}`);
       // Scrool up
       setTimeout(function() {
         document

@@ -38,8 +38,8 @@ const port = 3080;
 /* A POST request message to the server. */
 app.post("/", async (req, res) => {
   const {
-    currentModel,
-    message,
+    model,
+    messages,
     temperature,
     maxTokens,
     bestOf,
@@ -47,38 +47,41 @@ app.post("/", async (req, res) => {
     prompt,
     size,
   } = req.body;
+  console.log(req.body);
   try {
-    let response;
-    console.log("prompt = "+prompt);
+    console.log("sent model = "+model);
+    console.log("sent message = "+messages);
+    console.log("sent temperature = "+temperature);
+    console.log("sent maxTokens = "+maxTokens);
     if (prompt !== "") {
-      response = await openai.createImage({
+      const response = await openai.createImage({
         // Images prompt
         prompt: prompt,
         n: n,
         size: size,
       });
-      console.log(response.data);
       let imageURLs = response.data.data.map(
-        (url) => "<img src='" + url.url + "' className='images' onload=''/>"
+        (url) => "<img src='" + url.url + "' className='images'/>"
       );
       res.json({ message: imageURLs });
-      console.log("message = "+imageURLs);
+      console.log("image urls = "+imageURLs);
     } else {
-      response = await openai.createCompletion({
+      const response = await openai.createCompletion({
         // Texts prompt
-        model: `${currentModel}`, // "text-davinci-003",
-        temperature: Number(`${temperature}`),
-        max_tokens: parseInt(`${maxTokens}`),
-        n: Number(`${n}`),
-        best_of: Number(`${bestOf}`),
-        stop: "\n\n",
+        model: model, // "text-davinci-003",
+        prompt: messages,
+        temperature: Number(temperature),
+        max_tokens: parseInt(maxTokens),
+        n: Number(n),
+        best_of: Number(bestOf),
+        stop: "\n",
       });
       let choices = response.data.choices
         ?.map((choice) => choice.text)
         .join("\n_________________________________")
         .trimStart();
       res.json({ message: choices });
-      console.log("message = "+choices);
+      console.log("reply messages = "+choices);
     }
   } catch (error) {
     res.json({ message: ERROR_MESSAGE });
