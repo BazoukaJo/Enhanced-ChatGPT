@@ -86,7 +86,7 @@ function App() {
   const [bestOf, setBestOf] = useState(1);
 
   // declare 'presencePenality' with state hook with 0 as initial value
-  const [presencePenality, setPresencePenality] = useState(0);
+  const [presencePenalty, setPresencePenalty] = useState(0);
 
   // declare 'frequencyPenalty' with state hook with 0 as initial value
   const [frequencyPenalty, setFrequencyPenalty] = useState(0);
@@ -185,7 +185,7 @@ function App() {
         n: n,
         bestOf: bestOf,
         frequencyPenalty: frequencyPenalty,
-        presencePenality: presencePenality,
+        presencePenalty: presencePenalty,
         prompt: currentPrompt,
         size: currentResolution,
       }),
@@ -500,26 +500,26 @@ function App() {
         <div>
           <div className="tool-text">PRESENCE</div>
           <input
-            title="PRESENCE PENALITY"
+            title="PRESENCE PENALTY"
             className="side-menu-button-input"
             onChange={(e) => {
-              setPresencePenality(e.target.value);
+              setPresencePenalty(e.target.value);
             }}
             type="number"
             max="2"
             min="-2"
             rows="1"
             step="0.1"
-            value={presencePenality}
+            value={presencePenalty}
           />
           <div className="infos">
-            -2 - &nbsp;&nbsp;&nbsp;&nbsp;Penality&nbsp;&nbsp;&nbsp;&nbsp; - 2
+            -2 - &nbsp;&nbsp;&nbsp;&nbsp;Penalty&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - 2
           </div>
         </div>
         <div>
-          <div className="tool-text">FREQUENCE</div>
+          <div className="tool-text">FREQUENCY</div>
           <input
-            title="FREQUENCE PENALITY"
+            title="FREQUENCY PENALTY"
             className="side-menu-button-input"
             onChange={(e) => {
               setFrequencyPenalty(e.target.value);
@@ -532,7 +532,7 @@ function App() {
             value={frequencyPenalty}
           />
           <div className="infos">
-            -2 - &nbsp;&nbsp;&nbsp;&nbsp;Penality&nbsp;&nbsp;&nbsp;&nbsp; - 2
+            -2 - &nbsp;&nbsp;&nbsp;&nbsp;Penalty&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - 2
           </div>
         </div>
         <div className="resolution">
@@ -790,16 +790,6 @@ const ChatMessage = ({ message }) => {
             <span className="user-message">{message.message}</span>
           )}
         </div>
-        <button
-          title="Clear Message"
-          className="clear-message"
-          onClick={(e) => e.target.parentNode.parentNode.remove()}
-        >
-          <svg width="16" height="16" fill="currentColor" viewBox="1 -3 18 19">
-            <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
-            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
-          </svg>
-        </button>
         <button
           title="Copy Message To Clipboard"
           className="copy-current-button"

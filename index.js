@@ -44,7 +44,7 @@ app.post("/", async (req, res) => {
     maxTokens,
     bestOf,
     n,
-    frequencePenalty,
+    frequencyPenalty,
     presencePenalty,
     prompt,
     size,
@@ -77,7 +77,7 @@ app.post("/", async (req, res) => {
         n: Number(n),
         best_of: Number(bestOf),
         presence_penalty: Number(presencePenalty),
-        frequency_penalty: Number(frequencePenalty)
+        frequency_penalty: Number(frequencyPenalty)
       });
       let choices = response.data.choices
         ?.map((choice) => choice.text)
