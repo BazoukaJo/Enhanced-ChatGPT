@@ -165,8 +165,7 @@ function App() {
       chatLogNew[chatLogNew.length - 1]?.message.substr(0, 7) === "imagine"
         ? chatLogNew[chatLogNew.length - 1]?.message
         : "";
-
-        console.log("sent messages = "+messages);
+        //console.log("sent messages = "+messages);
 
     // POST request
     const response = await fetch("http://localhost:3080/", {
@@ -186,7 +185,7 @@ function App() {
 
     const data = await response.json();
     // Post request
-    console.log("recieved data.message = "+data.message);
+    //console.log("recieved data.message = "+data.message);
     if (data.message !== ERROR_MESSAGE) {
       if (currentPrompt === "") {
         handleIsReading(`${data.message}`);

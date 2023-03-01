@@ -49,10 +49,10 @@ app.post("/", async (req, res) => {
   } = req.body;
   console.log(req.body);
   try {
-    console.log("sent model = "+model);
-    console.log("sent message = "+messages);
-    console.log("sent temperature = "+temperature);
-    console.log("sent maxTokens = "+maxTokens);
+    //console.log("sent model = "+model);
+    //console.log("sent message = "+messages);
+    //console.log("sent temperature = "+temperature);
+    //console.log("sent maxTokens = "+maxTokens);
     if (prompt !== "") {
       const response = await openai.createImage({
         // Images prompt
@@ -73,8 +73,7 @@ app.post("/", async (req, res) => {
         temperature: Number(temperature),
         max_tokens: parseInt(maxTokens),
         n: Number(n),
-        best_of: Number(bestOf),
-        stop: "\n",
+        best_of: Number(bestOf)
       });
       let choices = response.data.choices
         ?.map((choice) => choice.text)
