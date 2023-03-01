@@ -448,11 +448,11 @@
   transition: ease 0.2s all;
 }
 
-.highlight-message {
+.gpt-message {
   white-space: break-spaces;
 }
 
-.simple-message {
+.user-message {
   white-space: break-spaces;
 }
 

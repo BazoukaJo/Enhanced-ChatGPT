@@ -741,7 +741,7 @@ const ChatMessage = ({ message }) => {
         </div>
         <div className="user-box">
           {message.user === "user" && (
-            <span className="-message">{message.message}</span>
+            <span className="user-message">{message.message}</span>
           )}
         </div>
         <button
