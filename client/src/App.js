@@ -32,8 +32,8 @@ function App() {
   // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
   const MAX_TOKENS = 4096;
 
-  // DEFAULT_MODEL set to "text-davinci-003".
-  const DEFAULT_MODEL = "text-davinci-003";
+  // DEFAULT_MODEL set to "gpt-3.5-turbo".
+  const DEFAULT_MODEL = "gpt-3.5-turbo";
 
   // DEFAULT_RESOLUTION set to image generation resolution
   const DEFAULT_RESOLUTION = "512x512";
@@ -464,7 +464,7 @@ function App() {
         <div>
           <div className="tool-text">LENGTH</div>
           <input
-            title="LENGTH"
+            title="MAX TOKENS"
             className="side-menu-button-input"
             onChange={(e) => setMaxTokens(e.target.value)}
             type="number"

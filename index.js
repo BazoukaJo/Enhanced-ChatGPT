@@ -68,19 +68,18 @@ app.post("/", async (req, res) => {
       res.json({ message: imageURLs });
       console.log("image urls = "+imageURLs);
     } else {
-      const response = await openai.createCompletion({
+      const response = await openai.createChatCompletion({
         // Texts prompt
-        model: model, // "text-davinci-003",
-        prompt: messages,
+        model: model, // "gpt-3.5-turbo",
+        messages: [{role: "user", content: messages}],
         temperature: Number(temperature),
         max_tokens: parseInt(maxTokens),
         n: Number(n),
-        best_of: Number(bestOf),
         presence_penalty: Number(presencePenalty),
         frequency_penalty: Number(frequencyPenalty)
       });
       let choices = response.data.choices
-        ?.map((choice) => choice.text)
+        ?.map((choice) => choice.message.content)
         .join("\n_________________________________")
         .trimStart();
       res.json({ message: choices });
