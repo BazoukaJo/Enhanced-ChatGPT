@@ -42,7 +42,6 @@ app.post("/", async (req, res) => {
     messages,
     temperature,
     maxTokens,
-    bestOf,
     n,
     frequencyPenalty,
     presencePenalty,
@@ -59,7 +58,7 @@ app.post("/", async (req, res) => {
       const response = await openai.createImage({
         // Images prompt
         prompt: prompt,
-        n: n,
+        n: parseInt(n),
         size: size,
       });
       let imageURLs = response.data.data.map(
@@ -74,7 +73,7 @@ app.post("/", async (req, res) => {
         messages: [{role: "user", content: messages}],
         temperature: Number(temperature),
         max_tokens: parseInt(maxTokens),
-        n: Number(n),
+        n: parseInt(n),
         presence_penalty: Number(presencePenalty),
         frequency_penalty: Number(frequencyPenalty)
       });
