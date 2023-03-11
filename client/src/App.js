@@ -120,7 +120,7 @@ function App() {
     fetch("http://localhost:3080/models")
       .then((res) => res.json())
       .then((data) => setModels(data.models));
-    //console.log("getEngine passed");
+    //console.log("model = " + models);
   }
 
   /**
@@ -236,30 +236,19 @@ function App() {
   }
 
   /*
-   * This code is a function that will show a loader and disable certain buttons.
+   * This code is a function that will show a loader.
    * The function first sets the visibility of the element with the class 'loader' to visible.
-   * Then, it disables the elements with classes 'record-voice-button', 'copy-button', 'read-button', and 'send-button'.
    */
   function showLoader() {
     document.querySelector(".loader").style.visibility = "visible";
-    document.querySelector(".record-voice-button").disabled = true;
-    document.querySelector(".copy-button").disabled = true;
-    document.querySelector(".read-button").disabled = true;
-    document.querySelector(".send-button").disabled = true;
   }
 
   /*
-   * This function hides the loader and enables all the buttons on the page.
-   * It uses document.querySelector() to select elements with the class 'loader',
-   * 'record-voice-button', 'copy-button', 'read-button', and 'send-button'
-   * and sets their visibility to hidden and disabled property to false.
+   * This function hides the loader.
+   * It uses document.querySelector() to select elements with the class 'loader'
    */
   function hideLoader() {
     document.querySelector(".loader").style.visibility = "hidden";
-    document.querySelector(".record-voice-button").disabled = false;
-    document.querySelector(".copy-button").disabled = false;
-    document.querySelector(".read-button").disabled = false;
-    document.querySelector(".send-button").disabled = false;
   }
 
   /*
@@ -393,7 +382,7 @@ function App() {
   };
   document.addEventListener("keydown", keyEventHandler);
 
-  // This function cycle through history display in the input text.
+  // This function cycle through history display in the prefix text.
   function cycleHistory(index) {
     let nextIndex = historyIndex + index;
     if (nextIndex < 0) {
@@ -573,8 +562,8 @@ function App() {
                 e.keyCode === 13 &&
                 handleSubmit() &&
                 e.preventDefault();
-              changeTextareaHeight();
             }}
+            onInput={changeTextareaHeight()}
           >
             <textarea
               type="text"

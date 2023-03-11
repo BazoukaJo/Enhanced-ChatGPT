@@ -500,10 +500,11 @@
   background-color: #202123;
   left: 171px;
   bottom: 0px;
-  height: 130px;
+  height: auto;
   position: fixed;
   right: 0px;
   transition: ease 0.2s all;
+  overflow: auto;
 }
 
 @keyframes loader {

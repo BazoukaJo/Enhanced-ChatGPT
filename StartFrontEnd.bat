@@ -1,7 +1,4 @@
-@echo
+@echo off
 
-#Start the frontend
 cd client
 serve -s build
-
-@echo

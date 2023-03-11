@@ -1,6 +1,3 @@
-@echo
+@echo off
 
-#Start the backend
 node index.js
-
-@echo
