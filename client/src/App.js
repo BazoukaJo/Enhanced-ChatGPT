@@ -33,7 +33,7 @@ function App() {
   const MAX_TOKENS = 4096;
 
   // DEFAULT_MODEL set to "gpt-3.5-turbo".
-  const DEFAULT_MODEL = "gpt-3.5-turbo";
+  const DEFAULT_MODEL = "gpt-4";
 
   // DEFAULT_RESOLUTION set to image generation resolution
   const DEFAULT_RESOLUTION = "512x512";
@@ -54,9 +54,7 @@ function App() {
   ];
 
   // Set current resolution with default value 'DEFAULT_RESOLUTION' using state hook useState
-  const [currentResolution, setCurrentResolution] = useState(
-    DEFAULT_RESOLUTION
-  );
+  const [currentResolution, setCurrentResolution] = useState(DEFAULT_RESOLUTION);
 
   // models set with list of objects using state hook useState
   const [models, setModels] = useState([]);
@@ -117,11 +115,15 @@ function App() {
    * was fetched.
    */
   async function getEngines() {
-    fetch("http://localhost:3080/models")
-      .then((res) => res.json())
-      .then((data) => setModels(data.models));
-    //console.log("model = " + models);
-  }
+    try {
+        const response = await fetch("http://localhost:3080/models");
+        const data = await response.json();
+        const filteredModels = data.models.filter((item) => item.id.startsWith("gpt"));
+        setModels(filteredModels);
+    } catch (error) {
+        console.error('Error fetching models:', error);
+    }
+}
 
   /**
    * This code is a messaging platform where a user can chat with a chatbot powered by OpenAI's language model.
@@ -395,11 +397,9 @@ function App() {
   }
 
   function changeTextareaHeight() {
+    document.getElementsByClassName("chat-input-textarea")[0].style.height = "auto";
     document.getElementsByClassName("chat-input-textarea")[0].style.height =
-      "auto";
-    document.getElementsByClassName("chat-input-textarea")[0].style.height =
-      document.getElementsByClassName("chat-input-textarea")[0].scrollHeight +
-      "px";
+      document.getElementsByClassName("chat-input-textarea")[0].scrollHeight + "px";
   }
 
   //###################### Return HTML ########################
@@ -563,7 +563,7 @@ function App() {
                 handleSubmit() &&
                 e.preventDefault();
             }}
-            onInput={changeTextareaHeight()}
+            onInput={(e) => {changeTextareaHeight()}}
           >
             <textarea
               type="text"
