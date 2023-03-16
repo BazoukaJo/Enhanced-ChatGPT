@@ -30,7 +30,7 @@ function App() {
   const DEFAULT_TEMPERATURE = 0.5;
 
   // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
-  const MAX_TOKENS = 4096;
+  const MAX_TOKENS = 8192;
 
   // DEFAULT_MODEL set to "gpt-3.5-turbo".
   const DEFAULT_MODEL = "gpt-4";
