@@ -92,7 +92,7 @@ function App() {
   // call getEngines() once when component is mounted
   useEffect(() => {
     getEngines();
-  }, []);
+  });
 
   // declare isListening as false with state hook, toggle when handleListen() called
   const [isListening, setIsListening] = useState(false);
@@ -122,9 +122,9 @@ function App() {
         setModels(filteredModels);
     } catch (error) {
         console.error('Error fetching models:', error);
+        showWarning();
     }
-}
-git PublicKeyCredential
+  }
   /**
    * This code is a messaging platform where a user can chat with a chatbot powered by OpenAI's language model.
    * A copy of current chatlog, chatLog, is made and assigned to chatLogNew.
@@ -158,7 +158,7 @@ git PublicKeyCredential
     const messages = chatLogNew?.map((message) => message.message).join("\n");
     setInput("");
     showLoader();
-    // Scrool up
+    // Scrool down
     setTimeout(function() {
       document
         .getElementsByClassName("chatbox")[0]
@@ -209,7 +209,7 @@ git PublicKeyCredential
           { user: "gpt", message: data.message, type: "image" },
         ]);
       }
-      // Scrool up
+      // Scrool down
       setTimeout(function() {
         document
           .getElementsByClassName("chatbox")[0]
@@ -219,16 +219,19 @@ git PublicKeyCredential
           );
       }, 200);
     } else {
-      // show warning in flashing red
-      document.getElementsByClassName("errors")[0].innerHTML = ERROR_MESSAGE;
-      setTimeout(function() {
-        document.getElementsByClassName("errors")[0].innerHTML = "";
-      }, 3000);
+      showWarning();
     }
     hideLoader();
   }
   //###################### END Async Functions #######################
 
+  // show warning in flashing red
+  function showWarning(){
+    document.getElementsByClassName("errors")[0].innerHTML = ERROR_MESSAGE;
+    setTimeout(function() {
+      document.getElementsByClassName("errors")[0].innerHTML = "";
+    }, 3000);
+  }
   /*
    * function to clear the chat messages
    * set chatLog to an array with one object containing nothing
