@@ -124,7 +124,7 @@ function App() {
         console.error('Error fetching models:', error);
     }
 }
-
+git PublicKeyCredential
   /**
    * This code is a messaging platform where a user can chat with a chatbot powered by OpenAI's language model.
    * A copy of current chatlog, chatLog, is made and assigned to chatLogNew.
