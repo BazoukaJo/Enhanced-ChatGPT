@@ -369,10 +369,12 @@ function App() {
       //console(event.keyCode);
       if (event.keyCode === 38) {
         //Up key, cycle history in text input
-        cycleHistory(1);
+        if(isPefixFocus())
+          cycleHistory(-1);
       } else if (event.keyCode === 40) {
         //Down key, cycle history in text input
-        cycleHistory(-1);
+        if(isPefixFocus())
+          cycleHistory(1);
       } else if (event.keyCode === 36) {
         //End key, toggle GPT read the text
         setIsListening((prevState) => !prevState);
@@ -386,6 +388,13 @@ function App() {
     }, 0.0001);
   };
   document.addEventListener("keydown", keyEventHandler);
+
+  function isPefixFocus(){
+    //console.log(document.activeElement);
+    //console.log(document.getElementsByClassName("chat-input-textarea-prefix")[0]);
+    //console.log(document.activeElement === document.getElementsByClassName("chat-input-textarea-prefix")[0]);
+    return document.activeElement === document.getElementsByClassName("chat-input-textarea-prefix")[0];
+  }
 
   // This function cycle through history display in the prefix text.
   function cycleHistory(index) {
