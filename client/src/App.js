@@ -24,7 +24,7 @@ function App() {
   const ERROR_MESSAGE = "Connection Or Compatibility Error";
 
   // DEFAULT_TOLKEN define the default max tolkens.
-  const DEFAULT_TOLKEN = 500;
+  const DEFAULT_TOLKEN = 4000;
 
   // DEFAULT_TEMPERATURE define the value of the default temperature.
   const DEFAULT_TEMPERATURE = 0.5;
@@ -90,9 +90,8 @@ function App() {
   const [frequencyPenalty, setFrequencyPenalty] = useState(0);
 
   // call getEngines() once when component is mounted
-  useEffect(() => {
-    getEngines();
-  });
+  // eslint-disable-next-line
+  useEffect(() => {getEngines();}, []);
 
   // declare isListening as false with state hook, toggle when handleListen() called
   const [isListening, setIsListening] = useState(false);
@@ -199,6 +198,7 @@ function App() {
     if (data.message !== ERROR_MESSAGE) {
       if (currentPrompt === "") {
         handleIsReading(`${data.message}`);
+        setUsages(data.usage);
         setChatLog([
           ...chatLogNew,
           { user: "gpt", message: data.message, type: "string" },
@@ -403,6 +403,15 @@ function App() {
     document.getElementsByClassName("chat-input-textarea")[0].style.height = "auto";
     document.getElementsByClassName("chat-input-textarea")[0].style.height =
       document.getElementsByClassName("chat-input-textarea")[0].scrollHeight + "px";
+  }
+
+  function setUsages(usage){
+    document.getElementsByClassName("usage")[0].innerHTML =
+      "Prompt Tokens : " +
+      usage.prompt_tokens +
+      " | Completion Tokens : " +
+      usage.completion_tokens+
+      " | Total Tokens : "+ usage.total_tokens;
   }
 
   //###################### Return HTML ########################
@@ -676,6 +685,7 @@ function App() {
             </div>
           </button>
           <div className="errors"></div>
+          <div className="usage"></div>
           <button
             className="clear-button"
             onClick={() => {

@@ -50,10 +50,6 @@ app.post("/", async (req, res) => {
   } = req.body;
   console.log(req.body);
   try {
-    //console.log("sent model = "+model);
-    //console.log("sent message = "+messages);
-    //console.log("sent temperature = "+temperature);
-    //console.log("sent maxTokens = "+maxTokens);
     if (prompt !== "") {
       const response = await openai.createImage({
         // Images prompt
@@ -64,7 +60,7 @@ app.post("/", async (req, res) => {
       let imageURLs = response.data.data.map(
         (url) => "<img src='" + url.url + "' className='images'/>"
       );
-      res.json({ message: imageURLs });
+      res.json({ message: imageURLs, usage: {} });
       console.log("image urls = "+imageURLs);
     } else {
       const response = await openai.createChatCompletion({
@@ -81,7 +77,7 @@ app.post("/", async (req, res) => {
         ?.map((choice) => choice.message.content)
         .join("\n_________________________________")
         .trimStart();
-      res.json({ message: choices });
+      res.json({ message: choices, usage: response.data.usage });
       console.log("reply messages = "+choices);
     }
   } catch (error) {
