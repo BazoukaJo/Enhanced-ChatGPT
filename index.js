@@ -15,6 +15,7 @@ const { Configuration, OpenAIApi } = require("openai");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const fs = require('fs');
 
 /*
  * OpenAI key stored in an environment variable.
@@ -41,6 +42,7 @@ app.post("/", async (req, res) => {
   const {
     model,
     messages,
+    message,
     temperature,
     maxTokens,
     n,
@@ -50,6 +52,7 @@ app.post("/", async (req, res) => {
     size,
   } = req.body;
   console.log(req.body);
+  addHistory(message.message);
   try {
     if (prompt !== "") {
       const response = await openai.createImage({
@@ -80,6 +83,7 @@ app.post("/", async (req, res) => {
         .trimStart();
       res.json({ message: choices, usage: response.data.usage });
       console.log("reply messages = " + choices);
+      addHistory(choices);
     }
   } catch (error) {
     res.json({ message: ERROR_MESSAGE });
@@ -106,3 +110,13 @@ app.get("/models", async (req, res) => {
 app.listen(port, () => {
   console.log(`app listen at http://localhost:${port}`);
 });
+
+function addHistory(message){
+  const currentDate = new Date().toLocaleString();
+  const historyEntry = { message, date: currentDate };
+  const historyData = JSON.stringify(historyEntry);
+  fs.appendFile('./history.json', `${historyData}\n `, (err) => {
+    if (err) throw err;
+    //console.log("\nmessages store in history.json = " + message + " at " + currentDate);
+  });
+}

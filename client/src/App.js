@@ -192,6 +192,7 @@ function App() {
       body: JSON.stringify({
         model: currentModel,
         messages: messages,
+        message: currentMessage,
         temperature: temperature,
         maxTokens: maxTokens,
         n: n,
