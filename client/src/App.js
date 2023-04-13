@@ -21,13 +21,16 @@ mic.lang = "en-US";
  */
 function App() {
   // ERROR_MESSAGE define the default message error.
-  const ERROR_MESSAGE = "Connection Or Compatibility Error";
+  const ERROR_MESSAGE = "Connection, server failure, to much tokens, errors";
 
   // DEFAULT_TOLKEN define the default max tolkens.
-  const DEFAULT_TOLKEN = 4000;
+  const DEFAULT_TOLKEN = 4096;
 
   // DEFAULT_TEMPERATURE define the value of the default temperature.
   const DEFAULT_TEMPERATURE = 0.5;
+
+  const SYSTEM_ROLE = "system";
+  const START_INSTRUCTION = "I am your personal teacher. I can answer your questions and generate images.";
 
   // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
   const MAX_TOKENS = 8192;
@@ -53,6 +56,9 @@ function App() {
     { id: "1024x1024" },
   ];
 
+  const APP_LEFT_X_IN = "0px";
+  const APP_LEFT_X_OUT = "-156px";
+
   // Set current resolution with default value 'DEFAULT_RESOLUTION' using state hook useState
   const [currentResolution, setCurrentResolution] = useState(DEFAULT_RESOLUTION);
 
@@ -60,7 +66,7 @@ function App() {
   const [models, setModels] = useState([]);
 
   // chatLog set with state hook useState
-  const [chatLog, setChatLog] = useState([{}]);
+  const [chatLog, setChatLog] = useState([{name:"GPT", user:"gpt", role:SYSTEM_ROLE, message :START_INSTRUCTION, type:"string"}]);
 
   // History set with state hook useState
   const [history] = useState([]);
@@ -123,6 +129,9 @@ function App() {
         console.error('Error fetching models:', error);
         showWarning();
     }
+    setTimeout(() => {
+      document.getElementsByClassName("App")[0].style.left = APP_LEFT_X_OUT;
+    }, 4000);
   }
   /**
    * This code is a messaging platform where a user can chat with a chatbot powered by OpenAI's language model.
@@ -143,7 +152,9 @@ function App() {
     //Pre request
     let chatLogNew = [...chatLog];
     let currentMessage = {
+      name: "Jonathan",
       user: "user",
+      role:"user",
       message: `${prefix +
         (prefix === "" ? "" : " :\n") +
         input +
@@ -152,7 +163,7 @@ function App() {
       type: "string",
     };
     chatLogNew.push(currentMessage);
-    history.push({ user: "user", message: input, type: "string" });
+    history.push({ name:"Jonathan", user: "user", role:"user", message: input, type: "string" });
     setChatLog(chatLogNew);
     const messages = chatLogNew?.map((message) => message.message).join("\n");
     setInput("");
@@ -201,12 +212,12 @@ function App() {
         setUsages(data.usage);
         setChatLog([
           ...chatLogNew,
-          { user: "gpt", message: data.message, type: "string" },
+          { name:"GPT", user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "string" },
         ]);
       } else {
         setChatLog([
           ...chatLogNew,
-          { user: "gpt", message: data.message, type: "image" },
+          { name:"GPT", user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "image" },
         ]);
       }
       // Scrool down
@@ -237,7 +248,7 @@ function App() {
    * set chatLog to an array with one object containing nothing
    */
   function clearChat() {
-    setChatLog([{}]);
+    setChatLog([{name:"GPT", user:"gpt", role:SYSTEM_ROLE, message :START_INSTRUCTION, type:"string"}]);
   }
 
   /*
@@ -362,10 +373,10 @@ function App() {
   };
 
   // This function will handle Delete Home, End, Up and Down key press
-  let timer;
+  let keyTimer;
   let keyEventHandler = function(event) {
-    clearTimeout(timer);
-    timer = setTimeout(function() {
+    clearTimeout(keyTimer);
+    keyTimer = setTimeout(function() {
       //console(event.keyCode);
       if (event.keyCode === 38) {
         //Up key, cycle history in text input
@@ -388,6 +399,42 @@ function App() {
     }, 0.0001);
   };
   document.addEventListener("keydown", keyEventHandler);
+
+
+  
+  // Define a variable to store a timer reference for `mouseout` event.
+let mouseOutTimer;
+
+// Get the first element with a class name of "chatbox".
+let chatbox = document.getElementsByClassName("chatbox")[0];
+
+// Add an event listener for 'mouseout' events to the whole document.
+document.addEventListener("mouseout", function(event) {
+  // Check if the target element is the "sidemenu" and if the mouse is moving towards the "chatbox".
+  if (event.target.id === "sidemenu" && event.relatedTarget === chatbox) {
+    console.log(event.target.id + " - " + event.relatedTarget);
+    // Clear the previous timer to avoid multiple timers at once.
+    clearTimeout(mouseOutTimer);
+    // Trigger the new timer to hide the "App" element after 4 seconds.
+    mouseOutTimer = setTimeout(function() {
+      document.getElementsByClassName("App")[0].style.left = APP_LEFT_X_OUT;
+    }, 4000);
+  }
+});
+
+// Add an event listener for 'mouseover' events for the "sidemenu".
+document.addEventListener("mouseover", function(event) {
+  // Check if the target element is the "sidemenu" and if the mouse is coming from the "chatbox".
+  if (event.target.id === "sidemenu" && event.relatedTarget === chatbox) {
+    console.log(event.target.id + " - " + event.relatedTarget);
+    // Clear the previous timer, if any.
+    clearTimeout(mouseOutTimer);
+    // Show the "App" element by resetting its left style property.
+    document.getElementsByClassName("App")[0].style.left = APP_LEFT_X_IN;
+  }
+});
+
+
 
   function isPefixFocus(){
     //console.log(document.activeElement);
@@ -427,7 +474,7 @@ function App() {
   /* The above code is a React component that renders the chatbot UI in HTML. */
   return (
     <div className="App">
-      <aside className="sidemenu">
+      <aside className="sidemenu" id="sidemenu">
         <div
           className="side-menu-button"
           onClick={(e) => {
@@ -571,7 +618,7 @@ function App() {
       </aside>
       <section className="chatbox">
         <div className="chat-log">
-          {chatLog?.map((message, index) => (index !== 0 &&
+          {chatLog?.map((message, index) => (
             <ChatMessage key={index} message={message} />
           ))}
         </div>

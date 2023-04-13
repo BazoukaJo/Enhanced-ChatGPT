@@ -7,20 +7,121 @@
  */
 
 .App {
-  bottom: 0;
+  bottom: 0px;
   color: white;
   display: flex;
-  left: 0;
+  left: 0px;
   position: absolute;
   right: 0;
   top: 0;
+  transition: ease 0.2s all;
 }
 
 .sidemenu {
+  /*Make the div colapse to the left side with only 10 pixel visible in the x axxis, after 5 second, on mouse move, make the timer reset*/
   background-color: #202123;
   max-width: 170px;
   min-width: 170px;
   padding: 10px;
+}
+
+.chatbox {
+  background-color: #343541;
+  flex: 1;
+  min-height: 600;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-bottom: 130px;
+  scroll-behavior: smooth;
+  transition: ease 0.2s all;
+}
+
+.form1 {
+  background-color: #202123;
+  left: 171px;
+  bottom: 0px;
+  height: auto;
+  right: 0px;
+  transition: ease 0.2s all;
+  overflow: auto;
+}
+
+.chat-input-textarea {
+  background-color: #40414f;
+  border-radius: 8px;
+  border-width: 1px;
+  border: none;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
+  color: white;
+  font-size: 1.25em;
+  outline: 1px solid rgb(111, 111, 111);
+  border-style: none;
+  transition: ease 0.2s all;
+
+  resize: vertical;
+  white-space: pre;
+
+  max-height: 200px;
+  min-height: 50px;
+  min-width: 90px;
+  position:absolute;
+  left: 219px;
+  right: 80px;
+  bottom: 75px;
+}
+
+.chat-input-textarea:hover {
+  background-color: #222222;
+  transition: ease 0.2s all;
+}
+
+.chat-input-textarea-prefix {
+  background-color: #373744;
+  border-radius: 8px;
+  border-width: 1px;
+  border: none;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
+  color: white;
+  font-size: 1.25em;
+  transition: ease 0.2s all;
+  outline: 1px solid rgb(111, 111, 111);
+  border-style: none;
+
+  min-width: 90px;
+  position: absolute;
+  bottom: 40px;
+  height: 30px;
+  right: 46px;
+  left:219px;
+}
+
+.chat-input-textarea-prefix:hover {
+  background-color: #222222;
+  transition: ease 0.2s all;
+}
+
+.chat-input-textarea-suffix {
+  background-color: #373744;
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
+  color: white;
+  font-size: 1.25em;
+  transition: ease 0.2s all;
+  outline: 1px solid rgb(111, 111, 111);
+  border-style: none;
+
+  min-width: 90px;
+  position: absolute;
+  bottom: 5px;
+  height: 30px;
+  right: 46px;
+  left:219px;
+}
+
+.chat-input-textarea-suffix:hover {
+  background-color: #222222;
+  transition: ease 0.2s all;
 }
 
 .side-menu-button {
@@ -41,7 +142,7 @@
   border-radius: 8px;
   color: white;
   height: 30px;
-  margin-bottom: 5px;
+  margin-bottom: 0px;
   padding-left: 10px;
   width: 100%;
   border-style: groove;
@@ -73,8 +174,8 @@
   color: #616378;
   font-size: 16px;
   position: fixed;
-  bottom: 130px;
-  right:86px;
+  top: 1px;
+  right:1px;
   text-align: right;
 }
 
@@ -90,17 +191,6 @@
 
 .side-menu-button-input:hover {
   background-color: #222222;
-  transition: ease 0.2s all;
-}
-
-.chatbox {
-  background-color: #343541;
-  flex: 1;
-  min-height: 600;
-  overflow-x: hidden;
-  overflow-y: auto;
-  padding-bottom: 130px;
-  scroll-behavior: smooth;
   transition: ease 0.2s all;
 }
 
@@ -135,6 +225,8 @@
   outline: 1px solid rgb(111, 111, 111);
   color: white;
   border-style: none;
+  position: absolute;
+  transition: ease 0.2s all;
 }
 
 .record-voice-button:hover {
@@ -148,12 +240,13 @@
   bottom: 5px;
   height: 30px;
   left: 184px;
-  position: fixed;
   transition: ease 0.2s all;
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
   color: white;
   border-style: none;
+  position: absolute;
+  transition: ease 0.2s all;
 }
 
 .read-button:hover {
@@ -173,6 +266,8 @@
   outline: 1px solid rgb(111, 111, 111);
   color: white;
   border-style: none;
+  position: absolute;
+  transition: ease 0.2s all;
 }
 
 .copy-button:hover {
@@ -185,7 +280,6 @@
   background-color: #40414f;
   border-radius: 8px;
   height: 25px;
-  right: 10px;
   transition: ease 0.2s all;
   width: 25px;
   outline: 1px solid rgb(111, 111, 111);
@@ -281,89 +375,8 @@
 
 .tool-text {
   font-size: medium;
-  margin: 10px;
+  margin: 2px;
   margin-top: 8%;
-  transition: ease 0.2s all;
-}
-
-.chat-input-textarea {
-  background-color: #40414f;
-  border-radius: 8px;
-  border-width: 1px;
-  border: none;
-  bottom: 75px;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
-  color: white;
-  font-size: 1.25em;
-  height: 30px;
-  left: 20px;
-  margin-left: 200px;
-  min-width: 90px;
-  min-height: 48px;
-  padding: 12px;
-  position: fixed;
-  transition: ease 0.2s all;
-  outline: 1px solid rgb(111, 111, 111);
-  width: calc(100% - 301px);
-  resize: vertical;
-  max-height: 200px;
-  white-space: pre;
-  border-style: none;
-}
-
-.chat-input-textarea:hover {
-  background-color: #222222;
-  transition: ease 0.2s all;
-}
-
-.chat-input-textarea-prefix {
-  background-color: #373744;
-  border-radius: 8px;
-  border-width: 1px;
-  border: none;
-  bottom: 40px;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
-  color: white;
-  font-size: 1.25em;
-  height: 30px;
-  left: 20px;
-  margin-left: 200px;
-  min-width: 90px;
-  padding: 12px;
-  position: fixed;
-  right: 46px;
-  transition: ease 0.2s all;
-  outline: 1px solid rgb(111, 111, 111);
-  border-style: none;
-}
-
-.chat-input-textarea-prefix:hover {
-  background-color: #222222;
-  transition: ease 0.2s all;
-}
-
-.chat-input-textarea-suffix {
-  background-color: #373744;
-  border-radius: 8px;
-  border: none;
-  bottom: 5px;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
-  color: white;
-  font-size: 1.25em;
-  height: 30px;
-  left: 20px;
-  margin-left: 200px;
-  min-width: 90px;
-  padding: 12px;
-  position: fixed;
-  right: 46px;
-  transition: ease 0.2s all;
-  outline: 1px solid rgb(111, 111, 111);
-  border-style: none;
-}
-
-.chat-input-textarea-suffix:hover {
-  background-color: #222222;
   transition: ease 0.2s all;
 }
 
@@ -503,17 +516,6 @@
   transition: ease 0.2s all;
   visibility: hidden;
   width: 40px;
-}
-
-.form1 {
-  background-color: #202123;
-  left: 171px;
-  bottom: 0px;
-  height: auto;
-  position: fixed;
-  right: 0px;
-  transition: ease 0.2s all;
-  overflow: auto;
 }
 
 @keyframes loader {
