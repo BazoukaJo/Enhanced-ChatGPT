@@ -205,7 +205,7 @@ function App() {
 
     const data = await response.json();
     // Post request
-    //console.log("recieved data.message = "+data.message);
+    // console.log("recieved data.message = "+data.message);
     if (data.message !== ERROR_MESSAGE) {
       if (currentPrompt === "") {
         handleIsReading(`${data.message}`);
@@ -248,7 +248,7 @@ function App() {
    * set chatLog to an array with one object containing nothing
    */
   function clearChat() {
-    setChatLog([{name:"GPT", user:"gpt", role:SYSTEM_ROLE, message :START_INSTRUCTION, type:"string"}]);
+    setChatLog([{name:"GPT", user:"gpt", role:SYSTEM_ROLE, message:START_INSTRUCTION, type:"string"}]);
   }
 
   /*
@@ -400,46 +400,34 @@ function App() {
   };
   document.addEventListener("keydown", keyEventHandler);
 
-
-  
   // Define a variable to store a timer reference for `mouseout` event.
-let mouseOutTimer;
+  let mouseOutTimer;
+  // Get the first element with a class name of "chatbox".
+  let chatbox = document.getElementsByClassName("chatbox")[0];
+  // Add an event listener for 'mouseout' events to the whole document.
+  document.addEventListener("mouseout", function(event) {
+    // Check if the target element is the "sidemenu" and if the mouse is moving towards the "chatbox".
+    if (event.target.id === "sidemenu" && event.relatedTarget === chatbox) {
+      //console.log(event.target.id + " - " + event.relatedTarget);
+      // Clear the previous timer to avoid multiple timers at once.
+      clearTimeout(mouseOutTimer);
+      // Trigger the new timer to hide the "App" element after 4 seconds.
+      mouseOutTimer = setTimeout(function() {
+        document.getElementsByClassName("App")[0].style.left = APP_LEFT_X_OUT;
+      }, 4000);
+    }
+  });
 
-// Get the first element with a class name of "chatbox".
-let chatbox = document.getElementsByClassName("chatbox")[0];
-
-// Add an event listener for 'mouseout' events to the whole document.
-document.addEventListener("mouseout", function(event) {
-  // Check if the target element is the "sidemenu" and if the mouse is moving towards the "chatbox".
-  if (event.target.id === "sidemenu" && event.relatedTarget === chatbox) {
-    console.log(event.target.id + " - " + event.relatedTarget);
-    // Clear the previous timer to avoid multiple timers at once.
-    clearTimeout(mouseOutTimer);
-    // Trigger the new timer to hide the "App" element after 4 seconds.
-    mouseOutTimer = setTimeout(function() {
-      document.getElementsByClassName("App")[0].style.left = APP_LEFT_X_OUT;
-    }, 4000);
-  }
-});
-
-// Add an event listener for 'mouseover' events for the "sidemenu".
-document.addEventListener("mouseover", function(event) {
-  // Check if the target element is the "sidemenu" and if the mouse is coming from the "chatbox".
-  if (event.target.id === "sidemenu" && event.relatedTarget === chatbox) {
-    console.log(event.target.id + " - " + event.relatedTarget);
-    // Clear the previous timer, if any.
-    clearTimeout(mouseOutTimer);
-    // Show the "App" element by resetting its left style property.
-    document.getElementsByClassName("App")[0].style.left = APP_LEFT_X_IN;
-  }
-});
-
-
+  // Add an event listener for 'mouseover' events for the "sidemenu".
+  document.addEventListener("mouseover", function(event) {
+    if (event.target.id === "sidemenu" && event.relatedTarget === chatbox) {
+      //console.log(event.target + " - " + event.relatedTarget);
+      clearTimeout(mouseOutTimer);
+      document.getElementsByClassName("App")[0].style.left = APP_LEFT_X_IN;
+    }
+  });
 
   function isPefixFocus(){
-    //console.log(document.activeElement);
-    //console.log(document.getElementsByClassName("chat-input-textarea-prefix")[0]);
-    //console.log(document.activeElement === document.getElementsByClassName("chat-input-textarea-prefix")[0]);
     return document.activeElement === document.getElementsByClassName("chat-input-textarea-prefix")[0];
   }
 

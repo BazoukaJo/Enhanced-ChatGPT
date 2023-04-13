@@ -18,7 +18,6 @@
 }
 
 .sidemenu {
-  /*Make the div colapse to the left side with only 10 pixel visible in the x axxis, after 5 second, on mouse move, make the timer reset*/
   background-color: #202123;
   max-width: 170px;
   min-width: 170px;
@@ -219,13 +218,12 @@
   bottom: 40px;
   height: 30px;
   left: 184px;
-  position: fixed;
+  position: absolute;
   transition: ease 0.2s all;
   width: 30px;
   outline: 1px solid rgb(111, 111, 111);
   color: white;
   border-style: none;
-  position: absolute;
   transition: ease 0.2s all;
 }
 
@@ -480,10 +478,9 @@
 
 .recorder {
   visibility: hidden;
-  position: fixed;
-  bottom: 37px;
-  height: 30px;
-  left: 187px;
+  bottom: 0px;
+  left: 2px;
+  position: absolute;
 }
 
 .mute {
