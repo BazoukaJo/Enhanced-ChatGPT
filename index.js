@@ -8,7 +8,7 @@
  */
 
 // Messages for display in case of connectivity or compatibility errors.
-const ERROR_MESSAGE = "Connection Or Compatibility Error";
+const ERROR_MESSAGE = "Connection, server failure, to much tokens, errors";
 
 //NPM packages: openai, express, bodyParser and cors.
 const { Configuration, OpenAIApi } = require("openai");

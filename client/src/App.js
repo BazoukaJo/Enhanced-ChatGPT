@@ -195,12 +195,12 @@ function App() {
         message: currentMessage,
         temperature: temperature,
         maxTokens: maxTokens,
-        n: n,
-        bestOf: bestOf,
         frequencyPenalty: frequencyPenalty,
         presencePenalty: presencePenalty,
         prompt: currentPrompt,
         size: currentResolution,
+        bestOf: bestOf,
+        n: n,
       }),
     });
 
@@ -242,7 +242,7 @@ function App() {
     document.getElementsByClassName("errors")[0].innerHTML = ERROR_MESSAGE;
     setTimeout(function() {
       document.getElementsByClassName("errors")[0].innerHTML = "";
-    }, 3000);
+    }, 4000);
   }
   /*
    * function to clear the chat messages
