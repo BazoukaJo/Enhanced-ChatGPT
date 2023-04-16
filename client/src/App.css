@@ -131,6 +131,7 @@
   margin-bottom: 5px;
   padding-left: 10px;
   padding-top: 5px;
+  margin-top: 10px;
   width: 100%;
   outline: 1px solid rgb(111, 111, 111);
   border-style: none;
@@ -171,9 +172,9 @@
 
 .usage{
   color: #616378;
-  font-size: 16px;
+  font-size: 14px;
   position: fixed;
-  top: 1px;
+  top: -2px;
   right:20px;
   text-align: right;
 }
@@ -426,10 +427,12 @@
 
 .you {
   color: #40414F;
-  font-size: 1.25em;
+  font-size: 1.50em;
   font-weight: bolder;
   margin-left: 2px;
-  margin-top: 8px;
+  margin-top: 6px;
+  height: 40px;
+  width: 40px;
 }
 
 .avatar {
@@ -446,9 +449,12 @@
   background: #0da37f;
 }
 
-.player-box {
+.user-box {
   animation: messageAnimation 0.2s;
   transition: ease 0.2s all;
+  display: block;
+  width:100%;
+  margin-left: 20px;
 }
 
 .player-box:hover {
@@ -461,6 +467,7 @@
   transition: ease 0.2s all;
   margin-left: 20px;
   display: block;
+  width:100%;
 }
 
 .gpt-box:hover {

@@ -41,9 +41,6 @@ function App() {
   // DEFAULT_RESOLUTION set to image generation resolution
   const DEFAULT_RESOLUTION = "512x512";
 
-  //MAX_ITERATION set the number of answers and images generation to be used, OpenAI suport a maximum of 10.
-  const MAX_ITERATION = 10;
-
   // declare input, prefix and suffix with state hook useState
   const [input, setInput] = useState("");
   const [prefix, setPrefix] = useState("");
@@ -56,11 +53,11 @@ function App() {
     { id: "1024x1024" },
   ];
 
-  const APP_LEFT_X_IN = "0px";
-  const APP_LEFT_X_OUT = "-156px";
+  const SIDE_X_IN = "0px";
+  const SIDE_X_OUT = "-150px";
 
   // Set current resolution with default value 'DEFAULT_RESOLUTION' using state hook useState
-  const [currentResolution, setCurrentResolution] = useState(DEFAULT_RESOLUTION);
+  const [currentResolution, setResolution] = useState(DEFAULT_RESOLUTION);
 
   // models set with list of objects using state hook useState
   const [models, setModels] = useState([]);
@@ -130,7 +127,7 @@ function App() {
         showWarning();
     }
     setTimeout(() => {
-      document.getElementsByClassName("App")[0].style.left = APP_LEFT_X_OUT;
+      document.getElementsByClassName("App")[0].style.left = SIDE_X_OUT;
     }, 4000);
   }
   /**
@@ -250,6 +247,7 @@ function App() {
    */
   function clearChat() {
     setChatLog([{name:"GPT", user:"gpt", role:SYSTEM_ROLE, message:START_INSTRUCTION, type:"string"}]);
+    setUsages("");
   }
 
   /*
@@ -410,7 +408,7 @@ function App() {
       //console.log(event.target.id + " - " + event.relatedTarget);
       clearTimeout(mouseOutTimer);
       mouseOutTimer = setTimeout(function() {
-        document.getElementsByClassName("App")[0].style.left = APP_LEFT_X_OUT;
+        document.getElementsByClassName("App")[0].style.left = SIDE_X_OUT;
       }, 4000);
     }
   });
@@ -420,7 +418,7 @@ function App() {
     if (event.target.id === "sidemenu" && (event.relatedTarget === chatbox || event.relatedTarget === chatPost)) {
       //console.log(event.target.id + " - " + event.relatedTarget);
       clearTimeout(mouseOutTimer);
-      document.getElementsByClassName("App")[0].style.left = APP_LEFT_X_IN;
+      document.getElementsByClassName("App")[0].style.left = SIDE_X_IN;
     }
   });
 
@@ -449,11 +447,14 @@ function App() {
 
   function setUsages(usage){
     document.getElementsByClassName("usage")[0].innerHTML =
+      usage !== "" ?
       "Prompt Tokens : " +
       usage.prompt_tokens +
       " | Completion Tokens : " +
       usage.completion_tokens+
-      " | Total Tokens : "+ usage.total_tokens;
+      " | Total Tokens : "+
+      usage.total_tokens
+      : "";
   }
 
   //###################### Return HTML ########################
@@ -502,10 +503,9 @@ function App() {
             rows="1"
             step="0.1"
           />
-          <div className="infos">0 - Logic&nbsp;Creative - 1</div>
         </div>
         <div>
-          <div className="tool-text">LENGTH</div>
+          <div className="tool-text">TOKENS</div>
           <input
             title="MAX TOKENS"
             className="side-menu-button-input"
@@ -517,10 +517,9 @@ function App() {
             step="10"
             value={maxTokens}
           />
-          <div className="infos">10 - Low High - {MAX_TOKENS}</div>
         </div>
         <div>
-          <div className="tool-text">COMPLETIONS</div>
+          <div className="tool-text">#COMPLETIONS</div>
           <input
             title="COMPLETIONS"
             className="side-menu-button-input"
@@ -535,10 +534,6 @@ function App() {
             step="1"
             value={n}
           />
-          <div className="infos">
-            1 - &nbsp;&nbsp;&nbsp;#Prompt&nbsp;&nbsp;&nbsp;&nbsp; -{" "}
-            {MAX_ITERATION}
-          </div>
         </div>
         <div>
           <div className="tool-text">PRESENCE</div>
@@ -555,9 +550,6 @@ function App() {
             step="0.1"
             value={presencePenalty}
           />
-          <div className="infos">
-            -2 - &nbsp;&nbsp;&nbsp;&nbsp;Penalty&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - 2
-          </div>
         </div>
         <div>
           <div className="tool-text">FREQUENCY</div>
@@ -574,9 +566,6 @@ function App() {
             step="0.1"
             value={frequencyPenalty}
           />
-          <div className="infos">
-            -2 - &nbsp;&nbsp;&nbsp;&nbsp;Penalty&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - 2
-          </div>
         </div>
         <div className="resolution">
           <div className="tool-text">RESOLUTION</div>
@@ -584,7 +573,7 @@ function App() {
             title="RESOLUTION"
             className="resolution-slection"
             onChange={(e) => {
-              setCurrentResolution(e.target.value);
+              setResolution(e.target.value);
             }}
             value={currentResolution}
           >
@@ -595,12 +584,6 @@ function App() {
             ))}
           </select>
         </div>
-        <div className="infos">"imagine" Generate DALL-E 2 images</div>
-        <div className="infos">&nbsp;</div>
-        <div className="infos">Delete : New Prompt</div>
-        <div className="infos">Home :Speak To GPT</div>
-        <div className="infos">End : &nbsp;&nbsp;&nbsp;&nbsp;Read By GPT</div>
-        <div className="infos">Up Down : &nbsp;&nbsp;&nbsp;History</div>
       </aside>
       <section className="chatbox">
         <div className="chat-log">
@@ -816,9 +799,9 @@ const ChatMessage = ({ message }) => {
               />
             </svg>
           )}
-          {message.user === "user" && <div className="you">You</div>}
+          {message.user === "user" && <div className="you">ME</div>}
         </div>
-        <div className="gpt-box">
+        { message.user !== "user" && <div className="gpt-box">
           {message.user === "gpt" && message.type === "image" && (
             <span
               className="gpt-message"
@@ -828,12 +811,12 @@ const ChatMessage = ({ message }) => {
           {message.user === "gpt" && message.type === "string" && (
             <span className="gpt-message">{message.message}</span>
           )}
-        </div>
-        <div className="user-box">
+        </div>}
+        {message.user !== "gpt" && <div className="user-box">
           {message.user === "user" && (
             <span className="user-message">{message.message}</span>
           )}
-        </div>
+        </div>}
         <button
           title="Copy Message To Clipboard"
           className="copy-current-button"
