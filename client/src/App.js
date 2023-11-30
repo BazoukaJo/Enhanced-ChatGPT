@@ -39,7 +39,7 @@ function App() {
   const DEFAULT_MODEL = "gpt-4";
 
   // DEFAULT_RESOLUTION set to image generation resolution
-  const DEFAULT_RESOLUTION = "512x512";
+  const DEFAULT_RESOLUTION = "1792x1024";
 
   // declare input, prefix and suffix with state hook useState
   const [input, setInput] = useState("");
@@ -48,9 +48,9 @@ function App() {
 
   // Image resolution settings
   const resolutions = [
-    { id: "256x256" },
-    { id: "512x512" },
     { id: "1024x1024" },
+    { id: "1024x1792" },
+    { id: "1792x1024" },
   ];
 
   const SIDE_X_IN = "0px";

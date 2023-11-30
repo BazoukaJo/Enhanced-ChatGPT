@@ -57,6 +57,7 @@ app.post("/", async (req, res) => {
     if (prompt !== "") {
       const response = await openai.createImage({
         // Images prompt
+        model:"dall-e-3",
         prompt: prompt,
         n: parseInt(n),
         size: size,
