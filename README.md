@@ -3,8 +3,7 @@
 
 # Enhanced ChatGPT
 
-The idea was to provide a custom utilization of ChatGPT with access to variables influencing the result. It also support the creation image with the prefix "imagine".
-To use the App, you need node.js, and python install and the needed package. Follow the react link for easy utilization and installation start.  
+The purpose of this project is to create a customized version of ChatGPT that allows users to influence the output by using variables. Additionally, it supports the creation of images using the "imagine" prefix. To use the app, you will need to have node.js and Python installed, along with the necessary packages. You can follow the provided React link for easy installation and utilization instructions.
 
 # Getting Started with Create React App
 
