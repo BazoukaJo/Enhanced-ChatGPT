@@ -379,7 +379,7 @@
   transition: ease 0.2s all;
 }
 
-.model-slection {
+.model-selection {
   background-color: #40414F;
   border-radius: 8px;
   outline: 1px solid rgb(111, 111, 111);
@@ -391,12 +391,12 @@
   border-style: none;
 }
 
-.model-slection:hover {
+.model-selection:hover {
   background-color: #222222;
   transition: ease 0.2s all;
 }
 
-.resolution-slection {
+.resolution-selection {
   background-color: #40414F;
   border-radius: 8px;
   outline: 1px solid rgb(111, 111, 111);
@@ -409,7 +409,7 @@
   border-style: none;
 }
 
-.resolution-slection:hover {
+.resolution-selection:hover {
   background-color: #222222;
   transition: ease 0.2s all;
 }

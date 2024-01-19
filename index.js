@@ -1,5 +1,5 @@
 /**
- * App Backend: Enhhanced ChatGPT
+ * App Backend: Enhanced ChatGPT
  *
  * @license MIT <https://opensource.org/licenses/MIT>
  * @author Jonathan Pratte <https://jonathanpratte.com>
@@ -8,7 +8,7 @@
  */
 
 // Messages for display in case of connectivity or compatibility errors.
-const ERROR_MESSAGE = "Connection, server failure, to much tokens, errors";
+const ERROR_MESSAGE = "Generics Errors Message";
 
 //NPM packages: openai, express, bodyParser and cors.
 const { Configuration, OpenAIApi } = require("openai");
@@ -20,8 +20,8 @@ const fs = require('fs');
 /*
  * OpenAI key stored in an environment variable.
  */
-let key = process.env.OPENAI_KEY; //store your key in the environement variable OPENAI_KEY='YourKey'.
-let org = process.env.OPENAI_ORG; //store your key in the environement variable OPENAI_ORG='OrgKey'.
+let key = process.env.OPENAI_KEY; //store your key in the environment variable OPENAI_KEY='YourKey'.
+let org = process.env.OPENAI_ORG; //store your key in the environment variable OPENAI_ORG='OrgKey'.
 const configuration = new Configuration({
   organization: org,
   apiKey: key,
@@ -66,12 +66,13 @@ app.post("/", async (req, res) => {
         (url) => "<img src='" + url.url + "' className='images'/>"
       );
       res.json({ message: imageURLs, usage: {} });
-      console.log("image urls = "+imageURLs);
+      addHistory(" " + imageURLs);
+      console.log("image urls = " + imageURLs);
     } else {
       const response = await openai.createChatCompletion({
         // Texts prompt
         model: model, // "gpt-4",
-        messages: [{name:"Jonathan", role: "user", content: messages}],
+        messages: [{name:"John", role: "user", content: messages}],//Change to your name.
         temperature: Number(temperature),
         max_tokens: parseInt(maxTokens),
         n: parseInt(n),
@@ -87,7 +88,7 @@ app.post("/", async (req, res) => {
       addHistory(choices);
     }
   } catch (error) {
-    res.json({ message: ERROR_MESSAGE });
+    res.json({ message: error.message });
     if (error.response) {
       console.log(error.response.status);
       console.log(error.response.data);
@@ -103,7 +104,14 @@ app.get("/models", async (req, res) => {
     const response = await openai.listModels();
     res.json({ models: response.data.data });
   } catch (error) {
-    res.json({ message: ERROR_MESSAGE });
+    res.json({ message: error.message });
+    if (error.response) {
+      console.log(error.response.status);
+      console.log(error.response.data);
+    } else {
+      console.log(error.message);
+    }
+    ERROR_MESSAGE = error.message;
   }
 });
 
@@ -118,6 +126,6 @@ function addHistory(message){
   const historyData = JSON.stringify(historyEntry);
   fs.appendFile('./history.json', `${historyData}\n `, (err) => {
     if (err) throw err;
-    //console.log("\nmessages store in history.json = " + message + " at " + currentDate);
+    console.log(err);
   });
 }

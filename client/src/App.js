@@ -23,8 +23,8 @@ function App() {
   // ERROR_MESSAGE define the default message error.
   const ERROR_MESSAGE = "Connection, server failure, to much tokens, errors";
 
-  // DEFAULT_TOLKEN define the default max tolkens.
-  const DEFAULT_TOLKEN = 4096;
+  // DEFAULT_TOKEN define the default max tokens.
+  const DEFAULT_TOKEN = 4096;
 
   // DEFAULT_TEMPERATURE define the value of the default temperature.
   const DEFAULT_TEMPERATURE = 0.5;
@@ -54,7 +54,7 @@ function App() {
   ];
 
   const SIDE_X_IN = "0px";
-  const SIDE_X_OUT = "-150px";
+  const SIDE_X_OUT = "-140px";
 
   // Set current resolution with default value 'DEFAULT_RESOLUTION' using state hook useState
   const [currentResolution, setResolution] = useState(DEFAULT_RESOLUTION);
@@ -78,7 +78,7 @@ function App() {
   const [temperature, setTemperature] = useState(Number(DEFAULT_TEMPERATURE));
 
   // maxTokens is set with state hook with 100 parsed to an integer as the initial value
-  const [maxTokens, setMaxTokens] = useState(parseInt(DEFAULT_TOLKEN));
+  const [maxTokens, setMaxTokens] = useState(parseInt(DEFAULT_TOKEN));
 
   // declare 'n' with state hook with 1 as initial value
   const [n, setN] = useState(1);
@@ -86,7 +86,7 @@ function App() {
   // declare 'bestOf' with state hook with 1 as initial value
   const [bestOf, setBestOf] = useState(1);
 
-  // declare 'presencePenality' with state hook with 0 as initial value
+  // declare 'presencePenalty' with state hook with 0 as initial value
   const [presencePenalty, setPresencePenalty] = useState(0);
 
   // declare 'frequencyPenalty' with state hook with 0 as initial value
@@ -160,12 +160,12 @@ function App() {
       type: "string",
     };
     chatLogNew.push(currentMessage);
-    history.push({ name:"Jonathan", user: "user", role:"user", message: input, type: "string" });
+    history.push({ name:"John", user: "user", role:"user", message: input, type: "string" });//Change to your name
     setChatLog(chatLogNew);
     const messages = chatLogNew?.map((message) => message.message).join("\n");
     setInput("");
     showLoader();
-    // Scrool down
+    // Scroll down
     setTimeout(function() {
       document
         .getElementsByClassName("chatbox")[0]
@@ -203,7 +203,7 @@ function App() {
 
     const data = await response.json();
     // Post request
-    // console.log("recieved data.message = "+data.message);
+    // console.log("received data.message = "+data.message);
     if (data.message !== ERROR_MESSAGE) {
       if (currentPrompt === "") {
         handleIsReading(`${data.message}`);
@@ -218,7 +218,7 @@ function App() {
           { name:"GPT", user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "image" },
         ]);
       }
-      // Scrool down
+      // Scroll down
       setTimeout(function() {
         document
           .getElementsByClassName("chatbox")[0]
@@ -362,7 +362,7 @@ function App() {
     //console.log("handleIsReading passed");
     if (isReading) {
       //console.log(message);
-      speak({ text: message, voice: voices[2] });
+      speak({ text: message, voice: voices[2] });//prefix 
       showMute();
     } else {
       //console.log("stopReading");
@@ -379,17 +379,17 @@ function App() {
       //console(event.keyCode);
       if (event.keyCode === 38) {
         //Up key, cycle history in text input
-        if(isPefixFocus())
+        if(isPrefixFocus())
           cycleHistory(-1);
       } else if (event.keyCode === 40) {
         //Down key, cycle history in text input
-        if(isPefixFocus())
+        if(isPrefixFocus())
           cycleHistory(1);
       } else if (event.keyCode === 36) {
         //End key, toggle GPT read the text
         setIsListening((prevState) => !prevState);
       } else if (event.keyCode === 35) {
-        //Home key, toggle speack to GPT
+        //Home key, toggle speak to GPT
         setIsReading((prevState) => !prevState);
       } else if (event.keyCode === 46) {
         //Delete key, new prompt
@@ -403,9 +403,9 @@ function App() {
   let chatbox = document.getElementsByClassName("chatbox")[0];
   let chatPost = document.getElementsByClassName("chat-message-center")[0];
   document.addEventListener("mouseout", function(event) {
-    //console.log(event.target.id + " - " + event.relatedTarget);
-    if (event.target.id === "sidemenu" && (event.relatedTarget === chatbox || event.relatedTarget === chatPost)) {
-      //console.log(event.target.id + " - " + event.relatedTarget);
+    //console.log("event.target.id " + event.target.id + " - relatedTarget " + event.relatedTarget);
+    if (event.target.id === "sidemenu" && (event.relatedTarget === chatbox || event.relatedTarget === chatPost || event.relatedTarget === null)) {
+      //console.log("event.target.id " + event.target.id + " - relatedTarget " + event.relatedTarget);
       clearTimeout(mouseOutTimer);
       mouseOutTimer = setTimeout(function() {
         document.getElementsByClassName("App")[0].style.left = SIDE_X_OUT;
@@ -415,15 +415,17 @@ function App() {
 
   // Add an event listener for 'mouseover' events for the "sidemenu".
   document.addEventListener("mouseover", function(event) {
-    if (event.target.id === "sidemenu" && (event.relatedTarget === chatbox || event.relatedTarget === chatPost)) {
-      //console.log(event.target.id + " - " + event.relatedTarget);
+    if ((event.target.id === "sidemenu" && (event.relatedTarget === chatbox || event.relatedTarget === chatPost || event.relatedTarget === null))
+    || (event.target.id === "" && event.relatedTarget === null)
+    ) {
+      //console.log("event.target.id " + event.target.id + " - relatedTarget " + event.relatedTarget);
       clearTimeout(mouseOutTimer);
       document.getElementsByClassName("App")[0].style.left = SIDE_X_IN;
     }
   });
 
 
-  function isPefixFocus(){
+  function isPrefixFocus(){
     return document.activeElement === document.getElementsByClassName("chat-input-textarea-prefix")[0];
   }
 
@@ -476,7 +478,7 @@ function App() {
           <div className="tool-text">MODELS</div>
           <select
             title="Model Selection"
-            className="model-slection"
+            className="model-selection"
             onChange={(e) => {
               setCurrentModel(e.target.value);
               clearChat();
@@ -571,7 +573,7 @@ function App() {
           <div className="tool-text">RESOLUTION</div>
           <select
             title="RESOLUTION"
-            className="resolution-slection"
+            className="resolution-selection"
             onChange={(e) => {
               setResolution(e.target.value);
             }}
@@ -584,6 +586,7 @@ function App() {
             ))}
           </select>
         </div>
+        <div>DALL-E 3</div> 
       </aside>
       <section className="chatbox">
         <div className="chat-log">
@@ -683,7 +686,7 @@ function App() {
           <button
             className="read-button"
             onClick={() => setIsReading((prevState) => !prevState)}
-            title="Answers Read By AI - Shorcut : End"
+            title="Answers Read By AI - Shortcut : End"
             type="button"
           >
             <div className="unmute">
