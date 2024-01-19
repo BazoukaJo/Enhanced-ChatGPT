@@ -1,6 +1,11 @@
 
 ![app screenshot](appscreenshot.jpg)
 
+# Enhanced ChatGPT
+
+The idea was to provide a custom utilization of ChatGPT with access to variables influencing the result. It also support the creation image with the prefix "imagine".
+To use the App, you need node.js, and python install and the needed package. Follow the react link for easy utilization and installation start.  
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
