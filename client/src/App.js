@@ -20,8 +20,6 @@ mic.lang = "en-US";
  * @public
  */
 function App() {
-  // ERROR_MESSAGE define the default message error.
-  const ERROR_MESSAGE = "Connection, server failure, to much tokens, errors";
 
   // DEFAULT_TOKEN define the default max tokens.
   const DEFAULT_TOKEN = 4096;
@@ -30,7 +28,7 @@ function App() {
   const DEFAULT_TEMPERATURE = 0.5;
 
   const SYSTEM_ROLE = "system";
-  const START_INSTRUCTION = "I am your personal teacher. I can answer your questions and generate images.";
+  const START_INSTRUCTION = "I am your personal teacher. I can answer your questions and generate images by adding 'imagine' as prefix.";
 
   // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
   const MAX_TOKENS = 8192;
@@ -40,6 +38,12 @@ function App() {
 
   // DEFAULT_RESOLUTION set to image generation resolution
   const DEFAULT_RESOLUTION = "1792x1024";
+
+  // DEFAULT_STYLE set to image generation resolution
+  const DEFAULT_STYLE = "vivid";
+
+    // DEFAULT_STYLE set to image generation resolution
+    const DEFAULT_QUALITY = "hd";
 
   // declare input, prefix and suffix with state hook useState
   const [input, setInput] = useState("");
@@ -53,11 +57,19 @@ function App() {
     { id: "1792x1024" },
   ];
 
+  const styles = [
+    { id: "vivid" },
+    { id: "natural" }
+  ];
+
   const SIDE_X_IN = "0px";
   const SIDE_X_OUT = "-140px";
 
   // Set current resolution with default value 'DEFAULT_RESOLUTION' using state hook useState
   const [currentResolution, setResolution] = useState(DEFAULT_RESOLUTION);
+
+  // Set current style with default value 'DEFAULT_STYLE' using state hook useState
+  const [currentStyle, setStyle] = useState(DEFAULT_STYLE);
 
   // models set with list of objects using state hook useState
   const [models, setModels] = useState([]);
@@ -124,7 +136,7 @@ function App() {
         setModels(filteredModels);
     } catch (error) {
         console.error('Error fetching models:', error);
-        showWarning();
+        showWarning(error);
     }
     setTimeout(() => {
       document.getElementsByClassName("App")[0].style.left = SIDE_X_OUT;
@@ -149,7 +161,7 @@ function App() {
     //Pre request
     let chatLogNew = [...chatLog];
     let currentMessage = {
-      name: "Jonathan",
+      name: "John",// change to your name
       user: "user",
       role:"user",
       message: `${prefix +
@@ -177,10 +189,10 @@ function App() {
 
     // look for the word imagine to define the image prompt.
     let currentPrompt =
-      chatLogNew[chatLogNew.length - 1]?.message.substr(0, 7) === "imagine"
-        ? chatLogNew[chatLogNew.length - 1]?.message
-        : "";
-        //console.log("sent messages = "+messages);
+    chatLogNew[chatLogNew.length - 1]?.message.substr(0, 7) === "imagine"
+      ? chatLogNew[chatLogNew.length - 1]?.message
+      : "";
+      //console.log("sent messages = "+messages);
 
     // POST request
     const response = await fetch("http://localhost:3080/", {
@@ -198,24 +210,32 @@ function App() {
         size: currentResolution,
         bestOf: bestOf,
         n: n,
+        quality:DEFAULT_QUALITY,
       }),
     });
 
     const data = await response.json();
     // Post request
-    // console.log("received data.message = "+data.message);
-    if (data.message !== ERROR_MESSAGE) {
-      if (currentPrompt === "") {
+    //console.log("received data.message = "+data.message);
+    //console.log("received currentPrompt = "+currentPrompt);
+    if (data.error && data.error !== "") {
+      showWarning(data.error);
+    } else {
+      if (currentPrompt !== "" || data.message.includes("<img")){
+        //console.log("is image");
+        handleIsReading("There is your image(s)");
+        setUsages(data.usage);
+        setChatLog([
+          ...chatLogNew,
+          { name:"GPT", user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "image" },
+        ]);
+      } else {
+        //console.log("is message");
         handleIsReading(`${data.message}`);
         setUsages(data.usage);
         setChatLog([
           ...chatLogNew,
           { name:"GPT", user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "string" },
-        ]);
-      } else {
-        setChatLog([
-          ...chatLogNew,
-          { name:"GPT", user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "image" },
         ]);
       }
       // Scroll down
@@ -227,16 +247,14 @@ function App() {
             document.getElementsByClassName("chat-log")[0].clientHeight
           );
       }, 200);
-    } else {
-      showWarning();
     }
     hideLoader();
   }
   //###################### END Async Functions #######################
 
   // show warning in flashing red
-  function showWarning(){
-    document.getElementsByClassName("errors")[0].innerHTML = ERROR_MESSAGE;
+  function showWarning(error){
+    document.getElementsByClassName("errors")[0].innerHTML = error;
     setTimeout(function() {
       document.getElementsByClassName("errors")[0].innerHTML = "";
     }, 4000);
@@ -347,6 +365,7 @@ function App() {
       setInput(transcript);
       mic.onerror = (event) => {
         console.log(event.error);
+        showWarning(event.error);
       };
     };
   };
@@ -449,7 +468,7 @@ function App() {
 
   function setUsages(usage){
     document.getElementsByClassName("usage")[0].innerHTML =
-      usage !== "" ?
+      usage && usage !== "" ?
       "Prompt Tokens : " +
       usage.prompt_tokens +
       " | Completion Tokens : " +
@@ -586,7 +605,25 @@ function App() {
             ))}
           </select>
         </div>
-        <div>DALL-E 3</div> 
+        <div className="style">
+          <div className="tool-text">STYLE</div>
+          <select
+            title="style"
+            className="resolution-selection"
+            onChange={(e) => {
+              setStyle(e.target.value);
+            }}
+            value={currentStyle}
+          >
+            {styles?.map((styles, index) => (
+              <option key={styles.id} value={styles.id}>
+                {styles.id}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>DALL-E 3</div>
+        <div className="orange-text">prefix : imagine</div>
       </aside>
       <section className="chatbox">
         <div className="chat-log">

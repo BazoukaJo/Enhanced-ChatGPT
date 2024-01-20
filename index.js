@@ -7,9 +7,6 @@
  * This script sets up a Node.js server that uses the OpenAI API to connect to OpenAI's language model.
  */
 
-// Messages for display in case of connectivity or compatibility errors.
-const ERROR_MESSAGE = "Generics Errors Message";
-
 //NPM packages: openai, express, bodyParser and cors.
 const { Configuration, OpenAIApi } = require("openai");
 const express = require("express");
@@ -50,24 +47,28 @@ app.post("/", async (req, res) => {
     presencePenalty,
     prompt,
     size,
+    style,
+    quality
   } = req.body;
-  console.log(req.body);
+  //console.log(req.body);
   addHistory(message.message);
   try {
     if (prompt !== "") {
       const response = await openai.createImage({
         // Images prompt
-        model:"dall-e-3",
-        prompt: prompt,
-        n: parseInt(n),
-        size: size,
+        model:"dall-e-3",//Default dall-e-2 or dall-e-3.
+        prompt: prompt,// Image description prompt.
+        n: parseInt(n),// Number of images to create.
+        size: size,//1024x1024, 1024x1792, 1792x1024.
+        quality: quality,//Default standard or hd. set to hd.
+        style: style,//Default vivid or natural.
       });
       let imageURLs = response.data.data.map(
         (url) => "<img src='" + url.url + "' className='images'/>"
       );
       res.json({ message: imageURLs, usage: {} });
       addHistory(" " + imageURLs);
-      console.log("image urls = " + imageURLs);
+      //console.log("image urls = " + imageURLs);
     } else {
       const response = await openai.createChatCompletion({
         // Texts prompt
@@ -84,7 +85,7 @@ app.post("/", async (req, res) => {
         .join("\n_________________________________")
         .trimStart();
       res.json({ message: choices, usage: response.data.usage });
-      console.log("reply messages = " + choices);
+      //console.log("reply messages = " + choices);
       addHistory(choices);
     }
   } catch (error) {
@@ -111,7 +112,6 @@ app.get("/models", async (req, res) => {
     } else {
       console.log(error.message);
     }
-    ERROR_MESSAGE = error.message;
   }
 });
 

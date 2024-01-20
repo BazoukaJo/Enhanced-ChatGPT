@@ -47,7 +47,7 @@
 
 .chat-input-textarea {
   background-color: #40414f;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   border-width: 1px;
   border: none;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
@@ -76,7 +76,7 @@
 
 .chat-input-textarea-prefix {
   background-color: #373744;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   border-width: 1px;
   border: none;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
@@ -101,7 +101,7 @@
 
 .chat-input-textarea-suffix {
   background-color: #373744;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   border: none;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
   color: white;
@@ -125,7 +125,7 @@
 
 .side-menu-button {
   background-color: #40414F;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   color: white;
   height: 30px;
   margin-bottom: 5px;
@@ -139,7 +139,7 @@
 
 .side-menu-button-input {
   background-color: #40414F;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   color: white;
   height: 30px;
   margin-bottom: 0px;
@@ -155,7 +155,7 @@
 
 .errors {
   color: #a92626;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   padding: 4px;
   bottom: 130px;
   left: 220px;
@@ -197,7 +197,7 @@
 .send-button {
   color: white;
   background-color: #40414f;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   bottom: 75px;
   height: 30px;
   position: fixed;
@@ -215,7 +215,7 @@
 
 .record-voice-button {
   background-color: #40414f;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   bottom: 40px;
   height: 30px;
   left: 184px;
@@ -235,7 +235,7 @@
 
 .read-button {
   background-color: #40414f;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   bottom: 5px;
   height: 30px;
   left: 184px;
@@ -255,7 +255,7 @@
 
 .copy-button {
   background-color: #40414f;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   bottom: 75px;
   height: 30px;
   left: 184px;
@@ -277,7 +277,7 @@
 .copy-current-button {
   color: white;
   background-color: #40414f;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   height: 25px;
   transition: ease 0.2s all;
   width: 25px;
@@ -292,10 +292,14 @@
   transition: ease 0.2s all;
 }
 
+.orange-text {
+  color: orange;
+}
+
 .clear-button {
   color: white;
   background-color: #40414f;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   bottom: 75px;
   height: 30px;
   position: absolute;
@@ -314,7 +318,7 @@
 .clear-button-prefix {
   color: white;
   background-color: #40414f;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   bottom: 40px;
   height: 30px;
   position: absolute;
@@ -333,7 +337,7 @@
 .clear-button-suffix {
   color: white;
   background-color: #40414f;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   bottom: 5px;
   height: 30px;
   position: absolute;
@@ -352,7 +356,7 @@
 .clear-message {
   color: white;
   background-color: #40414f;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   height: 25px;
   right: -8px;
   transition: ease 0.2s all;
@@ -381,7 +385,7 @@
 
 .model-selection {
   background-color: #40414F;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   outline: 1px solid rgb(111, 111, 111);
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
   color: white;
@@ -398,7 +402,7 @@
 
 .resolution-selection {
   background-color: #40414F;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   outline: 1px solid rgb(111, 111, 111);
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
   color: white;
