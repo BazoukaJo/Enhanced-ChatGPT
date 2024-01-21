@@ -28,10 +28,11 @@ function App() {
   const DEFAULT_TEMPERATURE = 0.5;
 
   const SYSTEM_ROLE = "system";
-  const START_INSTRUCTION = "I am your personal teacher. I can answer your questions and generate images by adding 'imagine' as prefix.";
+
+  const START_INSTRUCTION = "I am your personal teacher. I can answer your questions and generate images by adding 'imagine' as prefix with DALL-E-3.";
 
   // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
-  const MAX_TOKENS = 8192;
+  const MAX_TOKENS = 32000;
 
   // DEFAULT_MODEL set to "gpt-3.5-turbo".
   const DEFAULT_MODEL = "gpt-4";
@@ -42,8 +43,13 @@ function App() {
   // DEFAULT_STYLE set to image generation resolution
   const DEFAULT_STYLE = "vivid";
 
-    // DEFAULT_STYLE set to image generation resolution
-    const DEFAULT_QUALITY = "hd";
+  // DEFAULT_QUALITY set to image generation resolution
+  const DEFAULT_QUALITY = "hd";
+
+  // DEFAULT_SEED define the value of the Default seed = 0 = random.
+  const DEFAULT_SEED = 0;
+
+  const SEED_MAX = 2147483647;
 
   // declare input, prefix and suffix with state hook useState
   const [input, setInput] = useState("");
@@ -70,6 +76,9 @@ function App() {
 
   // Set current style with default value 'DEFAULT_STYLE' using state hook useState
   const [currentStyle, setStyle] = useState(DEFAULT_STYLE);
+
+  // Set current seed with default value 'DEFAULT_SEED' using state hook useState
+  const [currentSeed, setSeed] = useState(DEFAULT_SEED);
 
   // models set with list of objects using state hook useState
   const [models, setModels] = useState([]);
@@ -592,7 +601,7 @@ function App() {
           <div className="tool-text">RESOLUTION</div>
           <select
             title="RESOLUTION"
-            className="resolution-selection"
+            className="selection"
             onChange={(e) => {
               setResolution(e.target.value);
             }}
@@ -608,8 +617,8 @@ function App() {
         <div className="style">
           <div className="tool-text">STYLE</div>
           <select
-            title="style"
-            className="resolution-selection"
+            title="STYLE"
+            className="selection"
             onChange={(e) => {
               setStyle(e.target.value);
             }}
@@ -622,8 +631,22 @@ function App() {
             ))}
           </select>
         </div>
-        <div>DALL-E 3</div>
-        <div className="orange-text">prefix : imagine</div>
+        <div>
+          <div className="tool-text">SEED</div>
+          <input
+            title="SEED"
+            className="side-menu-button-input"
+            onChange={(e) => {
+              setSeed(e.target.value);
+            }}
+            type="number"
+            max={`${SEED_MAX}`}
+            min="-1"
+            rows="1"
+            step="1"
+            value={currentSeed}
+          />
+        </div>
       </aside>
       <section className="chatbox">
         <div className="chat-log">

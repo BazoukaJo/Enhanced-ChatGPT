@@ -48,7 +48,8 @@ app.post("/", async (req, res) => {
     prompt,
     size,
     style,
-    quality
+    quality,
+    seed
   } = req.body;
   //console.log(req.body);
   addHistory(message.message);
@@ -62,6 +63,10 @@ app.post("/", async (req, res) => {
         size: size,//1024x1024, 1024x1792, 1792x1024.
         quality: quality,//Default standard or hd. set to hd.
         style: style,//Default vivid or natural.
+        seed: seed,//Default 0 = random.
+        temperature: Number(temperature),//Default 1.
+        presence_penalty: Number(presencePenalty),//Default 0.
+        frequency_penalty: Number(frequencyPenalty),//Default 0.
       });
       let imageURLs = response.data.data.map(
         (url) => "<img src='" + url.url + "' className='images'/>"
@@ -72,13 +77,14 @@ app.post("/", async (req, res) => {
     } else {
       const response = await openai.createChatCompletion({
         // Texts prompt
-        model: model, // "gpt-4",
+        model: model, //Default "gpt-4".
         messages: [{name:"John", role: "user", content: messages}],//Change to your name.
-        temperature: Number(temperature),
-        max_tokens: parseInt(maxTokens),
-        n: parseInt(n),
-        presence_penalty: Number(presencePenalty),
-        frequency_penalty: Number(frequencyPenalty),
+        temperature: Number(temperature),//Default 1.
+        max_tokens: parseInt(maxTokens),//Default 32000.
+        n: parseInt(n),// Number of messages to create.
+        presence_penalty: Number(presencePenalty),//Default 0.
+        frequency_penalty: Number(frequencyPenalty),//Default 0.
+        seed: seed,//Default 0 = random to 2147483647.
       });
       let choices = response.data.choices
         ?.map((choice) => choice.message.content)
