@@ -64,9 +64,6 @@ app.post("/", async (req, res) => {
         quality: quality,//Default standard or hd. set to hd.
         style: style,//Default vivid or natural.
         seed: seed,//Default 0 = random.
-        temperature: Number(temperature),//Default 1.
-        presence_penalty: Number(presencePenalty),//Default 0.
-        frequency_penalty: Number(frequencyPenalty),//Default 0.
       });
       let imageURLs = response.data.data.map(
         (url) => "<img src='" + url.url + "' className='images'/>"
