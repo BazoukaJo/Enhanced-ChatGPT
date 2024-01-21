@@ -22,7 +22,7 @@ mic.lang = "en-US";
 function App() {
 
   // DEFAULT_TOKEN define the default max tokens.
-  const DEFAULT_TOKEN = 4096;
+  const DEFAULT_TOKEN = 32000;
 
   // DEFAULT_TEMPERATURE define the value of the default temperature.
   const DEFAULT_TEMPERATURE = 0.5;
