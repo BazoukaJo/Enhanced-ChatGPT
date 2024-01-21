@@ -8,7 +8,7 @@
  */
 
 //NPM packages: openai, express, bodyParser and cors.
-const { Configuration, OpenAIApi } = require("openai");
+const OpenAI = require("openai");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -19,16 +19,15 @@ const fs = require('fs');
  */
 let key = process.env.OPENAI_KEY; //store your key in the environment variable OPENAI_KEY='YourKey'.
 let org = process.env.OPENAI_ORG; //store your key in the environment variable OPENAI_ORG='OrgKey'.
-const configuration = new Configuration({
-  organization: org,
-  apiKey: key,
-});
 
 /* Creating an instance of the Express app using the required middlewares for incoming HTTP
  * requests data parsing and enabling CORS.
  * The server listens on port 3080.
  */
-const openai = new OpenAIApi(configuration);
+const openai = new OpenAI({
+  organization: org,
+  apiKey: key,
+});
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
@@ -72,7 +71,7 @@ app.post("/", async (req, res) => {
       addHistory(" " + imageURLs);
       //console.log("image urls = " + imageURLs);
     } else {
-      const response = await openai.createChatCompletion({
+      const response = await openai.chat.completions.create({
         // Texts prompt
         model: model, //Default "gpt-4".
         messages: [{name:"John", role: "user", content: messages}],//Change to your name.
@@ -83,11 +82,11 @@ app.post("/", async (req, res) => {
         frequency_penalty: Number(frequencyPenalty),//Default 0.
         seed: seed,//Default 0 = random to 2147483647.
       });
-      let choices = response.data.choices
+      let choices = response.choices
         ?.map((choice) => choice.message.content)
         .join("\n_________________________________")
         .trimStart();
-      res.json({ message: choices, usage: response.data.usage });
+      res.json({ message: choices, usage: response.usage });
       //console.log("reply messages = " + choices);
       addHistory(choices);
     }
@@ -105,8 +104,8 @@ app.post("/", async (req, res) => {
 /* A GET request the models from the server. */
 app.get("/models", async (req, res) => {
   try {
-    const response = await openai.listModels();
-    res.json({ models: response.data.data });
+    const response = await openai.models.list();
+    res.json({ models: response.data });
   } catch (error) {
     res.json({ message: error.message });
     if (error.response) {
@@ -127,8 +126,5 @@ function addHistory(message){
   const currentDate = new Date().toLocaleString();
   const historyEntry = { message, date: currentDate };
   const historyData = JSON.stringify(historyEntry);
-  fs.appendFile('./history.json', `${historyData}\n `, (err) => {
-    if (err) throw err;
-    console.log(err);
-  });
+  fs.appendFile('./history.json', historyData + ',', (err) => {});
 }

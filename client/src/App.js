@@ -22,7 +22,7 @@ mic.lang = "en-US";
 function App() {
 
   // DEFAULT_TOKEN define the default max tokens.
-  const DEFAULT_TOKEN = 32000;
+  const DEFAULT_TOKEN = 4096;
 
   // DEFAULT_TEMPERATURE define the value of the default temperature.
   const DEFAULT_TEMPERATURE = 0.5;
@@ -32,7 +32,7 @@ function App() {
   const START_INSTRUCTION = "I am your personal teacher. I can answer your questions and generate images by adding 'imagine' as prefix with DALL-E-3.";
 
   // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
-  const MAX_TOKENS = 32000;
+  const MAX_TOKENS = 32768;
 
   // DEFAULT_MODEL set to "gpt-3.5-turbo".
   const DEFAULT_MODEL = "gpt-4";
