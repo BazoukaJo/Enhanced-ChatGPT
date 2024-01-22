@@ -3,8 +3,6 @@ import "./normal.css";
 
 import React, { useEffect, useState } from "react";
 
-import { useSpeechSynthesis } from "react-speech-kit";
-
 const speechRecognition =
   window.SpeechRecognition || window.webkitSpeechRecognition;
 const mic = new speechRecognition();
@@ -129,8 +127,6 @@ function App() {
   // eslint-disable-next-line
   useEffect(() => {handleIsReading(chatLog[chatLog.length - 1].message);}, [isReading]);
 
-  // voice synthesis hook
-  const { speak, voices } = useSpeechSynthesis();
 
   //###################### Async Functions #######################
   /**
@@ -389,12 +385,10 @@ function App() {
   const handleIsReading = (message) => {
     //console.log("handleIsReading passed");
     if (isReading) {
-      //console.log(message);
-      speak({ text: message, voice: voices[2] });//prefix + input + suffix
+      console.log("startReading");
       showMute();
     } else {
-      //console.log("stopReading");
-      speak({ text: "", stop: true });
+      console.log("stopReading");
       hideMute();
     }
   };
