@@ -32,7 +32,7 @@ function App() {
   const START_INSTRUCTION = "I am your personal teacher. I can answer your questions and generate images by adding 'imagine' as prefix with DALL-E-3.";
 
   // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
-  const MAX_TOKENS = 32000;
+  const MAX_TOKENS = 32768;
 
   // DEFAULT_MODEL set to "gpt-3.5-turbo".
   const DEFAULT_MODEL = "gpt-4";
@@ -390,7 +390,7 @@ function App() {
     //console.log("handleIsReading passed");
     if (isReading) {
       //console.log(message);
-      speak({ text: message, voice: voices[2] });//prefix 
+      speak({ text: message, voice: voices[2] });//prefix + input + suffix
       showMute();
     } else {
       //console.log("stopReading");
@@ -597,7 +597,7 @@ function App() {
             value={frequencyPenalty}
           />
         </div>
-        <div className="resolution">
+        <div>
           <div className="tool-text">RESOLUTION</div>
           <select
             title="RESOLUTION"
@@ -614,7 +614,7 @@ function App() {
             ))}
           </select>
         </div>
-        <div className="style">
+        <div>
           <div className="tool-text">STYLE</div>
           <select
             title="STYLE"
@@ -624,9 +624,9 @@ function App() {
             }}
             value={currentStyle}
           >
-            {styles?.map((styles, index) => (
-              <option key={styles.id} value={styles.id}>
-                {styles.id}
+            {styles?.map((style, index) => (
+              <option key={style.id} value={style.id}>
+                {style.id}
               </option>
             ))}
           </select>
@@ -640,7 +640,7 @@ function App() {
               setSeed(e.target.value);
             }}
             type="number"
-            max={`${SEED_MAX}`}
+            max={SEED_MAX}
             min="-1"
             rows="1"
             step="1"
