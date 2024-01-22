@@ -61,7 +61,7 @@
   white-space: pre;
 
   max-height: 200px;
-  min-height: 50px;
+  min-height: 60px;
   min-width: 90px;
   position:absolute;
   left: 219px;
@@ -171,7 +171,7 @@
 }
 
 .usage{
-  color: #616378;
+  color: #8588a8;
   font-size: 14px;
   position: fixed;
   top: -2px;
@@ -379,7 +379,7 @@
 .tool-text {
   font-size: medium;
   margin: 2px;
-  margin-top: 3%;
+  margin-top: 2%;
   transition: ease 0.2s all;
 }
 
@@ -408,7 +408,7 @@
   color: white;
   height: 30px;
   padding-left: 10px;
-  margin-bottom: 5px;
+  margin-bottom: 0px;
   width: 100%;
   border-style: none;
 }
