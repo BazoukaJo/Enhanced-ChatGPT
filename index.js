@@ -56,7 +56,7 @@ app.post("/", async (req, res) => {
   try {
     if (prompt !== "") {
       console.log("prompt = " + prompt);
-      const response = await openai.createImage({
+      const response = await openai.images.generate({
         // Images prompt
         model: "dall-e-3", // Default dall-e-2 or dall-e-3.
         prompt: prompt, // Image description prompt.
@@ -64,14 +64,12 @@ app.post("/", async (req, res) => {
         size: size, // 1024x1024, 1024x1792, 1792x1024.
         quality: quality, // Default standard or hd. set to hd.
         style: style, // Default vivid or natural.
-        seed: seed // Default 0 = random to 2147483647.
       });
-      let imageURLs = response.data.data.map(
-        (url) => "<img src='" + url.url + "' className='images'/>"
-      );
-      res.json({ message: imageURLs, usage: {} });
-      addHistory(" " + imageURLs);
-      console.log("image urls = " + imageURLs);
+      let imageURLs = response.data.map((url) => "<img src='" + url.url + "' className='images'/>");
+      res.json({ message: imageURLs });
+      generateSpeech("Here are some images for you.");
+      addHistory( imageURLs + "\n" );
+      console.log("images url = " + imageURLs); 
     } else {
       const response = await openai.chat.completions.create({
         // Texts prompt
@@ -138,9 +136,10 @@ function addHistory(message){
 
 async function generateSpeech(message) {
   const mp3 = await openai.audio.speech.create({
-    model: "tts-1-hd",
-    voice: "alloy",
+    model: "tts-1",
+    voice: "nova",
     input: message,
+    quality: "low",
   });
   //console.log(speechFile);
 

@@ -25,7 +25,7 @@ function App() {
   const DEFAULT_TEMPERATURE = 0.5;
 
   // SYSTEM_ROLE define the value of the default bot role.
-  const SYSTEM_ROLE = "system";
+  const SYSTEM_ROLE = "assistant";
 
   const START_INSTRUCTION = "I am your personal teacher. I can answer your questions and generate images by adding 'imagine' as prefix using DALL-E-3.";
 
@@ -124,7 +124,7 @@ function App() {
   useEffect(() => {handleTranscriptSpeech();}, [isListening]);
 
   // declare isReading as false with state hook toggle botIsReading() when called
-const [botIsReading, setBotIsReading] = useState(true);
+  const [botIsReading, setBotIsReading] = useState(true);
 
   // eslint-disable-next-line
   useEffect(() => {handleIsReading(chatLog[chatLog.length - 1].message);});
@@ -161,7 +161,6 @@ const [botIsReading, setBotIsReading] = useState(true);
    * After 3000 milliseconds delay. The loader is hidden. This is to ensure that the loader is visible for at least 3 seconds.
    */
   async function handleSubmit() {
-    //console.log("**handleSubmit**");
     if (input === "" && suffix === "" && prefix === "") return;
     //Pre request
     let chatLogNew = [...chatLog];
@@ -169,13 +168,7 @@ const [botIsReading, setBotIsReading] = useState(true);
       name: "John",// change to your name
       user: "user",
       role:"user",
-      message: `${prefix +
-        (prefix === "" ? "" : " :\n") +
-        input +
-        (suffix === "" ? "" : "\n: ") +
-        suffix}`,
-      type: "string",
-    };
+      message: `${prefix + (prefix === "" ? "" : " :\n") + input + (suffix === "" ? "" : "\n: ") + suffix}`, type: "string"};
     chatLogNew.push(currentMessage);
     history.push({ message: input });
     setChatLog(chatLogNew);
@@ -183,14 +176,7 @@ const [botIsReading, setBotIsReading] = useState(true);
     setInput("");
     showLoader();
     // Scroll down
-    setTimeout(function() {
-      document
-        .getElementsByClassName("chatbox")[0]
-        .scrollTo(
-          0,
-          document.getElementsByClassName("chat-log")[0].clientHeight
-        );
-    }, 2);
+    setTimeout(function() { document.getElementsByClassName("chatbox")[0].scrollTo(0, document.getElementsByClassName("chat-log")[0].clientHeight);}, 2);
 
     // look for the word imagine to define the image prompt.
     let currentPrompt =
@@ -219,7 +205,7 @@ const [botIsReading, setBotIsReading] = useState(true);
         style: currentStyle,
         quality: DEFAULT_QUALITY,
         seed: currentSeed
-      }),
+      })
     });
 
     const data = await response.json();
@@ -230,7 +216,7 @@ const [botIsReading, setBotIsReading] = useState(true);
       showWarning("response error "+data.error);
     } else {
       if (currentPrompt !== "" || data.message.includes("<img")){
-        //console.log("is image");
+        console.log("is image");
         handleIsReading("There is your image");
         setUsages("");
         setChatLog([
@@ -238,7 +224,7 @@ const [botIsReading, setBotIsReading] = useState(true);
           { name:"GPT", user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "image" },
         ]);
       } else {
-        //console.log("is message");
+        console.log("is message");
         handleIsReading(`${data.message}`);
         setUsages(data.usage);
         setChatLog([
@@ -248,14 +234,8 @@ const [botIsReading, setBotIsReading] = useState(true);
       }
       // Scroll down
       setTimeout(function() {
-        document
-          .getElementsByClassName("chatbox")[0]
-          .scrollTo(
-            0,
-            document.getElementsByClassName("chat-log")[0].clientHeight
-          );
-      }, 200);
-    }
+        document.getElementsByClassName("chatbox")[0].scrollTo( 0, document.getElementsByClassName("chat-log")[0].clientHeight);}, 200);
+      }
     hideLoader();
   }
 
@@ -303,11 +283,9 @@ const [botIsReading, setBotIsReading] = useState(true);
     if (botIsReading) {
       console.log("Start Speaking");
       showMute();
-      // 
     } else {
       console.log("Stop Speaking");
       hideMute();
-      
     }
   };
 
@@ -421,13 +399,9 @@ const [botIsReading, setBotIsReading] = useState(true);
   let chatbox = document.getElementsByClassName("chatbox")[0];
   let chatPost = document.getElementsByClassName("chat-message-center")[0];
   document.addEventListener("mouseout", function(event) {
-    //console.log("event.target.id " + event.target.id + " - relatedTarget " + event.relatedTarget);
     if (event.target.id === "sidemenu" && (event.relatedTarget === chatbox || event.relatedTarget === chatPost || event.relatedTarget === null)) {
-      //console.log("event.target.id " + event.target.id + " - relatedTarget " + event.relatedTarget);
       clearTimeout(mouseOutTimer);
-      mouseOutTimer = setTimeout(function() {
-        document.getElementsByClassName("App")[0].style.left = SIDE_X_OUT;
-      }, 4000);
+      mouseOutTimer = setTimeout(function() {document.getElementsByClassName("App")[0].style.left = SIDE_X_OUT;}, 4000);
     }
   });
 
@@ -436,7 +410,6 @@ const [botIsReading, setBotIsReading] = useState(true);
     if ((event.target.id === "sidemenu" && (event.relatedTarget === chatbox || event.relatedTarget === chatPost || event.relatedTarget === null))
     || (event.target.id === "" && event.relatedTarget === null)
     ) {
-      //console.log("event.target.id " + event.target.id + " - relatedTarget " + event.relatedTarget);
       clearTimeout(mouseOutTimer);
       document.getElementsByClassName("App")[0].style.left = SIDE_X_IN;
     }
@@ -459,6 +432,7 @@ const [botIsReading, setBotIsReading] = useState(true);
     setPrefix(history[nextIndex]?.message);
   }
 
+  // This function change the height of the textarea to fit the content.
   function changeTextareaHeight() {
     document.getElementsByClassName("chat-input-textarea")[0].style.height = "auto";
     document.getElementsByClassName("chat-input-textarea")[0].style.height =
@@ -484,10 +458,7 @@ const [botIsReading, setBotIsReading] = useState(true);
       <aside className="sidemenu" id="sidemenu">
         <div
           className="side-menu-button"
-          onClick={(e) => {
-            clearChat();
-            focusTheTextArea();
-          }}
+          onClick={(e) => {clearChat(); focusTheTextArea();}}
           title="Copy Input To Clipboard"
         >
           <span>+ </span>New Prompts
@@ -497,10 +468,7 @@ const [botIsReading, setBotIsReading] = useState(true);
           <select
             title="Model Selection"
             className="model-selection"
-            onChange={(e) => {
-              setCurrentModel(e.target.value);
-              clearChat();
-            }}
+            onChange={(e) => {setCurrentModel(e.target.value); clearChat();}}
             value={currentModel}
           >
             {models?.map((model, index) => (
@@ -539,20 +507,17 @@ const [botIsReading, setBotIsReading] = useState(true);
           />
         </div>
         <div>
-          <div className="tool-text">#COMPLETIONS</div>
+          <div className="tool-text">SEED</div>
           <input
-            title="COMPLETIONS"
+            title="SEED"
             className="side-menu-button-input"
-            onChange={(e) => {
-              setN(e.target.value);
-              setBestOf(e.target.value);
-            }}
+            onChange={(e) => {setSeed(e.target.value);}}
             type="number"
-            max="10"
-            min="1"
+            max={SEED_MAX}
+            min="-1"
             rows="1"
             step="1"
-            value={n}
+            value={currentSeed}
           />
         </div>
         <div>
@@ -560,9 +525,7 @@ const [botIsReading, setBotIsReading] = useState(true);
           <input
             title="PRESENCE PENALTY"
             className="side-menu-button-input"
-            onChange={(e) => {
-              setPresencePenalty(e.target.value);
-            }}
+            onChange={(e) => {setPresencePenalty(e.target.value);}}
             type="number"
             max="2"
             min="-2"
@@ -576,9 +539,7 @@ const [botIsReading, setBotIsReading] = useState(true);
           <input
             title="FREQUENCY PENALTY"
             className="side-menu-button-input"
-            onChange={(e) => {
-              setFrequencyPenalty(e.target.value);
-            }}
+            onChange={(e) => {setFrequencyPenalty(e.target.value);}}
             type="number"
             max="2"
             min="-2"
@@ -588,13 +549,25 @@ const [botIsReading, setBotIsReading] = useState(true);
           />
         </div>
         <div>
+          <div className="tool-text">#COMPLETIONS</div>
+          <input
+            title="COMPLETIONS"
+            className="side-menu-button-input"
+            onChange={(e) => {setN(e.target.value); setBestOf(e.target.value);}}
+            type="number"
+            max="10"
+            min="1"
+            rows="1"
+            step="1"
+            value={n}
+          />
+        </div>
+        <div>
           <div className="tool-text">RESOLUTION</div>
           <select
             title="RESOLUTION"
             className="selection"
-            onChange={(e) => {
-              setResolution(e.target.value);
-            }}
+            onChange={(e) => {setResolution(e.target.value);}}
             value={currentResolution}
           >
             {resolutions?.map((resolution, index) => (
@@ -609,9 +582,7 @@ const [botIsReading, setBotIsReading] = useState(true);
           <select
             title="STYLE"
             className="selection"
-            onChange={(e) => {
-              setStyle(e.target.value);
-            }}
+            onChange={(e) => {setStyle(e.target.value);}}
             value={currentStyle}
           >
             {styles?.map((style, index) => (
@@ -621,46 +592,21 @@ const [botIsReading, setBotIsReading] = useState(true);
             ))}
           </select>
         </div>
-        <div>
-          <div className="tool-text">SEED</div>
-          <input
-            title="SEED"
-            className="side-menu-button-input"
-            onChange={(e) => {
-              setSeed(e.target.value);
-            }}
-            type="number"
-            max={SEED_MAX}
-            min="-1"
-            rows="1"
-            step="1"
-            value={currentSeed}
-          />
-        </div>
       </aside>
       <section className="chatbox">
         <div className="chat-log">
-          {chatLog?.map((message, index) => (
-            <ChatMessage key={index} message={message} />
-          ))}
+          {chatLog?.map((message, index) => (<ChatMessage key={index} message={message} />))}
         </div>
         <div className="chat-input-holder">
           <div
             className="form1"
-            onKeyDown={(e) => {
-              !e.getModifierState("Shift") &&
-                e.keyCode === 13 &&
-                handleSubmit() &&
-                e.preventDefault();
-            }}
+            onKeyDown={(e) => {!e.getModifierState("Shift") && e.keyCode === 13 && handleSubmit() && e.preventDefault();}}
             onInput={(e) => {changeTextareaHeight()}}
           >
             <textarea
               type="text"
               className="chat-input-textarea"
-              onChange={(e) => {
-                setInput(e.target.value);
-              }}
+              onChange={(e) => {setInput(e.target.value);}}
               placeholder="Prompt"
               autoFocus
               rows="1"
@@ -681,13 +627,9 @@ const [botIsReading, setBotIsReading] = useState(true);
           />
           <button
             className="send-button"
-            onClick={() => {
-              handleSubmit();
-            }}
+            onClick={() => {handleSubmit();}}
             tabIndex="-1"
-            onFocus={() => {
-              focusTheTextArea();
-            }}
+            onFocus={() => {focusTheTextArea();}}
             type="button"
             title="Send Prompt to GPT"
           >
@@ -713,10 +655,7 @@ const [botIsReading, setBotIsReading] = useState(true);
           </button>
           <button
             className="copy-button"
-            onClick={() => {
-              navigator.clipboard.writeText(
-                document.getElementsByClassName("chat-input-textarea")[0].value
-              );
+            onClick={() => {navigator.clipboard.writeText(document.getElementsByClassName("chat-input-textarea")[0].value);
             }}
             title="Copy Input To Clipboard"
           >
@@ -766,9 +705,7 @@ const [botIsReading, setBotIsReading] = useState(true);
           <div className="usage"></div>
           <button
             className="clear-button"
-            onClick={() => {
-              setInput("");
-            }}
+            onClick={() => {setInput("");}}
             onFocus={focusTheTextArea}
             type="button"
             title="Clear Input"
@@ -785,9 +722,7 @@ const [botIsReading, setBotIsReading] = useState(true);
           </button>
           <button
             className="clear-button-prefix"
-            onClick={() => {
-              setPrefix("");
-            }}
+            onClick={() => {setPrefix("");}}
             onFocus={focusTheTextArea}
             type="button"
             title="Clear Prefix"
@@ -804,9 +739,7 @@ const [botIsReading, setBotIsReading] = useState(true);
           </button>
           <button
             className="clear-button-suffix"
-            onClick={() => {
-              setSuffix("");
-            }}
+            onClick={() => {setSuffix("");}}
             onFocus={focusTheTextArea}
             type="button"
             title="Clear Suffix"
@@ -873,9 +806,7 @@ const ChatMessage = ({ message }) => {
         <button
           title="Copy Message To Clipboard"
           className="copy-current-button"
-          onClick={(e) => {
-            navigator.clipboard.writeText(message.message);
-          }}
+          onClick={(e) => {navigator.clipboard.writeText(message.message);}}
         >
           <svg width="16" height="16" fill="currentColor" viewBox="1 -3 19 19">
             <path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z" />
