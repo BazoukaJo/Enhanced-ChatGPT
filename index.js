@@ -7,13 +7,14 @@
  * This script sets up a Node.js server that uses the OpenAI API to connect to OpenAI's language model.
  */
 
-//NPM packages: openai, express, bodyParser and cors.
+// NPM packages: openai, express, bodyParser and cors.
 const OpenAI = require("openai");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const fs = require('fs');
-
+const path = require("path");
+const speechFile = path.resolve("./speech.mp3");
 /*
  * OpenAI key stored in an environment variable.
  */
@@ -54,40 +55,42 @@ app.post("/", async (req, res) => {
   addHistory(message.message);
   try {
     if (prompt !== "") {
+      console.log("prompt = " + prompt);
       const response = await openai.createImage({
         // Images prompt
-        model:"dall-e-3",//Default dall-e-2 or dall-e-3.
-        prompt: prompt,// Image description prompt.
-        n: parseInt(n),// Number of images to create.
-        size: size,//1024x1024, 1024x1792, 1792x1024.
-        quality: quality,//Default standard or hd. set to hd.
-        style: style,//Default vivid or natural.
-        seed: seed,//Default 0 = random.
+        model: "dall-e-3", // Default dall-e-2 or dall-e-3.
+        prompt: prompt, // Image description prompt.
+        n: parseInt(n), // Number of images to create.
+        size: size, // 1024x1024, 1024x1792, 1792x1024.
+        quality: quality, // Default standard or hd. set to hd.
+        style: style, // Default vivid or natural.
+        seed: seed // Default 0 = random to 2147483647.
       });
       let imageURLs = response.data.data.map(
         (url) => "<img src='" + url.url + "' className='images'/>"
       );
       res.json({ message: imageURLs, usage: {} });
       addHistory(" " + imageURLs);
-      //console.log("image urls = " + imageURLs);
+      console.log("image urls = " + imageURLs);
     } else {
       const response = await openai.chat.completions.create({
         // Texts prompt
-        model: model, //Default "gpt-4".
-        messages: [{name:"John", role: "user", content: messages}],//Change to your name.
-        temperature: Number(temperature),//Default 1.
-        max_tokens: parseInt(maxTokens),//Default 32000.
-        n: parseInt(n),// Number of messages to create.
-        presence_penalty: Number(presencePenalty),//Default 0.
-        frequency_penalty: Number(frequencyPenalty),//Default 0.
-        seed: seed,//Default 0 = random to 2147483647.
+        model: model, // Default "gpt-4".
+        messages: [{name:"John", role: "user", content: messages}], //Change to your name.
+        temperature: Number(temperature), // Default 1.
+        max_tokens: parseInt(maxTokens), // Default 32000.
+        n: parseInt(n), // Number of messages to create.
+        presence_penalty: Number(presencePenalty), // Default 0. From -2 to 2
+        frequency_penalty: Number(frequencyPenalty), // Default 0.From -2 to 2
+        seed: seed // Default 0 = random to 2147483647.
       });
       let choices = response.choices
         ?.map((choice) => choice.message.content)
         .join("\n_________________________________")
         .trimStart();
       res.json({ message: choices, usage: response.usage });
-      //console.log("reply messages = " + choices);
+      // console.log("reply messages = " + choices);
+      generateSpeech(choices);
       addHistory(choices);
     }
   } catch (error) {
@@ -126,5 +129,33 @@ function addHistory(message){
   const currentDate = new Date().toLocaleString();
   const historyEntry = { message, date: currentDate };
   const historyData = JSON.stringify(historyEntry);
-  fs.appendFile('./history.json', historyData + ',', (err) => {});
+  fs.appendFile('./history.json', historyData + ',', (err) => {
+    if (err) {
+      console.error(err);
+    }
+  });
+}
+
+async function generateSpeech(message) {
+  const mp3 = await openai.audio.speech.create({
+    model: "tts-1-hd",
+    voice: "alloy",
+    input: message,
+  });
+  //console.log(speechFile);
+
+  const buffer = Buffer.from(await mp3.arrayBuffer());
+  await fs.promises.writeFile(speechFile, buffer);
+
+  // play the mp3 file using ffplay
+  // fix code the audio to start from the beginning
+  const { exec } = require("child_process");
+  exec("ffplay -nodisp -autoexit " + speechFile, (error, stdout, stderr) => {
+    if (error) {
+      console.log(`error: ${error.message}`);
+    }
+    else if (stderr) {
+      console.log(`stderr: ${stderr}`);
+    }
+  });
 }

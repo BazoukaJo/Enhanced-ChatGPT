@@ -3,8 +3,7 @@ import "./normal.css";
 
 import React, { useEffect, useState } from "react";
 
-const speechRecognition =
-  window.SpeechRecognition || window.webkitSpeechRecognition;
+const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const mic = new speechRecognition();
 mic.continuous = true;
 mic.interimResults = true;
@@ -25,9 +24,10 @@ function App() {
   // DEFAULT_TEMPERATURE define the value of the default temperature.
   const DEFAULT_TEMPERATURE = 0.5;
 
+  // SYSTEM_ROLE define the value of the default bot role.
   const SYSTEM_ROLE = "system";
 
-  const START_INSTRUCTION = "I am your personal teacher. I can answer your questions and generate images by adding 'imagine' as prefix with DALL-E-3.";
+  const START_INSTRUCTION = "I am your personal teacher. I can answer your questions and generate images by adding 'imagine' as prefix using DALL-E-3.";
 
   // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
   const MAX_TOKENS = 32768;
@@ -61,11 +61,13 @@ function App() {
     { id: "1792x1024" },
   ];
 
+  // Image realism settings
   const styles = [
     { id: "vivid" },
     { id: "natural" }
   ];
 
+  // Side menu settings
   const SIDE_X_IN = "0px";
   const SIDE_X_OUT = "-140px";
 
@@ -116,17 +118,16 @@ function App() {
   useEffect(() => {getEngines();}, []);
 
   // declare isListening as false with state hook, toggle when handleListen() called
-  const [isListening, setIsListening] = useState(false);
+  const [isListening, setIsTranscript] = useState(false);
 
   // eslint-disable-next-line
-  useEffect(() => {handleIsListening();}, [isListening]);
+  useEffect(() => {handleTranscriptSpeech();}, [isListening]);
 
-  // declare isReading as false with state hook toggle isReading() when called
-  const [isReading, setIsReading] = useState(false);
+  // declare isReading as false with state hook toggle botIsReading() when called
+const [botIsReading, setBotIsReading] = useState(true);
 
   // eslint-disable-next-line
-  useEffect(() => {handleIsReading(chatLog[chatLog.length - 1].message);}, [isReading]);
-
+  useEffect(() => {handleIsReading(chatLog[chatLog.length - 1].message);});
 
   //###################### Async Functions #######################
   /**
@@ -140,8 +141,8 @@ function App() {
         const filteredModels = data.models.filter((item) => item.id.startsWith("gpt"));
         setModels(filteredModels);
     } catch (error) {
-        console.error('Error fetching models:', error);
-        showWarning(error);
+        console.log('Error fetching models:', error);
+        showWarning('Error fetching models:' + error);
     }
     setTimeout(() => {
       document.getElementsByClassName("App")[0].style.left = SIDE_X_OUT;
@@ -157,8 +158,7 @@ function App() {
    * After calling the function to scroll up the chatlog window, a post request is made to a locally hosted endpoint with certain parameters to get a response from the GPT language model.
    * The data received from the post request is processed & then a update to the chatlog with the latest informative message from "gpt" is added.
    * Finally, the UI is scrolled up and function handleIsReading is called to read the latest chat message.
-   * After 3000 milliseconds delay.
-   * @param e - the event object
+   * After 3000 milliseconds delay. The loader is hidden. This is to ensure that the loader is visible for at least 3 seconds.
    */
   async function handleSubmit() {
     //console.log("**handleSubmit**");
@@ -177,7 +177,7 @@ function App() {
       type: "string",
     };
     chatLogNew.push(currentMessage);
-    history.push({ name:"John", user: "user", role:"user", message: input, type: "string" });//Change to your name
+    history.push({ message: input });
     setChatLog(chatLogNew);
     const messages = chatLogNew?.map((message) => message.message).join("\n");
     setInput("");
@@ -194,10 +194,11 @@ function App() {
 
     // look for the word imagine to define the image prompt.
     let currentPrompt =
-    chatLogNew[chatLogNew.length - 1]?.message.substr(0, 7) === "imagine"
+    chatLogNew[chatLogNew.length - 1]
+      ?.message.substring(0, 7) === "imagine"
       ? chatLogNew[chatLogNew.length - 1]?.message
       : "";
-      //console.log("sent messages = "+messages);
+    //console.log("sent messages = "+messages);
 
     // POST request
     const response = await fetch("http://localhost:3080/", {
@@ -209,13 +210,15 @@ function App() {
         message: currentMessage,
         temperature: temperature,
         maxTokens: maxTokens,
+        n: n,
         frequencyPenalty: frequencyPenalty,
         presencePenalty: presencePenalty,
         prompt: currentPrompt,
         size: currentResolution,
         bestOf: bestOf,
-        n: n,
-        quality:DEFAULT_QUALITY,
+        style: currentStyle,
+        quality: DEFAULT_QUALITY,
+        seed: currentSeed
       }),
     });
 
@@ -224,12 +227,12 @@ function App() {
     //console.log("received data.message = "+data.message);
     //console.log("received currentPrompt = "+currentPrompt);
     if (data.error && data.error !== "") {
-      showWarning(data.error);
+      showWarning("response error "+data.error);
     } else {
       if (currentPrompt !== "" || data.message.includes("<img")){
         //console.log("is image");
-        handleIsReading("There is your image(s)");
-        setUsages(data.usage);
+        handleIsReading("There is your image");
+        setUsages("");
         setChatLog([
           ...chatLogNew,
           { name:"GPT", user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "image" },
@@ -255,7 +258,58 @@ function App() {
     }
     hideLoader();
   }
-  //###################### END Async Functions #######################
+
+  /*
+   * This code is a function that handles listening with a microphone.
+   * It checks if the microphone is listening, and if it is, it starts the microphone and sets an 'onend' event listener.
+   * If the microphone is not listening, it stops the microphone and sets an 'onend' event listener.
+   * It also sets an 'onstart' event listener which shows the recorder, and an 'onresult'
+   * event listener which sets the input to the transcript of what was said. Finally, it sets an 'onerror' event listener which logs any errors that occur.
+   */
+  const handleTranscriptSpeech = () => {
+    //console.log("handleTranscriptSpeech passed");
+    if (isListening) {
+      mic.start();
+      mic.onend = () => {
+        //console.log('continue..');
+        mic.start();
+      };
+    } else {
+      mic.stop();
+      mic.onend = () => {
+        //console.log('Mic off');
+        handleSubmit();
+        hideRecorder();
+      };
+    }
+    mic.onstart = () => {
+      //console.log('Mic on');
+      showRecorder();
+    };
+    mic.onresult = (event) => {
+      const transcript = Array.from(event.results)
+        .map((result) => result[0])
+        .map((result) => result.transcript)
+        .join("");
+      setInput(transcript);
+      mic.onerror = (event) => {
+        console.log(event.error);
+        showWarning(event.error);
+      };
+    };
+  };
+
+  const handleIsReading = (message) => {
+    if (botIsReading) {
+      console.log("Start Speaking");
+      showMute();
+      // 
+    } else {
+      console.log("Stop Speaking");
+      hideMute();
+      
+    }
+  };
 
   // show warning in flashing red
   function showWarning(error){
@@ -335,64 +389,6 @@ function App() {
     document.getElementsByClassName("chat-input-textarea")[0].focus();
   }
 
-  /*
-   * This code is a function that handles listening with a microphone.
-   * It checks if the microphone is listening, and if it is, it starts the microphone and sets an 'onend' event listener.
-   * If the microphone is not listening, it stops the microphone and sets an 'onend' event listener.
-   * It also sets an 'onstart' event listener which shows the recorder, and an 'onresult'
-   * event listener which sets the input to the transcript of what was said. Finally, it sets an 'onerror' event listener which logs any errors that occur.
-   */
-  const handleIsListening = () => {
-    //console.log("handleIsListening passed");
-    if (isListening) {
-      mic.start();
-      mic.onend = () => {
-        //console.log('continue..');
-        mic.start();
-      };
-    } else {
-      mic.stop();
-      mic.onend = () => {
-        //console.log('Mic off');
-        handleSubmit();
-        hideRecorder();
-      };
-    }
-    mic.onstart = () => {
-      //console.log('Mic on');
-      showRecorder();
-    };
-    mic.onresult = (event) => {
-      const transcript = Array.from(event.results)
-        .map((result) => result[0])
-        .map((result) => result.transcript)
-        .join("");
-      setInput(transcript);
-      mic.onerror = (event) => {
-        console.log(event.error);
-        showWarning(event.error);
-      };
-    };
-  };
-
-  /*
-   * This function handles the reading of a message.
-   * If the boolean variable isReading is true, the message will be
-   * spoken using the third voice in the voices array and the showMute()
-   * function will be called. If isReading is false, an empty string will
-   * be spoken and the hideMute() function will be called.
-   */
-  const handleIsReading = (message) => {
-    //console.log("handleIsReading passed");
-    if (isReading) {
-      console.log("startReading");
-      showMute();
-    } else {
-      console.log("stopReading");
-      hideMute();
-    }
-  };
-
   // This function will handle Delete Home, End, Up and Down key press
   let keyTimer;
   let keyEventHandler = function(event) {
@@ -409,10 +405,10 @@ function App() {
           cycleHistory(1);
       } else if (event.keyCode === 36) {
         //End key, toggle GPT read the text
-        setIsListening((prevState) => !prevState);
+        setIsTranscript((prevState) => !prevState);
       } else if (event.keyCode === 35) {
         //Home key, toggle speak to GPT
-        setIsReading((prevState) => !prevState);
+        setBotIsReading((prevState) => !prevState);
       } else if (event.keyCode === 46) {
         //Delete key, new prompt
         clearChat();
@@ -701,7 +697,7 @@ function App() {
           </button>
           <button
             className="record-voice-button"
-            onClick={() => setIsListening((prevState) => !prevState)}
+            onClick={() => setIsTranscript((prevState) => !prevState)}
             type="button"
             title="Record Voice To Prompt - Shortcut : Home"
           >
@@ -739,7 +735,7 @@ function App() {
           </button>
           <button
             className="read-button"
-            onClick={() => setIsReading((prevState) => !prevState)}
+            onClick={() => setBotIsReading((prevState) => !prevState)}
             title="Answers Read By AI - Shortcut : End"
             type="button"
           >
