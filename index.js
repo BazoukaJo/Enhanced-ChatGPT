@@ -151,10 +151,10 @@ async function generateSpeech(message) {
     buffer = cache.get(message);
   } else {
     const mp3 = await openai.audio.speech.create({
-      model: "tts-1-hd",
+      model: "tts-1",
       voice: "fable",
       input: message,
-      quality: "high",
+      quality: "higlowh",
     });
     buffer = Buffer.from(await mp3.arrayBuffer());
     cache.set(message, buffer);
