@@ -17,7 +17,8 @@ const path = require("path");
 const speechFile = path.resolve("./speech.mp3");
 
 const USER_NAME = "John";// change your name here
-
+const HTTP_PORT = "3080";// default 3080
+const IP_ADDRESS = "10.0.0.145"; // default localhost. change to your network address range
 /*
  * OpenAI key stored in an environment variable.
  */
@@ -36,7 +37,6 @@ const openai = new OpenAI({
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
-const port = 3080;
 
 /* A POST request message to the server. */
 app.post("/", async (req, res) => {
@@ -126,8 +126,8 @@ app.get("/models", async (req, res) => {
 });
 
 /* Listening to the port 3080. */
-app.listen(port, () => {
-  console.log(`app listen at http://localhost:${port}`);
+app.listen(HTTP_PORT, () => {
+  console.log(`app listen at http://${IP_ADDRESS}:${HTTP_PORT}`);
 });
 
 // Add history to history.json

@@ -3,12 +3,6 @@ import "./normal.css";
 
 import React, { useEffect, useState } from "react";
 
-const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-const mic = new speechRecognition();
-mic.continuous = true;
-mic.interimResults = true;
-mic.lang = "en-US";
-
 /**
  * App Frontend: Enhanced ChatGPT
  *
@@ -16,6 +10,13 @@ mic.lang = "en-US";
  * @author Jonathan Pratte <https://jonathanpratte.com>
  * @public
  */
+
+const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const mic = new speechRecognition();
+mic.continuous = true;
+mic.interimResults = true;
+mic.lang = "en-US";
+
 function App() {
 
   // HTTP_PORT define the value of the port used by the server.
@@ -24,8 +25,11 @@ function App() {
   // IP_ADDRESS define the value of the IP address used by the server.
   const IP_ADDRESS = "10.0.0.145"; //Default localhost
 
+    // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
+    const MAX_TOKENS = "32768";
+
   // DEFAULT_TOKEN define the default max tokens.
-  const DEFAULT_TOKEN = 4096;
+  const DEFAULT_TOKEN = "4096";
 
   // DEFAULT_TEMPERATURE define the value of the default temperature.
   const DEFAULT_TEMPERATURE = 0.5;
@@ -41,9 +45,6 @@ function App() {
 
   // START_INSTRUCTION define the value of the default bot role.
   const START_INSTRUCTION = `I am ${BOT_NAME}, your dedicated personal assistant. Not only can I answer all your questions, but I can also generate images using DALL-E-3. To do so, simply start your prompt with 'imagine', leaving the prefix field blank.`;
-
-  // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
-  const MAX_TOKENS = 32768;
 
   // DEFAULT_MODEL set to "gpt-4-1106-preview".
   const DEFAULT_MODEL = "gpt-4-1106-preview";
