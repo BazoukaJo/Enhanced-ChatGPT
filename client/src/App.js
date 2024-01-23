@@ -46,7 +46,7 @@ function App() {
   const MAX_TOKENS = 32768;
 
   // DEFAULT_MODEL set to "gpt-3.5-turbo".
-  const DEFAULT_MODEL = "gpt-4";
+  const DEFAULT_MODEL = "gpt-4-1106-preview";
 
   // DEFAULT_RESOLUTION set to image generation resolution
   const DEFAULT_RESOLUTION = "1024x1024";
