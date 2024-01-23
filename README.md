@@ -3,7 +3,7 @@
 
 # Enhanced ChatGPT
 
-The purpose of this project is to create a customized version of ChatGPT that allows users to influence the output by using hidden variables and/or different models. Additionally, it supports the creation of images using the "imagine" prefix using DALL-E-3 with hd quality. To use the app, you will need to have node.js, along with the necessary packages and also you need to install ffmpeg on your system. You can download it from the official website: <https://ffmpeg.org/download.html>. You can follow the provided React link for easy installation and utilization instructions.
+This project lets you customize your own ChatGPT and control how it responds by using special settings. It also allows you to create pictures with high quality by typing 'imagine' before your request, using DALL-E-3. You need to have node.js, some NPM packages, and ffmpeg, which you download from <https://ffmpeg.org/download.html>, to set it up. You must use your own OpenAI key, which should be placed in the environment variables, and then update the App.js and index.js files with your information like IP, name, and role. For setup help, follow the React instructions that are provided.
 
 # Getting Started with Create React App
 
