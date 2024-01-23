@@ -37,7 +37,7 @@ function App() {
   const USER_NAME = "John";// Change your name here
 
   // BOT_NAME define the value of the bot name.
-  const BOT_NAME = "Nova";// Change your name here
+  const BOT_NAME = "Sage";// Change your name here
 
   // START_INSTRUCTION define the value of the default bot role.
   const START_INSTRUCTION = `I am ${BOT_NAME}, your dedicated personal assistant. Not only can I answer all your questions, but I can also generate images using DALL-E-3. To do so, simply start your prompt with 'imagine', leaving the prefix field blank.`;
@@ -45,7 +45,7 @@ function App() {
   // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
   const MAX_TOKENS = 32768;
 
-  // DEFAULT_MODEL set to "gpt-3.5-turbo".
+  // DEFAULT_MODEL set to "gpt-4-1106-preview".
   const DEFAULT_MODEL = "gpt-4-1106-preview";
 
   // DEFAULT_RESOLUTION set to image generation resolution
