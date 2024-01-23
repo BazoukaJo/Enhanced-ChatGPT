@@ -154,7 +154,7 @@ async function generateSpeech(message) {
       model: "tts-1",
       voice: "fable",
       input: message,
-      quality: "higlowh",
+      quality: "low",
     });
     buffer = Buffer.from(await mp3.arrayBuffer());
     cache.set(message, buffer);
