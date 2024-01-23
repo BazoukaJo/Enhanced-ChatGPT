@@ -20,6 +20,10 @@ function App() {
 
   // HTTP_PORT define the value of the port used by the server.
   const HTTP_PORT = "3080";
+
+  // IP_ADDRESS define the value of the IP address used by the server.
+  const IP_ADDRESS = "10.0.0.145"; //Default localhost
+
   // DEFAULT_TOKEN define the default max tokens.
   const DEFAULT_TOKEN = 4096;
 
@@ -145,7 +149,7 @@ function App() {
    */
   async function getEngines() {
     try {
-        const response = await fetch(`http://localhost:${HTTP_PORT}/models`);
+        const response = await fetch(`http://${IP_ADDRESS}:${HTTP_PORT}/models`);
         const data = await response.json();
         const filteredModels = data.models.filter((item) => item.id.startsWith("gpt"));
         setModels(filteredModels);
@@ -193,7 +197,7 @@ function App() {
       : "";
 
     // Post request
-    const response = await fetch(`http://localhost:${HTTP_PORT}/`, {
+    const response = await fetch(`http://${IP_ADDRESS}:${HTTP_PORT}/`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
@@ -287,7 +291,7 @@ function App() {
 
   const handleSpeakButtonClick = async () => {
     try {
-      const response = await fetch(`http://localhost:${HTTP_PORT}/Speak-button-clicked`, {
+      const response = await fetch(`http://${IP_ADDRESS}:${HTTP_PORT}/Speak-button-clicked`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
