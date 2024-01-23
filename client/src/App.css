@@ -157,7 +157,7 @@
   color: #a92626;
   /* border-radius: 8px; */
   padding: 4px;
-  bottom: 130px;
+  bottom: 135px;
   left: 220px;
   position: absolute;
   transition: ease 0.2s all;
@@ -522,8 +522,8 @@
 
 
   position: absolute;
-  left: calc(50% + 85px);
-  bottom: calc(50% + 60px);
+  right: 95px;
+  bottom: 85px;
   width: 40px;
   height: 40px;
 }

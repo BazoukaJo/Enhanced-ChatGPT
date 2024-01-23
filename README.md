@@ -3,7 +3,7 @@
 
 # Enhanced ChatGPT
 
-The purpose of this project is to create a customized version of ChatGPT that allows users to influence the output by using hidden variables and/or different models. Additionally, it supports the creation of images using the "imagine" prefix using DALL-E-3 with hd quality. To use the app, you will need to have node.js, NPM and ffplay.exe in the solution directory, along with the necessary packages. You can follow the provided React link for easy installation and utilization instructions.
+The purpose of this project is to create a customized version of ChatGPT that allows users to influence the output by using hidden variables and/or different models. Additionally, it supports the creation of images using the "imagine" prefix using DALL-E-3 with hd quality. To use the app, you will need to have node.js, along with the necessary packages and also you need to install ffmpeg on your system. You can download it from the official website: <https://ffmpeg.org/download.html>. You can follow the provided React link for easy installation and utilization instructions.
 
 # Getting Started with Create React App
 

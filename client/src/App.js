@@ -18,6 +18,8 @@ mic.lang = "en-US";
  */
 function App() {
 
+  // HTTP_PORT define the value of the port used by the server.
+  const HTTP_PORT = "3080";
   // DEFAULT_TOKEN define the default max tokens.
   const DEFAULT_TOKEN = 4096;
 
@@ -25,9 +27,16 @@ function App() {
   const DEFAULT_TEMPERATURE = 0.5;
 
   // SYSTEM_ROLE define the value of the default bot role.
-  const SYSTEM_ROLE = "system";
+  const SYSTEM_ROLE = "assistant";
 
-  const START_INSTRUCTION = "I am your personal teacher. I can answer your questions and generate images by adding 'imagine' as prefix using DALL-E-3.";
+  // USER_NAME define the value of the user name.
+  const USER_NAME = "John";// Change your name here
+
+  // BOT_NAME define the value of the bot name.
+  const BOT_NAME = "Nova";// Change your name here
+
+  // START_INSTRUCTION define the value of the default bot role.
+  const START_INSTRUCTION = `I am ${BOT_NAME}, your dedicated personal assistant. Not only can I answer all your questions, but I can also generate images using DALL-E-3. To do so, simply start your prompt with 'imagine', leaving the prefix field blank.`;
 
   // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
   const MAX_TOKENS = 32768;
@@ -36,7 +45,7 @@ function App() {
   const DEFAULT_MODEL = "gpt-4";
 
   // DEFAULT_RESOLUTION set to image generation resolution
-  const DEFAULT_RESOLUTION = "1792x1024";
+  const DEFAULT_RESOLUTION = "1024x1024";
 
   // DEFAULT_STYLE set to image generation resolution
   const DEFAULT_STYLE = "vivid";
@@ -84,7 +93,7 @@ function App() {
   const [models, setModels] = useState([]);
 
   // chatLog set with state hook useState
-  const [chatLog, setChatLog] = useState([{name:"GPT", user:"gpt", role:SYSTEM_ROLE, message :START_INSTRUCTION, type:"string"}]);
+  const [chatLog, setChatLog] = useState([{name:BOT_NAME, user:"gpt", role:SYSTEM_ROLE, message :START_INSTRUCTION, type:"string"}]);
 
   // History set with state hook useState
   const [history] = useState([]);
@@ -118,16 +127,16 @@ function App() {
   useEffect(() => {getEngines();}, []);
 
   // declare isListening as false with state hook, toggle when handleListen() called
-  const [isListening, setIsTranscript] = useState(false);
+  const [isListening, setIsTranscribing] = useState(false);
 
   // eslint-disable-next-line
   useEffect(() => {handleTranscriptSpeech();}, [isListening]);
 
   // declare isReading as false with state hook toggle botIsReading() when called
-const [botIsReading, setBotIsReading] = useState(true);
+  const [isSpeaking, toggleButtonSpeak] = useState(true);
 
   // eslint-disable-next-line
-  useEffect(() => {handleIsReading(chatLog[chatLog.length - 1].message);});
+  useEffect(() => {handleIsReading();}, [isSpeaking]);
 
   //###################### Async Functions #######################
   /**
@@ -136,7 +145,7 @@ const [botIsReading, setBotIsReading] = useState(true);
    */
   async function getEngines() {
     try {
-        const response = await fetch("http://localhost:3080/models");
+        const response = await fetch(`http://localhost:${HTTP_PORT}/models`);
         const data = await response.json();
         const filteredModels = data.models.filter((item) => item.id.startsWith("gpt"));
         setModels(filteredModels);
@@ -144,9 +153,7 @@ const [botIsReading, setBotIsReading] = useState(true);
         console.log('Error fetching models:', error);
         showWarning('Error fetching models:' + error);
     }
-    setTimeout(() => {
-      document.getElementsByClassName("App")[0].style.left = SIDE_X_OUT;
-    }, 4000);
+    setTimeout(() => {document.getElementsByClassName("App")[0].style.left = SIDE_X_OUT;}, 4000);
   }
   /**
    * This code is a messaging platform where a user can chat with a chatbot powered by OpenAI's language model.
@@ -161,21 +168,14 @@ const [botIsReading, setBotIsReading] = useState(true);
    * After 3000 milliseconds delay. The loader is hidden. This is to ensure that the loader is visible for at least 3 seconds.
    */
   async function handleSubmit() {
-    //console.log("**handleSubmit**");
     if (input === "" && suffix === "" && prefix === "") return;
     //Pre request
     let chatLogNew = [...chatLog];
     let currentMessage = {
-      name: "John",// change to your name
+      name: USER_NAME,
       user: "user",
       role:"user",
-      message: `${prefix +
-        (prefix === "" ? "" : " :\n") +
-        input +
-        (suffix === "" ? "" : "\n: ") +
-        suffix}`,
-      type: "string",
-    };
+      message: `${prefix + (prefix === "" ? "" : ".\n") + input + (suffix === "" ? "" : ".\n") + suffix + "."}`, type: "string"};
     chatLogNew.push(currentMessage);
     history.push({ message: input });
     setChatLog(chatLogNew);
@@ -183,25 +183,17 @@ const [botIsReading, setBotIsReading] = useState(true);
     setInput("");
     showLoader();
     // Scroll down
-    setTimeout(function() {
-      document
-        .getElementsByClassName("chatbox")[0]
-        .scrollTo(
-          0,
-          document.getElementsByClassName("chat-log")[0].clientHeight
-        );
-    }, 2);
+    setTimeout(function() { document.getElementsByClassName("chatbox")[0].scrollTo(0, document.getElementsByClassName("chat-log")[0].clientHeight);}, 2);
 
     // look for the word imagine to define the image prompt.
     let currentPrompt =
     chatLogNew[chatLogNew.length - 1]
-      ?.message.substring(0, 7) === "imagine"
+      ?.message.toLowerCase().substring(0, 7) === "imagine"
       ? chatLogNew[chatLogNew.length - 1]?.message
       : "";
-    //console.log("sent messages = "+messages);
 
-    // POST request
-    const response = await fetch("http://localhost:3080/", {
+    // Post request
+    const response = await fetch(`http://localhost:${HTTP_PORT}/`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
@@ -219,43 +211,31 @@ const [botIsReading, setBotIsReading] = useState(true);
         style: currentStyle,
         quality: DEFAULT_QUALITY,
         seed: currentSeed
-      }),
+      })
     });
 
     const data = await response.json();
-    // Post request
-    //console.log("received data.message = "+data.message);
-    //console.log("received currentPrompt = "+currentPrompt);
     if (data.error && data.error !== "") {
       showWarning("response error "+data.error);
     } else {
       if (currentPrompt !== "" || data.message.includes("<img")){
         //console.log("is image");
-        handleIsReading("There is your image");
         setUsages("");
         setChatLog([
           ...chatLogNew,
-          { name:"GPT", user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "image" },
+          { name:BOT_NAME, user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "image" },
         ]);
       } else {
         //console.log("is message");
-        handleIsReading(`${data.message}`);
         setUsages(data.usage);
         setChatLog([
           ...chatLogNew,
-          { name:"GPT", user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "string" },
+          { name:BOT_NAME, user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "string" },
         ]);
       }
+      handleIsReading();
       // Scroll down
-      setTimeout(function() {
-        document
-          .getElementsByClassName("chatbox")[0]
-          .scrollTo(
-            0,
-            document.getElementsByClassName("chat-log")[0].clientHeight
-          );
-      }, 200);
-    }
+      setTimeout(function() {document.getElementsByClassName("chatbox")[0].scrollTo( 0, document.getElementsByClassName("chat-log")[0].clientHeight);}, 200);}
     hideLoader();
   }
 
@@ -267,11 +247,9 @@ const [botIsReading, setBotIsReading] = useState(true);
    * event listener which sets the input to the transcript of what was said. Finally, it sets an 'onerror' event listener which logs any errors that occur.
    */
   const handleTranscriptSpeech = () => {
-    //console.log("handleTranscriptSpeech passed");
     if (isListening) {
       mic.start();
       mic.onend = () => {
-        //console.log('continue..');
         mic.start();
       };
     } else {
@@ -299,24 +277,37 @@ const [botIsReading, setBotIsReading] = useState(true);
     };
   };
 
-  const handleIsReading = (message) => {
-    if (botIsReading) {
-      console.log("Start Speaking");
+  const handleIsReading = () => {
+    if (isSpeaking) {
       showMute();
-      // 
     } else {
-      console.log("Stop Speaking");
       hideMute();
-      
+    }
+  };
+
+  const handleSpeakButtonClick = async () => {
+    try {
+      const response = await fetch(`http://localhost:${HTTP_PORT}/Speak-button-clicked`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ read: true }) // send boolean value to server
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error(error.message);
     }
   };
 
   // show warning in flashing red
   function showWarning(error){
     document.getElementsByClassName("errors")[0].innerHTML = error;
-    setTimeout(function() {
-      document.getElementsByClassName("errors")[0].innerHTML = "";
-    }, 4000);
+    setTimeout(function() {document.getElementsByClassName("errors")[0].innerHTML = "";}, 4000);
   }
   /*
    * function to clear the chat messages
@@ -405,10 +396,10 @@ const [botIsReading, setBotIsReading] = useState(true);
           cycleHistory(1);
       } else if (event.keyCode === 36) {
         //End key, toggle GPT read the text
-        setIsTranscript((prevState) => !prevState);
+        setIsTranscribing((prevState) => !prevState);
       } else if (event.keyCode === 35) {
         //Home key, toggle speak to GPT
-        setBotIsReading((prevState) => !prevState);
+        toggleButtonSpeak((prevState) => !prevState);
       } else if (event.keyCode === 46) {
         //Delete key, new prompt
         clearChat();
@@ -421,13 +412,9 @@ const [botIsReading, setBotIsReading] = useState(true);
   let chatbox = document.getElementsByClassName("chatbox")[0];
   let chatPost = document.getElementsByClassName("chat-message-center")[0];
   document.addEventListener("mouseout", function(event) {
-    //console.log("event.target.id " + event.target.id + " - relatedTarget " + event.relatedTarget);
     if (event.target.id === "sidemenu" && (event.relatedTarget === chatbox || event.relatedTarget === chatPost || event.relatedTarget === null)) {
-      //console.log("event.target.id " + event.target.id + " - relatedTarget " + event.relatedTarget);
       clearTimeout(mouseOutTimer);
-      mouseOutTimer = setTimeout(function() {
-        document.getElementsByClassName("App")[0].style.left = SIDE_X_OUT;
-      }, 4000);
+      mouseOutTimer = setTimeout(function() {document.getElementsByClassName("App")[0].style.left = SIDE_X_OUT;}, 4000);
     }
   });
 
@@ -436,12 +423,10 @@ const [botIsReading, setBotIsReading] = useState(true);
     if ((event.target.id === "sidemenu" && (event.relatedTarget === chatbox || event.relatedTarget === chatPost || event.relatedTarget === null))
     || (event.target.id === "" && event.relatedTarget === null)
     ) {
-      //console.log("event.target.id " + event.target.id + " - relatedTarget " + event.relatedTarget);
       clearTimeout(mouseOutTimer);
       document.getElementsByClassName("App")[0].style.left = SIDE_X_IN;
     }
   });
-
 
   function isPrefixFocus(){
     return document.activeElement === document.getElementsByClassName("chat-input-textarea-prefix")[0];
@@ -459,22 +444,16 @@ const [botIsReading, setBotIsReading] = useState(true);
     setPrefix(history[nextIndex]?.message);
   }
 
+  // This function change the height of the textarea to fit the content.
   function changeTextareaHeight() {
     document.getElementsByClassName("chat-input-textarea")[0].style.height = "auto";
     document.getElementsByClassName("chat-input-textarea")[0].style.height =
       document.getElementsByClassName("chat-input-textarea")[0].scrollHeight + "px";
   }
 
+  //this function will return the the tokens infos and show it.
   function setUsages(usage){
-    document.getElementsByClassName("usage")[0].innerHTML =
-      usage && usage !== "" ?
-      "Prompt Tokens : " +
-      usage.prompt_tokens +
-      " | Completion Tokens : " +
-      usage.completion_tokens+
-      " | Total Tokens : "+
-      usage.total_tokens
-      : "";
+    document.getElementsByClassName("usage")[0].innerHTML = usage && usage !== "" ? "Prompt Tokens : " + usage.prompt_tokens + " | Completion Tokens : " + usage.completion_tokens + " | Total Tokens : " + usage.total_tokens : "";
   }
 
   //###################### Return HTML ########################
@@ -484,10 +463,7 @@ const [botIsReading, setBotIsReading] = useState(true);
       <aside className="sidemenu" id="sidemenu">
         <div
           className="side-menu-button"
-          onClick={(e) => {
-            clearChat();
-            focusTheTextArea();
-          }}
+          onClick={(e) => {clearChat(); focusTheTextArea();}}
           title="Copy Input To Clipboard"
         >
           <span>+ </span>New Prompts
@@ -497,10 +473,7 @@ const [botIsReading, setBotIsReading] = useState(true);
           <select
             title="Model Selection"
             className="model-selection"
-            onChange={(e) => {
-              setCurrentModel(e.target.value);
-              clearChat();
-            }}
+            onChange={(e) => {setCurrentModel(e.target.value); clearChat();}}
             value={currentModel}
           >
             {models?.map((model, index) => (
@@ -539,20 +512,17 @@ const [botIsReading, setBotIsReading] = useState(true);
           />
         </div>
         <div>
-          <div className="tool-text">#COMPLETIONS</div>
+          <div className="tool-text">SEED</div>
           <input
-            title="COMPLETIONS"
+            title="SEED"
             className="side-menu-button-input"
-            onChange={(e) => {
-              setN(e.target.value);
-              setBestOf(e.target.value);
-            }}
+            onChange={(e) => {setSeed(e.target.value);}}
             type="number"
-            max="10"
-            min="1"
+            max={SEED_MAX}
+            min="-1"
             rows="1"
             step="1"
-            value={n}
+            value={currentSeed}
           />
         </div>
         <div>
@@ -560,9 +530,7 @@ const [botIsReading, setBotIsReading] = useState(true);
           <input
             title="PRESENCE PENALTY"
             className="side-menu-button-input"
-            onChange={(e) => {
-              setPresencePenalty(e.target.value);
-            }}
+            onChange={(e) => {setPresencePenalty(e.target.value);}}
             type="number"
             max="2"
             min="-2"
@@ -576,9 +544,7 @@ const [botIsReading, setBotIsReading] = useState(true);
           <input
             title="FREQUENCY PENALTY"
             className="side-menu-button-input"
-            onChange={(e) => {
-              setFrequencyPenalty(e.target.value);
-            }}
+            onChange={(e) => {setFrequencyPenalty(e.target.value);}}
             type="number"
             max="2"
             min="-2"
@@ -588,13 +554,25 @@ const [botIsReading, setBotIsReading] = useState(true);
           />
         </div>
         <div>
+          <div className="tool-text">#COMPLETIONS</div>
+          <input
+            title="COMPLETIONS"
+            className="side-menu-button-input"
+            onChange={(e) => {setN(e.target.value); setBestOf(e.target.value);}}
+            type="number"
+            max="10"
+            min="1"
+            rows="1"
+            step="1"
+            value={n}
+          />
+        </div>
+        <div>
           <div className="tool-text">RESOLUTION</div>
           <select
             title="RESOLUTION"
             className="selection"
-            onChange={(e) => {
-              setResolution(e.target.value);
-            }}
+            onChange={(e) => {setResolution(e.target.value);}}
             value={currentResolution}
           >
             {resolutions?.map((resolution, index) => (
@@ -609,9 +587,7 @@ const [botIsReading, setBotIsReading] = useState(true);
           <select
             title="STYLE"
             className="selection"
-            onChange={(e) => {
-              setStyle(e.target.value);
-            }}
+            onChange={(e) => {setStyle(e.target.value);}}
             value={currentStyle}
           >
             {styles?.map((style, index) => (
@@ -621,46 +597,21 @@ const [botIsReading, setBotIsReading] = useState(true);
             ))}
           </select>
         </div>
-        <div>
-          <div className="tool-text">SEED</div>
-          <input
-            title="SEED"
-            className="side-menu-button-input"
-            onChange={(e) => {
-              setSeed(e.target.value);
-            }}
-            type="number"
-            max={SEED_MAX}
-            min="-1"
-            rows="1"
-            step="1"
-            value={currentSeed}
-          />
-        </div>
       </aside>
       <section className="chatbox">
         <div className="chat-log">
-          {chatLog?.map((message, index) => (
-            <ChatMessage key={index} message={message} />
-          ))}
+          {chatLog?.map((message, index) => (<ChatMessage key={index} message={message} />))}
         </div>
         <div className="chat-input-holder">
           <div
             className="form1"
-            onKeyDown={(e) => {
-              !e.getModifierState("Shift") &&
-                e.keyCode === 13 &&
-                handleSubmit() &&
-                e.preventDefault();
-            }}
+            onKeyDown={(e) => {!e.getModifierState("Shift") && e.keyCode === 13 && handleSubmit() && e.preventDefault();}}
             onInput={(e) => {changeTextareaHeight()}}
           >
             <textarea
               type="text"
               className="chat-input-textarea"
-              onChange={(e) => {
-                setInput(e.target.value);
-              }}
+              onChange={(e) => {setInput(e.target.value);}}
               placeholder="Prompt"
               autoFocus
               rows="1"
@@ -681,13 +632,9 @@ const [botIsReading, setBotIsReading] = useState(true);
           />
           <button
             className="send-button"
-            onClick={() => {
-              handleSubmit();
-            }}
+            onClick={() => {handleSubmit();}}
             tabIndex="-1"
-            onFocus={() => {
-              focusTheTextArea();
-            }}
+            onFocus={() => {focusTheTextArea();}}
             type="button"
             title="Send Prompt to GPT"
           >
@@ -697,7 +644,7 @@ const [botIsReading, setBotIsReading] = useState(true);
           </button>
           <button
             className="record-voice-button"
-            onClick={() => setIsTranscript((prevState) => !prevState)}
+            onClick={() => setIsTranscribing((prevState) => !prevState)}
             type="button"
             title="Record Voice To Prompt - Shortcut : Home"
           >
@@ -713,10 +660,7 @@ const [botIsReading, setBotIsReading] = useState(true);
           </button>
           <button
             className="copy-button"
-            onClick={() => {
-              navigator.clipboard.writeText(
-                document.getElementsByClassName("chat-input-textarea")[0].value
-              );
+            onClick={() => {navigator.clipboard.writeText(document.getElementsByClassName("chat-input-textarea")[0].value);
             }}
             title="Copy Input To Clipboard"
           >
@@ -735,7 +679,7 @@ const [botIsReading, setBotIsReading] = useState(true);
           </button>
           <button
             className="read-button"
-            onClick={() => setBotIsReading((prevState) => !prevState)}
+            onClick={() => { handleSpeakButtonClick(); toggleButtonSpeak((prevState) => !prevState); }}
             title="Answers Read By AI - Shortcut : End"
             type="button"
           >
@@ -766,10 +710,8 @@ const [botIsReading, setBotIsReading] = useState(true);
           <div className="usage"></div>
           <button
             className="clear-button"
-            onClick={() => {
-              setInput("");
-            }}
-            onFocus={focusTheTextArea}
+            onClick={() => {setInput("");}}
+            onFocus={() => {focusTheTextArea();}}
             type="button"
             title="Clear Input"
           >
@@ -785,10 +727,8 @@ const [botIsReading, setBotIsReading] = useState(true);
           </button>
           <button
             className="clear-button-prefix"
-            onClick={() => {
-              setPrefix("");
-            }}
-            onFocus={focusTheTextArea}
+            onClick={() => {setPrefix("");}}
+            onFocus={() => {focusTheTextArea();}}
             type="button"
             title="Clear Prefix"
           >
@@ -804,10 +744,8 @@ const [botIsReading, setBotIsReading] = useState(true);
           </button>
           <button
             className="clear-button-suffix"
-            onClick={() => {
-              setSuffix("");
-            }}
-            onFocus={focusTheTextArea}
+            onClick={() => {setSuffix("");}}
+            onFocus={() => {focusTheTextArea();}}
             type="button"
             title="Clear Suffix"
           >
@@ -873,9 +811,7 @@ const ChatMessage = ({ message }) => {
         <button
           title="Copy Message To Clipboard"
           className="copy-current-button"
-          onClick={(e) => {
-            navigator.clipboard.writeText(message.message);
-          }}
+          onClick={() => {navigator.clipboard.writeText(message.message);}}
         >
           <svg width="16" height="16" fill="currentColor" viewBox="1 -3 19 19">
             <path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z" />
