@@ -8,13 +8,15 @@
  */
 
 // NPM packages: openai, express, bodyParser and cors.
-const OpenAI = require("openai");
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
+const OpenAI = require('openai');
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
 const fs = require('fs');
 const path = require("path");
 const speechFile = path.resolve("./speech.mp3");
+const USER_NAME = "John";
+
 /*
  * OpenAI key stored in an environment variable.
  */
@@ -69,12 +71,12 @@ app.post("/", async (req, res) => {
       res.json({ message: imageURLs });
       generateSpeech("Here are some images for you.");
       addHistory( imageURLs + "\n" );
-      console.log("images url = " + imageURLs); 
+      console.log("images url = " + imageURLs);
     } else {
       const response = await openai.chat.completions.create({
         // Texts prompt
         model: model, // Default "gpt-4".
-        messages: [{name:"John", role: "user", content: messages}], //Change to your name.
+        messages: [{name:USER_NAME, role: "user", content: messages}], //Change to your name.
         temperature: Number(temperature), // Default 1.
         max_tokens: parseInt(maxTokens), // Default 32000.
         n: parseInt(n), // Number of messages to create.
@@ -82,9 +84,10 @@ app.post("/", async (req, res) => {
         frequency_penalty: Number(frequencyPenalty), // Default 0.From -2 to 2
         seed: seed // Default 0 = random to 2147483647.
       });
+      var i = 1;
       let choices = response.choices
-        ?.map((choice) => choice.message.content)
-        .join("\n_________________________________")
+        ?.map((choice) => (response.choices.length > 1 ? i++ + "- ": "") + choice.message.content)
+        .join("\n\n")
         .trimStart();
       res.json({ message: choices, usage: response.usage });
       // console.log("reply messages = " + choices);
@@ -134,6 +137,7 @@ function addHistory(message){
   });
 }
 
+// Generate speech from text
 async function generateSpeech(message) {
   const mp3 = await openai.audio.speech.create({
     model: "tts-1",
@@ -141,7 +145,6 @@ async function generateSpeech(message) {
     input: message,
     quality: "low",
   });
-  //console.log(speechFile);
 
   const buffer = Buffer.from(await mp3.arrayBuffer());
   await fs.promises.writeFile(speechFile, buffer);

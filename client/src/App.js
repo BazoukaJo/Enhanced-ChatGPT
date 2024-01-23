@@ -27,7 +27,11 @@ function App() {
   // SYSTEM_ROLE define the value of the default bot role.
   const SYSTEM_ROLE = "assistant";
 
-  const START_INSTRUCTION = "I am your personal teacher. I can answer your questions and generate images by adding 'imagine' as prefix using DALL-E-3.";
+  // USER_NAME define the value of the user name.
+  const USER_NAME = "John";// Change your name here
+
+  // START_INSTRUCTION define the value of the default bot role.
+  const START_INSTRUCTION = "I am Nova, your dedicated personal assistant. Not only can I answer all your questions, but I can also generate images using DALL-E-3. To do so, simply start your prompt with 'imagine', leaving the prefix field blank.";
 
   // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
   const MAX_TOKENS = 32768;
@@ -36,7 +40,7 @@ function App() {
   const DEFAULT_MODEL = "gpt-4";
 
   // DEFAULT_RESOLUTION set to image generation resolution
-  const DEFAULT_RESOLUTION = "1792x1024";
+  const DEFAULT_RESOLUTION = "1024x1024";
 
   // DEFAULT_STYLE set to image generation resolution
   const DEFAULT_STYLE = "vivid";
@@ -84,7 +88,7 @@ function App() {
   const [models, setModels] = useState([]);
 
   // chatLog set with state hook useState
-  const [chatLog, setChatLog] = useState([{name:"GPT", user:"gpt", role:SYSTEM_ROLE, message :START_INSTRUCTION, type:"string"}]);
+  const [chatLog, setChatLog] = useState([{name:"Nova", user:"gpt", role:SYSTEM_ROLE, message :START_INSTRUCTION, type:"string"}]);
 
   // History set with state hook useState
   const [history] = useState([]);
@@ -127,7 +131,7 @@ function App() {
   const [botIsReading, setBotIsReading] = useState(true);
 
   // eslint-disable-next-line
-  useEffect(() => {handleIsReading(chatLog[chatLog.length - 1].message);});
+  useEffect(() => {handleIsReading();}, [botIsReading]);
 
   //###################### Async Functions #######################
   /**
@@ -144,9 +148,7 @@ function App() {
         console.log('Error fetching models:', error);
         showWarning('Error fetching models:' + error);
     }
-    setTimeout(() => {
-      document.getElementsByClassName("App")[0].style.left = SIDE_X_OUT;
-    }, 4000);
+    setTimeout(() => {document.getElementsByClassName("App")[0].style.left = SIDE_X_OUT;}, 4000);
   }
   /**
    * This code is a messaging platform where a user can chat with a chatbot powered by OpenAI's language model.
@@ -165,10 +167,10 @@ function App() {
     //Pre request
     let chatLogNew = [...chatLog];
     let currentMessage = {
-      name: "John",// change to your name
+      name: USER_NAME,
       user: "user",
       role:"user",
-      message: `${prefix + (prefix === "" ? "" : " :\n") + input + (suffix === "" ? "" : "\n: ") + suffix}`, type: "string"};
+      message: `${prefix + (prefix === "" ? "" : ".\n") + input + (suffix === "" ? "" : ".\n") + suffix + "."}`, type: "string"};
     chatLogNew.push(currentMessage);
     history.push({ message: input });
     setChatLog(chatLogNew);
@@ -181,12 +183,11 @@ function App() {
     // look for the word imagine to define the image prompt.
     let currentPrompt =
     chatLogNew[chatLogNew.length - 1]
-      ?.message.substring(0, 7) === "imagine"
+      ?.message.toLowerCase().substring(0, 7) === "imagine"
       ? chatLogNew[chatLogNew.length - 1]?.message
       : "";
-    //console.log("sent messages = "+messages);
 
-    // POST request
+    // Post request
     const response = await fetch("http://localhost:3080/", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -209,33 +210,27 @@ function App() {
     });
 
     const data = await response.json();
-    // Post request
-    //console.log("received data.message = "+data.message);
-    //console.log("received currentPrompt = "+currentPrompt);
     if (data.error && data.error !== "") {
       showWarning("response error "+data.error);
     } else {
       if (currentPrompt !== "" || data.message.includes("<img")){
-        console.log("is image");
-        handleIsReading("There is your image");
+        //console.log("is image");
         setUsages("");
         setChatLog([
           ...chatLogNew,
-          { name:"GPT", user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "image" },
+          { name:"Nova", user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "image" },
         ]);
       } else {
-        console.log("is message");
-        handleIsReading(`${data.message}`);
+        //console.log("is message");
         setUsages(data.usage);
         setChatLog([
           ...chatLogNew,
-          { name:"GPT", user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "string" },
+          { name:"Nova", user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "string" },
         ]);
       }
+      handleIsReading();
       // Scroll down
-      setTimeout(function() {
-        document.getElementsByClassName("chatbox")[0].scrollTo( 0, document.getElementsByClassName("chat-log")[0].clientHeight);}, 200);
-      }
+      setTimeout(function() {document.getElementsByClassName("chatbox")[0].scrollTo( 0, document.getElementsByClassName("chat-log")[0].clientHeight);}, 200);}
     hideLoader();
   }
 
@@ -247,11 +242,9 @@ function App() {
    * event listener which sets the input to the transcript of what was said. Finally, it sets an 'onerror' event listener which logs any errors that occur.
    */
   const handleTranscriptSpeech = () => {
-    //console.log("handleTranscriptSpeech passed");
     if (isListening) {
       mic.start();
       mic.onend = () => {
-        //console.log('continue..');
         mic.start();
       };
     } else {
@@ -279,7 +272,7 @@ function App() {
     };
   };
 
-  const handleIsReading = (message) => {
+  const handleIsReading = () => {
     if (botIsReading) {
       console.log("Start Speaking");
       showMute();
@@ -292,9 +285,7 @@ function App() {
   // show warning in flashing red
   function showWarning(error){
     document.getElementsByClassName("errors")[0].innerHTML = error;
-    setTimeout(function() {
-      document.getElementsByClassName("errors")[0].innerHTML = "";
-    }, 4000);
+    setTimeout(function() {document.getElementsByClassName("errors")[0].innerHTML = "";}, 4000);
   }
   /*
    * function to clear the chat messages
@@ -439,6 +430,7 @@ function App() {
       document.getElementsByClassName("chat-input-textarea")[0].scrollHeight + "px";
   }
 
+  //this function will return the the tokens infos and show it.
   function setUsages(usage){
     document.getElementsByClassName("usage")[0].innerHTML =
       usage && usage !== "" ?
@@ -806,7 +798,7 @@ const ChatMessage = ({ message }) => {
         <button
           title="Copy Message To Clipboard"
           className="copy-current-button"
-          onClick={(e) => {navigator.clipboard.writeText(message.message);}}
+          onClick={() => {navigator.clipboard.writeText(message.message);}}
         >
           <svg width="16" height="16" fill="currentColor" viewBox="1 -3 19 19">
             <path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z" />

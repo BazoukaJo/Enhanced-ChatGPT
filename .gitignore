@@ -27,3 +27,4 @@ yarn-error.log*
 history.json
 ffplay.exe
 speech.mp3
+speech.pcm
