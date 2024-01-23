@@ -18,6 +18,8 @@ mic.lang = "en-US";
  */
 function App() {
 
+  // HTTP_PORT define the value of the port used by the server.
+  const HTTP_PORT = "3080";
   // DEFAULT_TOKEN define the default max tokens.
   const DEFAULT_TOKEN = 4096;
 
@@ -30,8 +32,11 @@ function App() {
   // USER_NAME define the value of the user name.
   const USER_NAME = "John";// Change your name here
 
+  // BOT_NAME define the value of the bot name.
+  const BOT_NAME = "Nova";// Change your name here
+
   // START_INSTRUCTION define the value of the default bot role.
-  const START_INSTRUCTION = "I am Nova, your dedicated personal assistant. Not only can I answer all your questions, but I can also generate images using DALL-E-3. To do so, simply start your prompt with 'imagine', leaving the prefix field blank.";
+  const START_INSTRUCTION = `I am ${BOT_NAME}, your dedicated personal assistant. Not only can I answer all your questions, but I can also generate images using DALL-E-3. To do so, simply start your prompt with 'imagine', leaving the prefix field blank.`;
 
   // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
   const MAX_TOKENS = 32768;
@@ -88,7 +93,7 @@ function App() {
   const [models, setModels] = useState([]);
 
   // chatLog set with state hook useState
-  const [chatLog, setChatLog] = useState([{name:"Nova", user:"gpt", role:SYSTEM_ROLE, message :START_INSTRUCTION, type:"string"}]);
+  const [chatLog, setChatLog] = useState([{name:BOT_NAME, user:"gpt", role:SYSTEM_ROLE, message :START_INSTRUCTION, type:"string"}]);
 
   // History set with state hook useState
   const [history] = useState([]);
@@ -122,16 +127,16 @@ function App() {
   useEffect(() => {getEngines();}, []);
 
   // declare isListening as false with state hook, toggle when handleListen() called
-  const [isListening, setIsTranscript] = useState(false);
+  const [isListening, setIsTranscribing] = useState(false);
 
   // eslint-disable-next-line
   useEffect(() => {handleTranscriptSpeech();}, [isListening]);
 
   // declare isReading as false with state hook toggle botIsReading() when called
-  const [botIsReading, setBotIsReading] = useState(true);
+  const [isSpeaking, toggleButtonSpeak] = useState(true);
 
   // eslint-disable-next-line
-  useEffect(() => {handleIsReading();}, [botIsReading]);
+  useEffect(() => {handleIsReading();}, [isSpeaking]);
 
   //###################### Async Functions #######################
   /**
@@ -140,7 +145,7 @@ function App() {
    */
   async function getEngines() {
     try {
-        const response = await fetch("http://localhost:3080/models");
+        const response = await fetch(`http://localhost:${HTTP_PORT}/models`);
         const data = await response.json();
         const filteredModels = data.models.filter((item) => item.id.startsWith("gpt"));
         setModels(filteredModels);
@@ -188,7 +193,7 @@ function App() {
       : "";
 
     // Post request
-    const response = await fetch("http://localhost:3080/", {
+    const response = await fetch(`http://localhost:${HTTP_PORT}/`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
@@ -218,14 +223,14 @@ function App() {
         setUsages("");
         setChatLog([
           ...chatLogNew,
-          { name:"Nova", user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "image" },
+          { name:BOT_NAME, user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "image" },
         ]);
       } else {
         //console.log("is message");
         setUsages(data.usage);
         setChatLog([
           ...chatLogNew,
-          { name:"Nova", user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "string" },
+          { name:BOT_NAME, user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "string" },
         ]);
       }
       handleIsReading();
@@ -273,12 +278,29 @@ function App() {
   };
 
   const handleIsReading = () => {
-    if (botIsReading) {
-      console.log("Start Speaking");
+    if (isSpeaking) {
       showMute();
     } else {
-      console.log("Stop Speaking");
       hideMute();
+    }
+  };
+
+  const handleSpeakButtonClick = async () => {
+    try {
+      const response = await fetch(`http://localhost:${HTTP_PORT}/Speak-button-clicked`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ read: true }) // send boolean value to server
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error(error.message);
     }
   };
 
@@ -374,10 +396,10 @@ function App() {
           cycleHistory(1);
       } else if (event.keyCode === 36) {
         //End key, toggle GPT read the text
-        setIsTranscript((prevState) => !prevState);
+        setIsTranscribing((prevState) => !prevState);
       } else if (event.keyCode === 35) {
         //Home key, toggle speak to GPT
-        setBotIsReading((prevState) => !prevState);
+        toggleButtonSpeak((prevState) => !prevState);
       } else if (event.keyCode === 46) {
         //Delete key, new prompt
         clearChat();
@@ -406,7 +428,6 @@ function App() {
     }
   });
 
-
   function isPrefixFocus(){
     return document.activeElement === document.getElementsByClassName("chat-input-textarea-prefix")[0];
   }
@@ -432,15 +453,7 @@ function App() {
 
   //this function will return the the tokens infos and show it.
   function setUsages(usage){
-    document.getElementsByClassName("usage")[0].innerHTML =
-      usage && usage !== "" ?
-      "Prompt Tokens : " +
-      usage.prompt_tokens +
-      " | Completion Tokens : " +
-      usage.completion_tokens+
-      " | Total Tokens : "+
-      usage.total_tokens
-      : "";
+    document.getElementsByClassName("usage")[0].innerHTML = usage && usage !== "" ? "Prompt Tokens : " + usage.prompt_tokens + " | Completion Tokens : " + usage.completion_tokens + " | Total Tokens : " + usage.total_tokens : "";
   }
 
   //###################### Return HTML ########################
@@ -631,7 +644,7 @@ function App() {
           </button>
           <button
             className="record-voice-button"
-            onClick={() => setIsTranscript((prevState) => !prevState)}
+            onClick={() => setIsTranscribing((prevState) => !prevState)}
             type="button"
             title="Record Voice To Prompt - Shortcut : Home"
           >
@@ -666,7 +679,7 @@ function App() {
           </button>
           <button
             className="read-button"
-            onClick={() => setBotIsReading((prevState) => !prevState)}
+            onClick={() => { handleSpeakButtonClick(); toggleButtonSpeak((prevState) => !prevState); }}
             title="Answers Read By AI - Shortcut : End"
             type="button"
           >
@@ -698,7 +711,7 @@ function App() {
           <button
             className="clear-button"
             onClick={() => {setInput("");}}
-            onFocus={focusTheTextArea}
+            onFocus={() => {focusTheTextArea();}}
             type="button"
             title="Clear Input"
           >
@@ -715,7 +728,7 @@ function App() {
           <button
             className="clear-button-prefix"
             onClick={() => {setPrefix("");}}
-            onFocus={focusTheTextArea}
+            onFocus={() => {focusTheTextArea();}}
             type="button"
             title="Clear Prefix"
           >
@@ -732,7 +745,7 @@ function App() {
           <button
             className="clear-button-suffix"
             onClick={() => {setSuffix("");}}
-            onFocus={focusTheTextArea}
+            onFocus={() => {focusTheTextArea();}}
             type="button"
             title="Clear Suffix"
           >
