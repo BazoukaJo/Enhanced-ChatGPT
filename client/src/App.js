@@ -284,9 +284,9 @@ function App() {
 
   const handleIsReading = () => {
     if (isSpeaking) {
-      showMute();
-    } else {
       hideMute();
+    } else {
+      showMute();
     }
   };
 
