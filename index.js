@@ -10,11 +10,13 @@
 // NPM packages: openai, express, bodyParser and cors.
 const OpenAI = require('openai');
 const express = require('express');
+const { spawn } = require("child_process");
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const fs = require('fs');
 const path = require("path");
 const speechFile = path.resolve("./speech.mp3");
+const cache = new Map();
 
 const USER_NAME = "John";// change your name here
 const HTTP_PORT = "3080";// default 3080
@@ -142,8 +144,6 @@ function addHistory(message){
   });
 }
 
-const cache = new Map();
-
 // Generate speech from text
 async function generateSpeech(message) {
   let buffer;
@@ -152,27 +152,21 @@ async function generateSpeech(message) {
   } else {
     const mp3 = await openai.audio.speech.create({
       model: "tts-1",
-      voice: "fable",
+      voice: "nova",
       input: message,
       quality: "low",
     });
     buffer = Buffer.from(await mp3.arrayBuffer());
     cache.set(message, buffer);
   }
-  await fs.promises.writeFile(speechFile, buffer);
-  const { exec } = require("child_process");
-  exec("ffplay -nodisp -autoexit " + speechFile, (error, stdout, stderr) => {
-    if (error) {
-      console.log(`error: ${error.message}`);
-    }
-    else if (stderr) {
-      console.log(`stderr: ${stderr}`);
-    }
+  const ffplay = spawn("ffplay", ["-nodisp", "-autoexit", "-"], { stdio: ['pipe', 'ignore', 'ignore'] });
+  ffplay.stdin.write(buffer);
+  ffplay.stdin.end();
+
+  app.post('/Speak-button-clicked', (req, res) => {
+    //console.log('Speak button clicked');
+    isSpeaking = !isSpeaking;
+    res.json({ message: 'Speak button clicked' });
   });
 }
 
-app.post('/Speak-button-clicked', (req, res) => {
-  //console.log('Speak button clicked');
-  isSpeaking = !isSpeaking;
-  res.json({ message: 'Speak button clicked' });
-});
