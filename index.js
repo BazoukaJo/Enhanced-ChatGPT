@@ -162,11 +162,10 @@ async function generateSpeech(message) {
   const ffplay = spawn("ffplay", ["-nodisp", "-autoexit", "-"], { stdio: ['pipe', 'ignore', 'ignore'] });
   ffplay.stdin.write(buffer);
   ffplay.stdin.end();
-
-  app.post('/Speak-button-clicked', (req, res) => {
-    //console.log('Speak button clicked');
-    isSpeaking = !isSpeaking;
-    res.json({ message: 'Speak button clicked' });
-  });
 }
 
+app.post('/Speak-button-clicked', (req, res) => {
+  //console.log('Speak button clicked');
+  isSpeaking = !isSpeaking;
+  res.json({ message: 'Speak button clicked' });
+});
