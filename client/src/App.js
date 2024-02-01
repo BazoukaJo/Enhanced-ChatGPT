@@ -47,7 +47,7 @@ function App() {
   const START_INSTRUCTION = `I am ${BOT_NAME}, your dedicated personal assistant. Not only can I answer all your questions, but I can also generate images using DALL-E-3. To do so, simply start your prompt with 'imagine', leaving the prefix field blank.`;
 
   // DEFAULT_MODEL set to "gpt-4-1106-preview".
-  const DEFAULT_MODEL = "gpt-4-1106-preview";
+  const DEFAULT_MODEL = "gpt-4-turbo-preview";
 
   // DEFAULT_RESOLUTION set to image generation resolution
   const DEFAULT_RESOLUTION = "1024x1024";
