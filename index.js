@@ -30,7 +30,7 @@ let org = process.env.OPENAI_ORG; //store your key in the environment variable O
 let isSpeaking = true;
 /* Creating an instance of the Express app using the required middlewares for incoming HTTP
  * requests data parsing and enabling CORS.
- * The server listens on port 3080.
+ * The server listens on port HTTP_PORT.
  */
 const openai = new OpenAI({
   organization: org,
@@ -112,7 +112,7 @@ app.post("/", async (req, res) => {
 });
 
 /* A GET request the models from the server. */
-app.get("/models", async (req, res) => {
+app.get("/models", async (_, res) => {
   try {
     const response = await openai.models.list();
     res.json({ models: response.data });
@@ -149,22 +149,22 @@ async function generateSpeech(message) {
   let buffer;
   if (cache.has(message)) {
     buffer = cache.get(message);
-  } else {
-    const mp3 = await openai.audio.speech.create({
-      model: "tts-1",
-      voice: "nova",
-      input: message,
-      quality: "low",
-    });
-    buffer = Buffer.from(await mp3.arrayBuffer());
-    cache.set(message, buffer);
-  }
-  const ffplay = spawn("ffplay", ["-nodisp", "-autoexit", "-"], { stdio: ['pipe', 'ignore', 'ignore'] });
+      } else {
+          const mp3 = await openai.audio.speech.create({
+        model: "tts-1",
+        voice: "nova",
+        input: message,
+        quality: "low",
+      });
+      buffer = Buffer.from(await mp3.arrayBuffer());
+      cache.set(message, buffer);
+        }
+const ffplay = spawn("ffplay", ["-nodisp", "-autoexit", "-"], { stdio: ['pipe', 'ignore', 'ignore'] });
   ffplay.stdin.write(buffer);
   ffplay.stdin.end();
 }
 
-app.post('/Speak-button-clicked', (req, res) => {
+app.post('/Speak-button-clicked', (_, res) => {
   //console.log('Speak button clicked');
   isSpeaking = !isSpeaking;
   res.json({ message: 'Speak button clicked' });

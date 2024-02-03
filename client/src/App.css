@@ -208,6 +208,21 @@
   border-style: none;
 }
 
+.stop-button {
+  color: white;
+  background-color: #40414f;
+  /* border-radius: 8px; */
+  bottom: 75px;
+  height: 30px;
+  position: fixed;
+  right: 50px;
+  transition: ease 0.2s all;
+  width: 30px;
+  outline: 1px solid rgb(111, 111, 111);
+  border-style: none;
+  visibility: hidden;
+}
+
 .send-button:hover {
   background-color: #222222;
   transition: ease 0.2s all;

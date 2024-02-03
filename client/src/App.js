@@ -25,8 +25,8 @@ function App() {
   // IP_ADDRESS define the value of the IP address used by the server.
   const IP_ADDRESS = "10.0.0.145"; //Default localhost
 
-    // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
-    const MAX_TOKENS = "32768";
+  // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
+  const MAX_TOKENS = "32768";
 
   // DEFAULT_TOKEN define the default max tokens.
   const DEFAULT_TOKEN = "4096";
@@ -140,6 +140,9 @@ function App() {
   // declare isReading as false with state hook toggle botIsReading() when called
   const [isSpeaking, toggleButtonSpeak] = useState(true);
 
+    // declare 'stopped' with state hook with false as initial value
+    const [stopped, setStopped] = useState(false);
+
   // eslint-disable-next-line
   useEffect(() => {handleIsReading();}, [isSpeaking]);
 
@@ -173,6 +176,7 @@ function App() {
    * After 3000 milliseconds delay. The loader is hidden. This is to ensure that the loader is visible for at least 3 seconds.
    */
   async function handleSubmit() {
+    setStopped(false);
     if (input === "" && suffix === "" && prefix === "") return;
     //Pre request
     let chatLogNew = [...chatLog];
@@ -220,13 +224,15 @@ function App() {
     });
 
     const data = await response.json();
+    if (stopped)
+      return;
     if (data.error && data.error !== "") {
       showWarning("response error "+data.error);
     } else {
       if (currentPrompt !== "" || data.message.includes("<img")){
         //console.log("is image");
         setUsages("");
-        setChatLog([
+                setChatLog([
           ...chatLogNew,
           { name:BOT_NAME, user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "image" },
         ]);
@@ -237,10 +243,17 @@ function App() {
           ...chatLogNew,
           { name:BOT_NAME, user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "string" },
         ]);
-      }
+              }
       handleIsReading();
       // Scroll down
       setTimeout(function() {document.getElementsByClassName("chatbox")[0].scrollTo( 0, document.getElementsByClassName("chat-log")[0].clientHeight);}, 200);}
+    hideLoader();
+  }
+
+  // Stop request to GPT
+  function handleStop()
+  {
+    setStopped(true);
     hideLoader();
   }
 
@@ -290,6 +303,7 @@ function App() {
     }
   };
 
+  // This function will handle the speak button click
   const handleSpeakButtonClick = async () => {
     try {
       const response = await fetch(`http://${IP_ADDRESS}:${HTTP_PORT}/Speak-button-clicked`, {
@@ -329,6 +343,7 @@ function App() {
    */
   function showLoader() {
     document.querySelector(".loader").style.visibility = "visible";
+    document.querySelector(".stop-button").style.visibility = "visible";
   }
 
   /*
@@ -337,6 +352,7 @@ function App() {
    */
   function hideLoader() {
     document.querySelector(".loader").style.visibility = "hidden";
+    document.querySelector(".stop-button").style.visibility = "hidden";
   }
 
   /*
@@ -645,6 +661,18 @@ function App() {
           >
             <svg width="16" height="27" fill="currentColor" viewBox="0 0 16 16">
               <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z" />
+            </svg>
+          </button>
+          <button
+            className="stop-button"
+            onClick={() => {handleStop();}}
+            tabIndex="-1"
+            onFocus={() => {focusTheTextArea();}}
+            type="button"
+            title="Stop request to GPT"
+          >
+            <svg fill="#ffffff" viewBox="10 0 240 200" id="Flat" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="stop" strokeWidth="0"></g><g id="stop" strokeLinecap="round" strokeLinejoin="round"></g><g id="stop"> 
+              <path d="M212,58.90918V197.09082A14.92639,14.92639,0,0,1,197.09082,212H58.90918A14.92639,14.92639,0,0,1,44,197.09082V58.90918A14.92607,14.92607,0,0,1,58.90918,44H197.09082A14.92607,14.92607,0,0,1,212,58.90918Z"></path> </g>
             </svg>
           </button>
           <button
