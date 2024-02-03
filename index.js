@@ -60,6 +60,7 @@ app.post("/", async (req, res) => {
   //console.log(req.body);
   addHistory(message.message);
   try {
+    let audioData;
     if (prompt !== "") {
       console.log("prompt = " + prompt);
       const response = await openai.images.generate({
@@ -70,11 +71,13 @@ app.post("/", async (req, res) => {
         size: size, // 1024x1024, 1024x1792, 1792x1024.
         quality: quality, // Default standard or hd. set to hd.
         style: style, // Default vivid or natural.
+        audioData: audioData
       });
       let imageURLs = response.data.map((url) => "<img src='" + url.url + "' className='images'/>");
-      res.json({ message: imageURLs });
-      if(isSpeaking)
-        generateSpeech(`Here is the image for you ${USER_NAME}.`);
+      res.json({ message: imageURLs, audioData: audioData });
+      if(isSpeaking) {
+        audioData = await generateSpeech(`Here is the image for you ${USER_NAME}.`);
+      }
       addHistory( imageURLs + "\n" );
       console.log("images url = " + imageURLs);
     } else {
@@ -94,10 +97,11 @@ app.post("/", async (req, res) => {
         ?.map((choice) => (response.choices.length > 1 ? i++ + "- ": "") + choice.message.content)
         .join("\n\n")
         .trimStart();
-      res.json({ message: choices, usage: response.usage });
+      res.json({ message: choices, usage: response.usage, audioData: audioData});
       // console.log("reply messages = " + choices);
-      if(isSpeaking)
-        generateSpeech(choices);
+      if(isSpeaking) {
+        audioData = await generateSpeech(choices);
+      }
       addHistory(choices);
     }
   } catch (error) {
@@ -110,6 +114,25 @@ app.post("/", async (req, res) => {
     }
   }
 });
+
+// In your generateSpeech function
+async function generateSpeech(message) {
+  let buffer;
+  if (cache.has(message)) {
+    buffer = cache.get(message);
+  } else {
+    const mp3 = await openai.audio.speech.create({
+      model: "tts-1",
+      voice: "nova",
+      input: message,
+      quality: "low",
+    });
+    buffer = Buffer.from(await mp3.arrayBuffer());
+    cache.set(message, buffer);
+  }
+  // Convert the buffer to base64 so it can be sent over HTTP
+  return buffer.toString('base64');
+}
 
 /* A GET request the models from the server. */
 app.get("/models", async (_, res) => {
@@ -142,26 +165,6 @@ function addHistory(message){
       console.error(err);
     }
   });
-}
-
-// Generate speech from text
-async function generateSpeech(message) {
-  let buffer;
-  if (cache.has(message)) {
-    buffer = cache.get(message);
-      } else {
-          const mp3 = await openai.audio.speech.create({
-        model: "tts-1",
-        voice: "nova",
-        input: message,
-        quality: "low",
-      });
-      buffer = Buffer.from(await mp3.arrayBuffer());
-      cache.set(message, buffer);
-        }
-const ffplay = spawn("ffplay", ["-nodisp", "-autoexit", "-"], { stdio: ['pipe', 'ignore', 'ignore'] });
-  ffplay.stdin.write(buffer);
-  ffplay.stdin.end();
 }
 
 app.post('/Speak-button-clicked', (_, res) => {
