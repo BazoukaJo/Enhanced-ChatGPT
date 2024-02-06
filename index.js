@@ -15,12 +15,12 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const fs = require('fs');
 const path = require("path");
-const speechFile = path.resolve("./speech.mp3");
+const historyFile = path.resolve("./history.json");
 const cache = new Map();
 
 const USER_NAME = "John";// change your name here
 const HTTP_PORT = "3080";// default 3080
-const IP_ADDRESS = "10.0.0.145"; // default localhost. change to your network address range
+const IP_ADDRESS = "10.0.0.145"; // Change to your network address range
 /*
  * OpenAI key stored in an environment variable.
  */
@@ -39,6 +39,11 @@ const openai = new OpenAI({
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
+
+app.use((_, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*'); // This allows all origins
+  next();
+});
 
 /* A POST request message to the server. */
 app.post("/", async (req, res) => {
@@ -75,9 +80,6 @@ app.post("/", async (req, res) => {
       });
       let imageURLs = response.data.map((url) => "<img src='" + url.url + "' className='images'/>");
       res.json({ message: imageURLs, audioData: audioData });
-      if(isSpeaking) {
-        audioData = await generateSpeech(`Here is the image for you ${USER_NAME}.`);
-      }
       addHistory( imageURLs + "\n" );
       console.log("images url = " + imageURLs);
     } else {
@@ -91,7 +93,7 @@ app.post("/", async (req, res) => {
         presence_penalty: Number(presencePenalty), // Default 0. From -2 to 2
         frequency_penalty: Number(frequencyPenalty), // Default 0.From -2 to 2
         seed: seed // Default 0 = random to 2147483647.
-      });
+              });
       var i = 1;
       let choices = response.choices
         ?.map((choice) => (response.choices.length > 1 ? i++ + "- ": "") + choice.message.content)
@@ -99,9 +101,6 @@ app.post("/", async (req, res) => {
         .trimStart();
       res.json({ message: choices, usage: response.usage, audioData: audioData});
       // console.log("reply messages = " + choices);
-      if(isSpeaking) {
-        audioData = await generateSpeech(choices);
-      }
       addHistory(choices);
     }
   } catch (error) {
@@ -115,7 +114,6 @@ app.post("/", async (req, res) => {
   }
 });
 
-// In your generateSpeech function
 async function generateSpeech(message) {
   let buffer;
   if (cache.has(message)) {
@@ -130,9 +128,15 @@ async function generateSpeech(message) {
     buffer = Buffer.from(await mp3.arrayBuffer());
     cache.set(message, buffer);
   }
-  // Convert the buffer to base64 so it can be sent over HTTP
-  return buffer.toString('base64');
+  return buffer;
 }
+
+app.get('/generateSpeech', async (req, res) => {
+  const message = req.query.message;
+  const audioBuffer = await generateSpeech(message);
+  res.set('Content-Type', 'audio/mpeg');
+  res.send(audioBuffer);
+});
 
 /* A GET request the models from the server. */
 app.get("/models", async (_, res) => {
@@ -160,15 +164,9 @@ function addHistory(message){
   const currentDate = new Date().toLocaleString();
   const historyEntry = { message, date: currentDate };
   const historyData = JSON.stringify(historyEntry);
-  fs.appendFile('./history.json', historyData + ',', (err) => {
+  fs.appendFile(`${historyFile}`, historyData + ',', (err) => {
     if (err) {
       console.error(err);
     }
   });
 }
-
-app.post('/Speak-button-clicked', (_, res) => {
-  //console.log('Speak button clicked');
-  isSpeaking = !isSpeaking;
-  res.json({ message: 'Speak button clicked' });
-});

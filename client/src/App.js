@@ -63,6 +63,8 @@ function App() {
 
   const SEED_MAX = 2147483647;
 
+  let controller;
+
   // declare input, prefix and suffix with state hook useState
   const [input, setInput] = useState("");
   const [prefix, setPrefix] = useState("");
@@ -140,11 +142,8 @@ function App() {
   // declare isReading as false with state hook toggle botIsReading() when called
   const [isSpeaking, toggleButtonSpeak] = useState(true);
 
-    // declare 'stopped' with state hook with false as initial value
-    const [stopped, setStopped] = useState(false);
-
   // eslint-disable-next-line
-  useEffect(() => {handleIsReading();}, [isSpeaking]);
+  useEffect(() => {handleReadingButton();}, [isSpeaking]);
 
   //###################### Async Functions #######################
   /**
@@ -172,11 +171,10 @@ function App() {
    * showLoader() is called to indicate that some processing is happening.
    * After calling the function to scroll up the chatlog window, a post request is made to a locally hosted endpoint with certain parameters to get a response from the GPT language model.
    * The data received from the post request is processed & then a update to the chatlog with the latest informative message from "gpt" is added.
-   * Finally, the UI is scrolled up and function handleIsReading is called to read the latest chat message.
+   * Finally, the UI is scrolled up to show the latest message. The loader is hidden. If there is an error, it is logged.
    * After 3000 milliseconds delay. The loader is hidden. This is to ensure that the loader is visible for at least 3 seconds.
    */
-  async function handleSubmit() {
-    setStopped(false);
+  async function handleSubmitPrompt() {
     if (input === "" && suffix === "" && prefix === "") return;
     //Pre request
     let chatLogNew = [...chatLog];
@@ -200,11 +198,13 @@ function App() {
       ?.message.toLowerCase().substring(0, 7) === "imagine"
       ? chatLogNew[chatLogNew.length - 1]?.message
       : "";
-
+    // Assign a new AbortController to controller
+    controller = new AbortController();
+    const signal = controller.signal;
     // Post request
     const response = await fetch(`http://${IP_ADDRESS}:${HTTP_PORT}/`, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json","Access-Control-Allow-Origin": "*" },
       body: JSON.stringify({
         model: currentModel,
         messages: messages,
@@ -219,42 +219,61 @@ function App() {
         bestOf: bestOf,
         style: currentStyle,
         quality: DEFAULT_QUALITY,
-        seed: currentSeed
+        seed: currentSeed,
+        signal: signal
       })
     });
 
     const data = await response.json();
-    if (stopped)
-      return;
     if (data.error && data.error !== "") {
       showWarning("response error "+data.error);
     } else {
-      if (currentPrompt !== "" || data.message.includes("<img")){
-        //console.log("is image");
-        setUsages("");
-                setChatLog([
-          ...chatLogNew,
-          { name:BOT_NAME, user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "image" },
-        ]);
-      } else {
-        //console.log("is message");
-        setUsages(data.usage);
-        setChatLog([
-          ...chatLogNew,
-          { name:BOT_NAME, user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "string" },
-        ]);
-              }
-      handleIsReading();
-      // Scroll down
-      setTimeout(function() {document.getElementsByClassName("chatbox")[0].scrollTo( 0, document.getElementsByClassName("chat-log")[0].clientHeight);}, 200);}
+    if (currentPrompt !== "" || data.message.includes("<img")){
+      setUsages("");
+      setChatLog([
+        ...chatLogNew,
+        { name:BOT_NAME, user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "image" },
+      ]);
+      playResponse(`Here is the image for you ${USER_NAME}.`);
+    } else {
+      setUsages(data.usage);
+      setChatLog([
+        ...chatLogNew,
+        { name:BOT_NAME, user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "string" },
+      ]);
+      playResponse(data.message);
+    }
+    // Scroll down
+    setTimeout(function() {document.getElementsByClassName("chatbox")[0].scrollTo( 0, document.getElementsByClassName("chat-log")[0].clientHeight);}, 200);}
     hideLoader();
   }
 
   // Stop request to GPT
-  function handleStop()
-  {
-    setStopped(true);
+  function handleStopController(){
+    controller.abort();
     hideLoader();
+  }
+
+  async function playResponse(message) {
+    if (!isSpeaking)
+      return;
+    try {
+      const response = await fetch(`http://${IP_ADDRESS}:${HTTP_PORT}/generateSpeech?message=${encodeURIComponent(message)}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const audioBlob = await response.blob();
+      if (!audioBlob.type.startsWith('audio/')) {
+        console.error('The fetched blob is not an audio file');
+        return;
+      }
+      const audio = new Audio(URL.createObjectURL(audioBlob));
+      audio.play().catch(function(error) {
+        console.log('Failed to play audio: ', error);
+      });
+    } catch (error) {
+      console.error('There has been a problem with your fetch audio response operation: ', error);
+    }
   }
 
   /*
@@ -274,7 +293,7 @@ function App() {
       mic.stop();
       mic.onend = () => {
         //console.log('Mic off');
-        handleSubmit();
+        handleSubmitPrompt();
         hideRecorder();
       };
     }
@@ -295,31 +314,11 @@ function App() {
     };
   };
 
-  const handleIsReading = () => {
+  const handleReadingButton = () => {
     if (isSpeaking) {
       hideMute();
     } else {
       showMute();
-    }
-  };
-
-  // This function will handle the speak button click
-  const handleSpeakButtonClick = async () => {
-    try {
-      const response = await fetch(`http://${IP_ADDRESS}:${HTTP_PORT}/Speak-button-clicked`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ read: true }) // send boolean value to server
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      console.log(data);
-    } catch (error) {
-      console.error(error.message);
     }
   };
 
@@ -477,10 +476,16 @@ function App() {
     document.getElementsByClassName("usage")[0].innerHTML = usage && usage !== "" ? "Prompt Tokens : " + usage.prompt_tokens + " | Completion Tokens : " + usage.completion_tokens + " | Total Tokens : " + usage.total_tokens : "";
   }
 
+  function splitCodeFromString(message) {
+    //TODO complete the code to split the message and return the result adding the missing tags to format the codes parts in the chat.
+    return message;
+  }
+
   //###################### Return HTML ########################
   /* The above code is a React component that renders the chatbot UI in HTML. */
   return (
     <div className="App">
+      <audio id="audio-player" src="/speech.mp3" type="audio/mpeg"></audio>
       <aside className="sidemenu" id="sidemenu">
         <div
           className="side-menu-button"
@@ -621,12 +626,12 @@ function App() {
       </aside>
       <section className="chatbox">
         <div className="chat-log">
-          {chatLog?.map((message, index) => (<ChatMessage key={index} message={message} />))}
+          {chatLog?.map((message, index) => (<ChatMessage key={index} message={splitCodeFromString(message)} />))}
         </div>
         <div className="chat-input-holder">
           <div
             className="form1"
-            onKeyDown={(e) => {!e.getModifierState("Shift") && e.keyCode === 13 && handleSubmit() && e.preventDefault();}}
+            onKeyDown={(e) => {!e.getModifierState("Shift") && e.keyCode === 13 && handleSubmitPrompt() && e.preventDefault();}}
             onInput={(e) => {changeTextareaHeight()}}
           >
             <textarea
@@ -653,7 +658,7 @@ function App() {
           />
           <button
             className="send-button"
-            onClick={() => {handleSubmit();}}
+            onClick={() => {handleSubmitPrompt();}}
             tabIndex="-1"
             onFocus={() => {focusTheTextArea();}}
             type="button"
@@ -665,7 +670,7 @@ function App() {
           </button>
           <button
             className="stop-button"
-            onClick={() => {handleStop();}}
+            onClick={() => {handleStopController();}}
             tabIndex="-1"
             onFocus={() => {focusTheTextArea();}}
             type="button"
@@ -712,7 +717,7 @@ function App() {
           </button>
           <button
             className="read-button"
-            onClick={() => { handleSpeakButtonClick(); toggleButtonSpeak((prevState) => !prevState); }}
+            onClick={() => { toggleButtonSpeak((prevState) => !prevState); }}
             title="Answers Read By AI - Shortcut : End"
             type="button"
           >
