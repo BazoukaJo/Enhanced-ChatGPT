@@ -186,7 +186,7 @@ function App() {
     chatLogNew.push(currentMessage);
     history.push({ message: input });
     setChatLog(chatLogNew);
-    const messages = chatLogNew?.map((message) => message.message).join("\n");
+    const messages = chatLogNew?.map((message) => message.message.startsWith("<img ") ? message.message.match(/<img src='(.*?)' className='images'\/>/)[1] : message.message ).join("\n");
     setInput("");
     showLoader();
     // Scroll down
@@ -219,20 +219,20 @@ function App() {
         bestOf: bestOf,
         style: currentStyle,
         quality: DEFAULT_QUALITY,
-        seed: currentSeed,
-        signal: signal
-      })
+        seed: currentSeed
+      }),
+      signal: signal
     });
 
     const data = await response.json();
     if (data.error && data.error !== "") {
       showWarning("response error "+data.error);
     } else {
-    if (currentPrompt !== "" || data.message.includes("<img")){
+    if (currentPrompt !== ""){
       setUsages("");
       setChatLog([
         ...chatLogNew,
-        { name:BOT_NAME, user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "image" },
+        { name:BOT_NAME, user: "gpt", role:SYSTEM_ROLE, message: "<img src='" + data.message + "' className='images'/>", type: "image" },
       ]);
       playResponse(`Here is the image for you ${USER_NAME}.`);
     } else {
@@ -477,7 +477,8 @@ function App() {
   }
 
   function splitCodeFromString(message) {
-    //TODO complete the code to split the message and return the result adding the missing tags to format the codes parts in the chat.
+    //TODO markdown parsing
+    
     return message;
   }
 

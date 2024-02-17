@@ -62,8 +62,7 @@ app.post("/", async (req, res) => {
     quality,
     seed
   } = req.body;
-  //console.log(req.body);
-  addHistory(message.message);
+  console.log(req.body);
   try {
     let audioData;
     if (prompt !== "") {
@@ -78,7 +77,7 @@ app.post("/", async (req, res) => {
         style: style, // Default vivid or natural.
         audioData: audioData
       });
-      let imageURLs = response.data.map((url) => "<img src='" + url.url + "' className='images'/>");
+      let imageURLs = response.data.map((url) => url.url);
       res.json({ message: imageURLs, audioData: audioData });
       addHistory( imageURLs + "\n" );
       console.log("images url = " + imageURLs);
@@ -92,7 +91,7 @@ app.post("/", async (req, res) => {
         n: parseInt(n), // Number of messages to create.
         presence_penalty: Number(presencePenalty), // Default 0. From -2 to 2
         frequency_penalty: Number(frequencyPenalty), // Default 0.From -2 to 2
-        seed: seed // Default 0 = random to 2147483647.
+        seed: seed // Default 0 = random to max 2147483647.
               });
       var i = 1;
       let choices = response.choices
@@ -100,7 +99,7 @@ app.post("/", async (req, res) => {
         .join("\n\n")
         .trimStart();
       res.json({ message: choices, usage: response.usage, audioData: audioData});
-      // console.log("reply messages = " + choices);
+      console.log("reply messages = " + choices);
       addHistory(choices);
     }
   } catch (error) {
