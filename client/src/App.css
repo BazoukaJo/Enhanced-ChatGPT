@@ -485,6 +485,8 @@
   animation: messageAnimation 0.2s;
   transition: ease 0.2s all;
   margin-left: 20px;
+  margin-bottom: -10px;
+  margin-top: -10px;
   display: block;
   width:100%;
 }

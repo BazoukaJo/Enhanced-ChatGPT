@@ -3,6 +3,9 @@ import "./normal.css";
 
 import React, { useEffect, useState } from "react";
 
+import Prism from 'prismjs';
+import { marked } from 'marked';
+
 /**
  * App Frontend: Enhanced ChatGPT
  *
@@ -476,10 +479,15 @@ function App() {
     document.getElementsByClassName("usage")[0].innerHTML = usage && usage !== "" ? "Prompt Tokens : " + usage.prompt_tokens + " | Completion Tokens : " + usage.completion_tokens + " | Total Tokens : " + usage.total_tokens : "";
   }
 
-  function splitCodeFromString(message) {
-    //TODO markdown parsing
-    
-    return message;
+  function colorSyntaxWithPrism(html) {
+    //return Prism.highlight(html, "language-javascript");
+    return html;
+  }
+
+  function convertAndHighlightMarkdown(message) {
+    let html = marked.parse(message.message);
+    let colorSyntaxCode = colorSyntaxWithPrism(html);
+    return colorSyntaxCode;
   }
 
   //###################### Return HTML ########################
@@ -627,7 +635,7 @@ function App() {
       </aside>
       <section className="chatbox">
         <div className="chat-log">
-          {chatLog?.map((message, index) => (<ChatMessage key={index} message={splitCodeFromString(message)} />))}
+          {chatLog?.map((message, index) => (<ChatMessage key={index} message={message} htmlMessage={convertAndHighlightMarkdown(message)}/>))}
         </div>
         <div className="chat-input-holder">
           <div
@@ -816,7 +824,7 @@ function App() {
 /**
  * @returns A React component that renders a div with a class of chat-message.
  */
-const ChatMessage = ({ message }) => {
+const ChatMessage = ({ message, htmlMessage }) => {
   return (
     <div className={`chat-message ${message.user === "gpt" && "chatgpt"}`}>
       <div className="chat-message-center">
@@ -835,11 +843,14 @@ const ChatMessage = ({ message }) => {
           {message.user === "gpt" && message.type === "image" && (
             <span
               className="gpt-message"
-              dangerouslySetInnerHTML={{ __html: message.message }}
+              dangerouslySetInnerHTML={{ __html: htmlMessage }}
             ></span>
           )}
           {message.user === "gpt" && message.type === "string" && (
-            <span className="gpt-message">{message.message}</span>
+            <span
+            className="gpt-message"
+            dangerouslySetInnerHTML={{ __html: htmlMessage }}
+          ></span>
           )}
         </div>}
         {message.user !== "gpt" && <div className="user-box">
