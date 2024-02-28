@@ -469,35 +469,32 @@
 }
 
 .user-box {
-  animation: messageAnimation 0.2s;
   transition: ease 0.2s all;
   display: block;
   width:100%;
   margin-left: 20px;
-}
-
-.player-box:hover {
-  font-size: 18px;
-  transition: ease 0.2s all;
 }
 
 .gpt-box {
-  animation: messageAnimation 0.2s;
-  transition: ease 0.2s all;
   margin-left: 20px;
-  margin-bottom: -10px;
-  margin-top: -10px;
+  margin-bottom: 0px;
+  margin-top: 0px;
   display: block;
   width:100%;
-}
-
-.gpt-box:hover {
-  font-size: 18px;
-  transition: ease 0.2s all;
 }
 
 .gpt-message {
   white-space: break-spaces;
+  margin-bottom: 0px;
+  margin-top: -20px;
+  display: block;
+}
+
+.gpt-image {
+  white-space: break-spaces;
+  margin-bottom: 0px;
+  margin-top: 0px;
+  display: block;
 }
 
 .user-message {
@@ -551,18 +548,6 @@
   }
   100% {
     transform: rotate(360deg);
-  }
-}
-
-@keyframes messageAnimation {
-  0% {
-    font-size: 16px;
-  }
-  50% {
-    font-size: 15px;
-  }
-  100% {
-    font-size: 16px;
   }
 }
 

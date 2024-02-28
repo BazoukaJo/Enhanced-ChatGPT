@@ -3,16 +3,7 @@ import "./normal.css";
 
 import React, { useEffect, useState } from "react";
 
-import Prism from 'prismjs';
 import { marked } from 'marked';
-
-/**
- * App Frontend: Enhanced ChatGPT
- *
- * @license MIT <https://opensource.org/licenses/MIT>
- * @author Jonathan Pratte <https://jonathanpratte.com>
- * @public
- */
 
 const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const mic = new speechRecognition();
@@ -21,138 +12,55 @@ mic.interimResults = true;
 mic.lang = "en-US";
 
 function App() {
-
-  // HTTP_PORT define the value of the port used by the server.
   const HTTP_PORT = "3080";
-
-  // IP_ADDRESS define the value of the IP address used by the server.
-  const IP_ADDRESS = "10.0.0.145"; //Default localhost
-
-  // MAX_TOKENS defined as integer with a value assigned by parsing the result of "4096" to an integer.
-  const MAX_TOKENS = "32768";
-
-  // DEFAULT_TOKEN define the default max tokens.
-  const DEFAULT_TOKEN = "4096";
-
-  // DEFAULT_TEMPERATURE define the value of the default temperature.
+  const IP_ADDRESS = "10.0.0.145";
+  const MAX_TOKENS = 32768;
+  const DEFAULT_TOKEN = 4096;
   const DEFAULT_TEMPERATURE = 0.5;
-
-  // SYSTEM_ROLE define the value of the default bot role.
   const SYSTEM_ROLE = "assistant";
-
-  // USER_NAME define the value of the user name.
-  const USER_NAME = "John";// Change your name here
-
-  // BOT_NAME define the value of the bot name.
-  const BOT_NAME = "Sage";// Change your name here
-
-  // START_INSTRUCTION define the value of the default bot role.
+  const USER_NAME = "John";
+  const BOT_NAME = "Sage";
   const START_INSTRUCTION = `I am ${BOT_NAME}, your dedicated personal assistant. Not only can I answer all your questions, but I can also generate images using DALL-E-3. To do so, simply start your prompt with 'imagine', leaving the prefix field blank.`;
-
-  // DEFAULT_MODEL set to "gpt-4-1106-preview".
   const DEFAULT_MODEL = "gpt-4-turbo-preview";
-
-  // DEFAULT_RESOLUTION set to image generation resolution
   const DEFAULT_RESOLUTION = "1024x1024";
-
-  // DEFAULT_STYLE set to image generation resolution
   const DEFAULT_STYLE = "vivid";
-
-  // DEFAULT_QUALITY set to image generation resolution
   const DEFAULT_QUALITY = "hd";
-
-  // DEFAULT_SEED define the value of the Default seed = 0 = random.
   const DEFAULT_SEED = 0;
-
   const SEED_MAX = 2147483647;
 
   let controller;
 
-  // declare input, prefix and suffix with state hook useState
   const [input, setInput] = useState("");
   const [prefix, setPrefix] = useState("");
   const [suffix, setSuffix] = useState("");
-
-  // Image resolution settings
-  const resolutions = [
-    { id: "1024x1024" },
-    { id: "1024x1792" },
-    { id: "1792x1024" },
-  ];
-
-  // Image realism settings
-  const styles = [
-    { id: "vivid" },
-    { id: "natural" }
-  ];
-
-  // Side menu settings
+  const resolutions = [{ id: "1024x1024" }, { id: "1024x1792" }, { id: "1792x1024" }];
+  const styles = [{ id: "vivid" }, { id: "natural" }];
   const SIDE_X_IN = "0px";
   const SIDE_X_OUT = "-140px";
-
-  // Set current resolution with default value 'DEFAULT_RESOLUTION' using state hook useState
   const [currentResolution, setResolution] = useState(DEFAULT_RESOLUTION);
-
-  // Set current style with default value 'DEFAULT_STYLE' using state hook useState
   const [currentStyle, setStyle] = useState(DEFAULT_STYLE);
-
-  // Set current seed with default value 'DEFAULT_SEED' using state hook useState
   const [currentSeed, setSeed] = useState(DEFAULT_SEED);
-
-  // models set with list of objects using state hook useState
   const [models, setModels] = useState([]);
-
-  // chatLog set with state hook useState
-  const [chatLog, setChatLog] = useState([{name:BOT_NAME, user:"gpt", role:SYSTEM_ROLE, message :START_INSTRUCTION, type:"string"}]);
-
-  // History set with state hook useState
-  const [history] = useState([]);
-
-  // Set currentModel with default value 'DEFAULT_MODEL' using state hook useState
+  const [chatLog, setChatLog] = useState([{ name: BOT_NAME, user: "gpt", role: SYSTEM_ROLE, message: START_INSTRUCTION, type: "string" }]);
+  // eslint-disable-next-line
+  const [history, setHistory] = useState([]);
   const [currentModel, setCurrentModel] = useState(DEFAULT_MODEL);
-
-  // Set History Index to cycle trough history
   const [historyIndex, setHistoryIndex] = useState(0);
-
-  // temperature is set with state hook with 0.5 as the initial value
-  const [temperature, setTemperature] = useState(Number(DEFAULT_TEMPERATURE));
-
-  // maxTokens is set with state hook with 100 parsed to an integer as the initial value
-  const [maxTokens, setMaxTokens] = useState(parseInt(DEFAULT_TOKEN));
-
-  // declare 'n' with state hook with 1 as initial value
+  const [temperature, setTemperature] = useState(DEFAULT_TEMPERATURE);
+  const [maxTokens, setMaxTokens] = useState(DEFAULT_TOKEN);
   const [n, setN] = useState(1);
-
-  // declare 'bestOf' with state hook with 1 as initial value
   const [bestOf, setBestOf] = useState(1);
-
-  // declare 'presencePenalty' with state hook with 0 as initial value
   const [presencePenalty, setPresencePenalty] = useState(0);
-
-  // declare 'frequencyPenalty' with state hook with 0 as initial value
   const [frequencyPenalty, setFrequencyPenalty] = useState(0);
-
-  // call getEngines() once when component is mounted
   // eslint-disable-next-line
-  useEffect(() => {getEngines();}, []);
-
-  // declare isListening as false with state hook, toggle when handleListen() called
+  useEffect(() => { getEngines(); }, []);
   const [isListening, setIsTranscribing] = useState(false);
-
   // eslint-disable-next-line
-  useEffect(() => {handleTranscriptSpeech();}, [isListening]);
-
-  // declare isReading as false with state hook toggle botIsReading() when called
+  useEffect(() => { handleTranscriptSpeech(); }, [isListening]);
   const [isSpeaking, toggleButtonSpeak] = useState(true);
-
   // eslint-disable-next-line
-  useEffect(() => {handleReadingButton();}, [isSpeaking]);
+  useEffect(() => { handleReadingButton(); }, [isSpeaking]);
 
-  //###################### Async Functions #######################
-  /**
-   * When the page loads, fetch the data from the server and then set the models state to the data that
-   * was fetched.
-   */
   async function getEngines() {
     try {
         const response = await fetch(`http://${IP_ADDRESS}:${HTTP_PORT}/models`);
@@ -165,18 +73,7 @@ function App() {
     }
     setTimeout(() => {document.getElementsByClassName("App")[0].style.left = SIDE_X_OUT;}, 4000);
   }
-  /**
-   * This code is a messaging platform where a user can chat with a chatbot powered by OpenAI's language model.
-   * A copy of current chatlog, chatLog, is made and assigned to chatLogNew.
-   * If the input value is not an empty string, a new message object is created and added to chatLogNew
-   * The messages are mapped to their respective messages and joined into a single text string.
-   * The updated chatLog & an empty input value is set in state.
-   * showLoader() is called to indicate that some processing is happening.
-   * After calling the function to scroll up the chatlog window, a post request is made to a locally hosted endpoint with certain parameters to get a response from the GPT language model.
-   * The data received from the post request is processed & then a update to the chatlog with the latest informative message from "gpt" is added.
-   * Finally, the UI is scrolled up to show the latest message. The loader is hidden. If there is an error, it is logged.
-   * After 3000 milliseconds delay. The loader is hidden. This is to ensure that the loader is visible for at least 3 seconds.
-   */
+
   async function handleSubmitPrompt() {
     if (input === "" && suffix === "" && prefix === "") return;
     //Pre request
@@ -227,31 +124,29 @@ function App() {
       signal: signal
     });
 
-    const data = await response.json();
-    if (data.error && data.error !== "") {
-      showWarning("response error "+data.error);
+    const message = await response.json();
+    if (message.error && message.error !== "") {
+      showWarning("response error "+message.error);
     } else {
     if (currentPrompt !== ""){
       setUsages("");
       setChatLog([
         ...chatLogNew,
-        { name:BOT_NAME, user: "gpt", role:SYSTEM_ROLE, message: "<img src='" + data.message + "' className='images'/>", type: "image" },
+        { name:BOT_NAME, user: "gpt", role:SYSTEM_ROLE, message: "<img src='" + message.message + "' className='images'/>", type: "image" },
       ]);
       playResponse(`Here is the image for you ${USER_NAME}.`);
     } else {
-      setUsages(data.usage);
+      setUsages(message.usage);
       setChatLog([
         ...chatLogNew,
-        { name:BOT_NAME, user: "gpt", role:SYSTEM_ROLE, message: data.message, type: "string" },
+        { name:BOT_NAME, user: "gpt", role:SYSTEM_ROLE, message: message.message, type: "string" },
       ]);
-      playResponse(data.message);
+      playResponse(message.message);
     }
-    // Scroll down
     setTimeout(function() {document.getElementsByClassName("chatbox")[0].scrollTo( 0, document.getElementsByClassName("chat-log")[0].clientHeight);}, 200);}
     hideLoader();
   }
 
-  // Stop request to GPT
   function handleStopController(){
     controller.abort();
     hideLoader();
@@ -295,13 +190,11 @@ function App() {
     } else {
       mic.stop();
       mic.onend = () => {
-        //console.log('Mic off');
         handleSubmitPrompt();
         hideRecorder();
       };
     }
     mic.onstart = () => {
-      //console.log('Mic on');
       showRecorder();
     };
     mic.onresult = (event) => {
@@ -325,106 +218,64 @@ function App() {
     }
   };
 
-  // show warning in flashing red
   function showWarning(error){
     document.getElementsByClassName("errors")[0].innerHTML = error;
     setTimeout(function() {document.getElementsByClassName("errors")[0].innerHTML = "";}, 4000);
   }
-  /*
-   * function to clear the chat messages
-   * set chatLog to an array with one object containing nothing
-   */
+
   function clearChat() {
     setChatLog([{name:"GPT", user:"gpt", role:SYSTEM_ROLE, message:START_INSTRUCTION, type:"string"}]);
     setUsages("");
   }
 
-  /*
-   * This code is a function that will show a loader.
-   * The function first sets the visibility of the element with the class 'loader' to visible.
-   */
   function showLoader() {
     document.querySelector(".loader").style.visibility = "visible";
     document.querySelector(".stop-button").style.visibility = "visible";
   }
 
-  /*
-   * This function hides the loader.
-   * It uses document.querySelector() to select elements with the class 'loader'
-   */
   function hideLoader() {
     document.querySelector(".loader").style.visibility = "hidden";
     document.querySelector(".stop-button").style.visibility = "hidden";
   }
 
-  /*
-   * This function shows the recorder by making it visible. It uses the document.
-   * querySelector() method to select the element with the class of 'recorder' and then sets its
-   * style.visibility property to "visible".
-   */
   function showRecorder() {
     document.querySelector(".recorder").style.visibility = "visible";
   }
 
-  /*
-   * This function hides an element with the class of "recorder" by changing its visibility to "hidden".
-   * It uses the querySelector() method to select the element and then sets its
-   * style.visibility property to "hidden".
-   */
   function hideRecorder() {
     document.querySelector(".recorder").style.visibility = "hidden";
   }
 
-  /*
-   * This function hides or shows an element with the class of "mute" and "unmute" by changing its visibility to "hidden" or "visible".
-   * It uses the querySelector() method to select the element and then sets its
-   * style.visibility property to "hidden" or "visible".
-   */
   function showMute() {
     document.querySelector(".mute").style.visibility = "visible";
     document.querySelector(".unmute").style.visibility = "hidden";
   }
 
-  /*
-   * This function hides or shows an element with the class of "mute" and "unmute" by changing its visibility to "hidden" or "visible".
-   * It uses the querySelector() method to select the element and then sets its
-   * style.visibility property to "hidden" or "visible".
-   */
   function hideMute() {
     document.querySelector(".mute").style.visibility = "hidden";
     document.querySelector(".unmute").style.visibility = "visible";
   }
 
-  /*
-   * This function focuses the text area element with the class name "chat-input-textarea".
-   * It uses the getElementsByClassName() method to select the element and then calls the focus() method on it.
-   */
   function focusTheTextArea() {
     document.getElementsByClassName("chat-input-textarea")[0].focus();
   }
 
-  // This function will handle Delete Home, End, Up and Down key press
   let keyTimer;
   let keyEventHandler = function(event) {
     clearTimeout(keyTimer);
     keyTimer = setTimeout(function() {
       //console(event.keyCode);
       if (event.keyCode === 38) {
-        //Up key, cycle history in text input
         if(isPrefixFocus())
           cycleHistory(-1);
       } else if (event.keyCode === 40) {
-        //Down key, cycle history in text input
         if(isPrefixFocus())
           cycleHistory(1);
       } else if (event.keyCode === 36) {
-        //End key, toggle GPT read the text
         setIsTranscribing((prevState) => !prevState);
       } else if (event.keyCode === 35) {
-        //Home key, toggle speak to GPT
         toggleButtonSpeak((prevState) => !prevState);
       } else if (event.keyCode === 46) {
-        //Delete key, new prompt
         clearChat();
       }
     }, 0.0001);
@@ -441,7 +292,6 @@ function App() {
     }
   });
 
-  // Add an event listener for 'mouseover' events for the "sidemenu".
   document.addEventListener("mouseover", function(event) {
     if ((event.target.id === "sidemenu" && (event.relatedTarget === chatbox || event.relatedTarget === chatPost || event.relatedTarget === null))
     || (event.target.id === "" && event.relatedTarget === null)
@@ -455,7 +305,6 @@ function App() {
     return document.activeElement === document.getElementsByClassName("chat-input-textarea-prefix")[0];
   }
 
-  // This function cycle through history display in the prefix text.
   function cycleHistory(index) {
     let nextIndex = historyIndex + index;
     if (nextIndex < 0) {
@@ -467,31 +316,21 @@ function App() {
     setPrefix(history[nextIndex]?.message);
   }
 
-  // This function change the height of the textarea to fit the content.
   function changeTextareaHeight() {
     document.getElementsByClassName("chat-input-textarea")[0].style.height = "auto";
     document.getElementsByClassName("chat-input-textarea")[0].style.height =
       document.getElementsByClassName("chat-input-textarea")[0].scrollHeight + "px";
   }
 
-  //this function will return the the tokens infos and show it.
   function setUsages(usage){
     document.getElementsByClassName("usage")[0].innerHTML = usage && usage !== "" ? "Prompt Tokens : " + usage.prompt_tokens + " | Completion Tokens : " + usage.completion_tokens + " | Total Tokens : " + usage.total_tokens : "";
   }
 
-  function colorSyntaxWithPrism(html) {
-    //return Prism.highlight(html, "language-javascript");
-    return html;
-  }
-
   function convertAndHighlightMarkdown(message) {
-    let html = marked.parse(message.message);
-    let colorSyntaxCode = colorSyntaxWithPrism(html);
-    return colorSyntaxCode;
+    return marked.parse(message.message);
   }
 
   //###################### Return HTML ########################
-  /* The above code is a React component that renders the chatbot UI in HTML. */
   return (
     <div className="App">
       <audio id="audio-player" src="/speech.mp3" type="audio/mpeg"></audio>
@@ -821,9 +660,6 @@ function App() {
 }
 //###################### END Return HTML ########################
 
-/**
- * @returns A React component that renders a div with a class of chat-message.
- */
 const ChatMessage = ({ message, htmlMessage }) => {
   return (
     <div className={`chat-message ${message.user === "gpt" && "chatgpt"}`}>
@@ -842,7 +678,7 @@ const ChatMessage = ({ message, htmlMessage }) => {
         { message.user !== "user" && <div className="gpt-box">
           {message.user === "gpt" && message.type === "image" && (
             <span
-              className="gpt-message"
+              className="gpt-image"
               dangerouslySetInnerHTML={{ __html: htmlMessage }}
             ></span>
           )}

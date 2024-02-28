@@ -1,52 +1,31 @@
-/**
- * App Backend: Enhanced ChatGPT
- *
- * @license MIT <https://opensource.org/licenses/MIT>
- * @author Jonathan Pratte <https://jonathanpratte.com>
- * @public
- * This script sets up a Node.js server that uses the OpenAI API to connect to OpenAI's language model.
- */
-
-// NPM packages: openai, express, bodyParser and cors.
 const OpenAI = require('openai');
 const express = require('express');
-const { spawn } = require("child_process");
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const fs = require('fs');
-const path = require("path");
-const historyFile = path.resolve("./history.json");
+
 const cache = new Map();
+const USER_NAME = 'John';
+const HTTP_PORT = 3080;
+const IP_ADDRESS = '10.0.0.145';
 
-const USER_NAME = "John";// change your name here
-const HTTP_PORT = "3080";// default 3080
-const IP_ADDRESS = "10.0.0.145"; // Change to your network address range
-/*
- * OpenAI key stored in an environment variable.
- */
-let key = process.env.OPENAI_KEY; //store your key in the environment variable OPENAI_KEY='YourKey'.
-let org = process.env.OPENAI_ORG; //store your key in the environment variable OPENAI_ORG='OrgKey'.
+let key = process.env.OPENAI_KEY;
+let org = process.env.OPENAI_ORG;
 
-let isSpeaking = true;
-/* Creating an instance of the Express app using the required middlewares for incoming HTTP
- * requests data parsing and enabling CORS.
- * The server listens on port HTTP_PORT.
- */
 const openai = new OpenAI({
   organization: org,
   apiKey: key,
 });
 const app = express();
+
 app.use(bodyParser.json());
 app.use(cors());
 
 app.use((_, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*'); // This allows all origins
+  res.header('Access-Control-Allow-Origin', '*');
   next();
 });
 
-/* A POST request message to the server. */
-app.post("/", async (req, res) => {
+app.post('/', async (req, res) => {
   const {
     model,
     messages,
@@ -62,45 +41,42 @@ app.post("/", async (req, res) => {
     quality,
     seed
   } = req.body;
-  console.log(req.body);
+
   try {
     let audioData;
-    if (prompt !== "") {
-      console.log("prompt = " + prompt);
+
+    if (prompt !== '') {
       const response = await openai.images.generate({
-        // Images prompt
-        model: "dall-e-3", // Default dall-e-2 or dall-e-3.
-        prompt: prompt, // Image description prompt.
-        n: parseInt(n), // Number of images to create.
-        size: size, // 1024x1024, 1024x1792, 1792x1024.
-        quality: quality, // Default standard or hd. set to hd.
-        style: style, // Default vivid or natural.
+        model: 'dall-e-3',
+        prompt: prompt,
+        n: parseInt(n),
+        size: size,
+        quality: quality,
+        style: style,
         audioData: audioData
       });
+
       let imageURLs = response.data.map((url) => url.url);
       res.json({ message: imageURLs, audioData: audioData });
-      addHistory( imageURLs + "\n" );
-      console.log("images url = " + imageURLs);
     } else {
       const response = await openai.chat.completions.create({
-        // Texts prompt
-        model: model, // Default "gpt-4".
-        messages: [{name:USER_NAME, role: "user", content: messages}],
-        temperature: Number(temperature), // Default 1.
-        max_tokens: parseInt(maxTokens), // Default 32000.
-        n: parseInt(n), // Number of messages to create.
-        presence_penalty: Number(presencePenalty), // Default 0. From -2 to 2
-        frequency_penalty: Number(frequencyPenalty), // Default 0.From -2 to 2
-        seed: seed // Default 0 = random to max 2147483647.
-              });
-      var i = 1;
+        model: model,
+        messages: [{ name: USER_NAME, role: 'user', content: messages }],
+        temperature: Number(temperature),
+        max_tokens: parseInt(maxTokens),
+        n: parseInt(n),
+        presence_penalty: Number(presencePenalty),
+        frequency_penalty: Number(frequencyPenalty),
+        seed: seed
+      });
+
+      let i = 1;
       let choices = response.choices
-        ?.map((choice) => (response.choices.length > 1 ? i++ + "- ": "") + choice.message.content)
-        .join("\n\n")
+        ?.map((choice) => (response.choices.length > 1 ? i++ + '- ' : '') + choice.message.content)
+        .join('\n\n')
         .trimStart();
-      res.json({ message: choices, usage: response.usage, audioData: audioData});
-      console.log("reply messages = " + choices);
-      addHistory(choices);
+
+      res.json({ message: choices, usage: response.usage, audioData: audioData });
     }
   } catch (error) {
     res.json({ message: error.message });
@@ -114,20 +90,12 @@ app.post("/", async (req, res) => {
 });
 
 async function generateSpeech(message) {
-  let buffer;
-  if (cache.has(message)) {
-    buffer = cache.get(message);
-  } else {
-    const mp3 = await openai.audio.speech.create({
-      model: "tts-1",
-      voice: "nova",
-      input: message,
-      quality: "low",
-    });
-    buffer = Buffer.from(await mp3.arrayBuffer());
-    cache.set(message, buffer);
-  }
-  return buffer;
+  return cache.get(message) || cache.set(message, Buffer.from(await (await openai.audio.speech.create({
+    model: 'tts-1',
+    voice: 'nova',
+    input: message,
+    quality: 'low',
+  })).arrayBuffer())).get(message);
 }
 
 app.get('/generateSpeech', async (req, res) => {
@@ -137,8 +105,7 @@ app.get('/generateSpeech', async (req, res) => {
   res.send(audioBuffer);
 });
 
-/* A GET request the models from the server. */
-app.get("/models", async (_, res) => {
+app.get('/models', async (_, res) => {
   try {
     const response = await openai.models.list();
     res.json({ models: response.data });
@@ -153,19 +120,6 @@ app.get("/models", async (_, res) => {
   }
 });
 
-/* Listening to the port 3080. */
 app.listen(HTTP_PORT, () => {
   console.log(`app listen at http://${IP_ADDRESS}:${HTTP_PORT}`);
 });
-
-// Add history to history.json
-function addHistory(message){
-  const currentDate = new Date().toLocaleString();
-  const historyEntry = { message, date: currentDate };
-  const historyData = JSON.stringify(historyEntry);
-  fs.appendFile(`${historyFile}`, historyData + ',', (err) => {
-    if (err) {
-      console.error(err);
-    }
-  });
-}

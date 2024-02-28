@@ -16,7 +16,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "fs": "^0.0.1-security",
     "morgan": "^1.10.0",
-    "openai": "^4.25.0",
+    "openai": "^4.28.0",
     "path": "^0.12.7",
     "speaker": "^0.5.4"
   }
