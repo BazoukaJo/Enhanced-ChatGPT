@@ -37,7 +37,6 @@ app.post('/', async (req, res) => {
   } = req.body;
 
   try {
-    let audioData;
     if (prompt !== '') {
       const response = await openai.images.generate({
         model: 'dall-e-3',
@@ -45,11 +44,10 @@ app.post('/', async (req, res) => {
         n: parseInt(n),
         size: size,
         quality: quality,
-        style: style,
-        audioData: audioData
+        style: style
       });
       let imageURLs = response.data.map((url) => url.url);
-      res.json({ message: imageURLs, audioData: audioData });
+      res.json({ message: imageURLs });
     } else {
       const response = await openai.chat.completions.create({
         model: model,
@@ -66,7 +64,7 @@ app.post('/', async (req, res) => {
         ?.map((choice) => (response.choices.length > 1 ? i++ + '- ' : '') + choice.message.content)
         .join('\n\n')
         .trimStart();
-      res.json({ message: choices, usage: response.usage, audioData: audioData });
+      res.json({ message: choices, usage: response.usage });
     }
   } catch (error) {
     res.json({ message: error.message });
