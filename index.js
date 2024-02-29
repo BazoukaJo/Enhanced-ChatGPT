@@ -20,16 +20,10 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-app.use((_, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  next();
-});
-
 app.post('/', async (req, res) => {
   const {
     model,
     messages,
-    message,
     temperature,
     maxTokens,
     n,
@@ -44,7 +38,6 @@ app.post('/', async (req, res) => {
 
   try {
     let audioData;
-
     if (prompt !== '') {
       const response = await openai.images.generate({
         model: 'dall-e-3',
@@ -55,7 +48,6 @@ app.post('/', async (req, res) => {
         style: style,
         audioData: audioData
       });
-
       let imageURLs = response.data.map((url) => url.url);
       res.json({ message: imageURLs, audioData: audioData });
     } else {
@@ -69,13 +61,11 @@ app.post('/', async (req, res) => {
         frequency_penalty: Number(frequencyPenalty),
         seed: seed
       });
-
       let i = 1;
       let choices = response.choices
         ?.map((choice) => (response.choices.length > 1 ? i++ + '- ' : '') + choice.message.content)
         .join('\n\n')
         .trimStart();
-
       res.json({ message: choices, usage: response.usage, audioData: audioData });
     }
   } catch (error) {
@@ -94,7 +84,7 @@ async function generateSpeech(message) {
     model: 'tts-1',
     voice: 'nova',
     input: message,
-    quality: 'low',
+    quality: 'high',
   })).arrayBuffer())).get(message);
 }
 

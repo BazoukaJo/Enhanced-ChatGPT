@@ -76,7 +76,6 @@ function App() {
 
   async function handleSubmitPrompt() {
     if (input === "" && suffix === "" && prefix === "") return;
-    //Pre request
     let chatLogNew = [...chatLog];
     let currentMessage = {
       name: USER_NAME,
@@ -89,19 +88,14 @@ function App() {
     const messages = chatLogNew?.map((message) => message.message.startsWith("<img ") ? message.message.match(/<img src='(.*?)' className='images'\/>/)[1] : message.message ).join("\n");
     setInput("");
     showLoader();
-    // Scroll down
     setTimeout(function() { document.getElementsByClassName("chatbox")[0].scrollTo(0, document.getElementsByClassName("chat-log")[0].clientHeight);}, 2);
-
-    // look for the word imagine to define the image prompt.
     let currentPrompt =
     chatLogNew[chatLogNew.length - 1]
       ?.message.toLowerCase().substring(0, 7) === "imagine"
       ? chatLogNew[chatLogNew.length - 1]?.message
       : "";
-    // Assign a new AbortController to controller
     controller = new AbortController();
     const signal = controller.signal;
-    // Post request
     const response = await fetch(`http://${IP_ADDRESS}:${HTTP_PORT}/`, {
       method: "POST",
       headers: { "content-type": "application/json","Access-Control-Allow-Origin": "*" },
@@ -174,13 +168,6 @@ function App() {
     }
   }
 
-  /*
-   * This code is a function that handles listening with a microphone.
-   * It checks if the microphone is listening, and if it is, it starts the microphone and sets an 'onend' event listener.
-   * If the microphone is not listening, it stops the microphone and sets an 'onend' event listener.
-   * It also sets an 'onstart' event listener which shows the recorder, and an 'onresult'
-   * event listener which sets the input to the transcript of what was said. Finally, it sets an 'onerror' event listener which logs any errors that occur.
-   */
   const handleTranscriptSpeech = () => {
     if (isListening) {
       mic.start();
