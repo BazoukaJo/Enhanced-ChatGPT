@@ -1,8 +1,10 @@
 import "./App.css";
 import "./normal.css";
+import 'prismjs/themes/prism-okaidia.css';
 
 import React, { useEffect, useState } from "react";
 
+import Prism from 'prismjs';
 import { marked } from 'marked';
 
 const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -12,6 +14,7 @@ mic.interimResults = true;
 mic.lang = "en-US";
 
 function App() {
+  // TO BE MODIFY
   const HTTP_PORT = "3080";
   const IP_ADDRESS = "10.0.0.145";
   const MAX_TOKENS = 32768;
@@ -117,7 +120,6 @@ function App() {
       }),
       signal: signal
     });
-
     const message = await response.json();
     if (message.error && message.error !== "") {
       showWarning("response error "+message.error);
@@ -313,8 +315,14 @@ function App() {
     document.getElementsByClassName("usage")[0].innerHTML = usage && usage !== "" ? "Prompt Tokens : " + usage.prompt_tokens + " | Completion Tokens : " + usage.completion_tokens + " | Total Tokens : " + usage.total_tokens : "";
   }
 
-  function convertAndHighlightMarkdown(message) {
-    return marked.parse(message.message);
+  function highlightMarkdownAndCode(message) {
+    let htmlMessage = marked.parse(message.message);
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlMessage;
+    tempDiv.querySelectorAll('pre code').forEach((block) => {
+      Prism.highlightElement(block);
+    });
+    return tempDiv.innerHTML;
   }
 
   //###################### Return HTML ########################
@@ -461,7 +469,7 @@ function App() {
       </aside>
       <section className="chatbox">
         <div className="chat-log">
-          {chatLog?.map((message, index) => (<ChatMessage key={index} message={message} htmlMessage={convertAndHighlightMarkdown(message)}/>))}
+          {chatLog?.map((message, index) => (<ChatMessage key={index} message={message} htmlMessage={highlightMarkdownAndCode(message)}/>))}
         </div>
         <div className="chat-input-holder">
           <div

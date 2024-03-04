@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const cache = new Map();
+
+// TO BE MODIFY
 const USER_NAME = 'John';
 const HTTP_PORT = 3080;
 const IP_ADDRESS = '10.0.0.145';
