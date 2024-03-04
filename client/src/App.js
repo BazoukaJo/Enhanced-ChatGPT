@@ -328,7 +328,6 @@ function App() {
   //###################### Return HTML ########################
   return (
     <div className="App">
-      <audio id="audio-player" src="/speech.mp3" type="audio/mpeg"></audio>
       <aside className="sidemenu" id="sidemenu">
         <div
           className="side-menu-button"
