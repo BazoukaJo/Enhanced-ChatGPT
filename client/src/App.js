@@ -22,17 +22,16 @@ function App() {
   const DEFAULT_TEMPERATURE = 0.5;
   const SYSTEM_ROLE = "assistant";
   const USER_NAME = "John";
-  const BOT_NAME = "Sage";
-  const START_INSTRUCTION = `I am ${BOT_NAME}, your dedicated personal assistant. Not only can I answer all your questions, but I can also generate images using DALL-E-3. To do so, simply start your prompt with 'imagine', leaving the prefix field blank.`;
+  let BOT_NAME = "Claude";
   const DEFAULT_MODEL = "gpt-4-turbo-preview";
   const DEFAULT_RESOLUTION = "1024x1024";
   const DEFAULT_STYLE = "vivid";
   const DEFAULT_QUALITY = "hd";
   const DEFAULT_SEED = 0;
   const SEED_MAX = 2147483647;
-
-  let controller;
-
+  const ANTHROPIC_MODEL = {
+    id: "claude-3-opus-20240229"
+  };
   const [input, setInput] = useState("");
   const [prefix, setPrefix] = useState("");
   const [suffix, setSuffix] = useState("");
@@ -44,7 +43,8 @@ function App() {
   const [currentStyle, setStyle] = useState(DEFAULT_STYLE);
   const [currentSeed, setSeed] = useState(DEFAULT_SEED);
   const [models, setModels] = useState([]);
-  const [chatLog, setChatLog] = useState([{ name: BOT_NAME, user: "gpt", role: SYSTEM_ROLE, message: START_INSTRUCTION, type: "string" }]);
+  const [chatLog, setChatLog] = useState([{ name: BOT_NAME, user: "gpt", role: SYSTEM_ROLE, message: "", type: "string" }]);
+  //setChatLog(null);
   // eslint-disable-next-line
   const [history, setHistory] = useState([]);
   const [currentModel, setCurrentModel] = useState(DEFAULT_MODEL);
@@ -63,12 +63,14 @@ function App() {
   const [isSpeaking, toggleButtonSpeak] = useState(true);
   // eslint-disable-next-line
   useEffect(() => { handleReadingButton(); }, [isSpeaking]);
+  let controller;
 
   async function getEngines() {
     try {
         const response = await fetch(`http://${IP_ADDRESS}:${HTTP_PORT}/models`);
         const data = await response.json();
         const filteredModels = data.models.filter((item) => item.id.startsWith("gpt"));
+        filteredModels.push(ANTHROPIC_MODEL);
         setModels(filteredModels);
     } catch (error) {
         console.log('Error fetching models:', error);
@@ -213,7 +215,7 @@ function App() {
   }
 
   function clearChat() {
-    setChatLog([{name:"GPT", user:"gpt", role:SYSTEM_ROLE, message:START_INSTRUCTION, type:"string"}]);
+    setChatLog([{name:"GPT", user:"gpt", role:SYSTEM_ROLE, message:"", type:"string"}]);
     setUsages("");
   }
 

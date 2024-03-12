@@ -1,4 +1,5 @@
 const OpenAI = require('openai');
+const Anthropic = require('@anthropic-ai/sdk');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -7,15 +8,24 @@ const cache = new Map();
 
 // TO BE MODIFY
 const USER_NAME = 'John';
+const USER_ROLE = 'user';
 const HTTP_PORT = 3080;
 const IP_ADDRESS = '10.0.0.145';
+const IMAGE_MODEL = 'dall-e-3';
+const ANTHROPIC_MODEL = 'claude-3-opus-20240229';
 
-let key = process.env.OPENAI_KEY;
+let openai_key = process.env.OPENAI_KEY;
 let org = process.env.OPENAI_ORG;
+
+let claude_key = process.env.CLAUDE_KEY;
+
+const anthropic = new Anthropic({
+  apiKey: claude_key,
+});
 
 const openai = new OpenAI({
   organization: org,
-  apiKey: key,
+  apiKey: openai_key,
 });
 const app = express();
 
@@ -41,7 +51,7 @@ app.post('/', async (req, res) => {
   try {
     if (prompt !== '') {
       const response = await openai.images.generate({
-        model: 'dall-e-3',
+        model: IMAGE_MODEL,
         prompt: prompt,
         n: parseInt(n),
         size: size,
@@ -51,22 +61,33 @@ app.post('/', async (req, res) => {
       let imageURLs = response.data.map((url) => url.url);
       res.json({ message: imageURLs });
     } else {
-      const response = await openai.chat.completions.create({
-        model: model,
-        messages: [{ name: USER_NAME, role: 'user', content: messages }],
-        temperature: Number(temperature),
-        max_tokens: parseInt(maxTokens),
-        n: parseInt(n),
-        presence_penalty: Number(presencePenalty),
-        frequency_penalty: Number(frequencyPenalty),
-        seed: seed
-      });
-      let i = 1;
-      let choices = response.choices
-        ?.map((choice) => (response.choices.length > 1 ? i++ + '- ' : '') + choice.message.content)
-        .join('\n\n')
-        .trimStart();
-      res.json({ message: choices, usage: response.usage });
+      if(model == ANTHROPIC_MODEL){
+        response = await anthropic.messages.create({
+          model: ANTHROPIC_MODEL,
+          max_tokens: parseInt(maxTokens),
+          messages: [{ role: USER_ROLE, content: messages }],
+        });
+        let i = 1;
+        console.log(response.content[0].text);
+        res.json({ message: response.content[0].text, usage: response.usage });
+      } else {
+        response = await openai.chat.completions.create({
+          model: model,
+          messages: [{ name: USER_NAME, role: USER_ROLE, content: messages }],
+          temperature: Number(temperature),
+          max_tokens: parseInt(maxTokens),
+          n: parseInt(n),
+          presence_penalty: Number(presencePenalty),
+          frequency_penalty: Number(frequencyPenalty),
+          seed: seed
+        });
+        let i = 1;
+        let choices = response.choices
+          ?.map((choice) => (response.choices.length > 1 ? i++ + '- ' : '') + choice.message.content)
+          .join('\n\n')
+          .trimStart();
+        res.json({ message: choices, usage: response.usage });
+      }
     }
   } catch (error) {
     res.json({ message: error.message });
