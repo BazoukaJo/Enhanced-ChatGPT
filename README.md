@@ -3,7 +3,18 @@
 
 # Enhanced ChatGPT
 
-This project lets you customize your own ChatGPT and control how it responds by using special settings. It also allows you to create pictures with high quality by typing 'imagine' before your request, using DALL-E-3. You need to have node.js, some NPM packages installed. You must use your own OpenAI key, which should be placed in the environment variables, and then update the App.js and index.js files with your information like IP, name, and role. For setup help, follow the React instructions that are provided.
+This project lets you customize your own OpenAI ChatGPT or Anthropic Claude and control how it responds by using special settings. It also allows you to create pictures with high quality by typing 'imagine' before your request or in the prefix textfield, using DALL-E-3. You need to have node.js and some NPM packages installed. You must use your own OpenAI and/or Anthropic key, which should be placed in the environment variables, and then update the App.js and index.js files with your information like IP, names, and roles. For setup help, follow the React instructions that are provided.
+
+# Features list
+
+- Supports all OpenAI ChatGPT versions and the most recent Anthropic Claude as of 3/17/2023.
+- Costs are related to consumption instead of a defined amount.
+- Accesses the service faster, even during server congestion.
+- Exposes some of the variables for query control: Models, Temperature, Seed, Token Number, Presence, Frequency, Image Resolution, Image Style.
+- Formats the text with Markdown.
+- Formats, highlights, and colors all types of code.
+- Prefixes and suffixes, with a separated text field for query control.
+- No in-app access; history stored in a JSON file, history.json.
 
 # Getting Started with Create React App
 

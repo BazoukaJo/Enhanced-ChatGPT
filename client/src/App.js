@@ -43,7 +43,7 @@ function App() {
   const [currentStyle, setStyle] = useState(DEFAULT_STYLE);
   const [currentSeed, setSeed] = useState(DEFAULT_SEED);
   const [models, setModels] = useState([]);
-  const [chatLog, setChatLog] = useState([{ name: BOT_NAME, user: "gpt", role: SYSTEM_ROLE, message: "", type: "string" }]);
+  const [chatLog, setChatLog] = useState([]);
   //setChatLog(null);
   // eslint-disable-next-line
   const [history, setHistory] = useState([]);
@@ -51,8 +51,6 @@ function App() {
   const [historyIndex, setHistoryIndex] = useState(0);
   const [temperature, setTemperature] = useState(DEFAULT_TEMPERATURE);
   const [maxTokens, setMaxTokens] = useState(DEFAULT_TOKEN);
-  const [n, setN] = useState(1);
-  const [bestOf, setBestOf] = useState(1);
   const [presencePenalty, setPresencePenalty] = useState(0);
   const [frequencyPenalty, setFrequencyPenalty] = useState(0);
   // eslint-disable-next-line
@@ -110,12 +108,12 @@ function App() {
         message: currentMessage,
         temperature: temperature,
         maxTokens: maxTokens,
-        n: n,
+        n: 1,
         frequencyPenalty: frequencyPenalty,
         presencePenalty: presencePenalty,
         prompt: currentPrompt,
         size: currentResolution,
-        bestOf: bestOf,
+        bestOf: 1,
         style: currentStyle,
         quality: DEFAULT_QUALITY,
         seed: currentSeed
@@ -134,12 +132,12 @@ function App() {
       ]);
       playResponse(`Here is the image for you ${USER_NAME}.`);
     } else {
-      setUsages(message.usage);
+      setUsages(message.usage ? message.usage : "");
       setChatLog([
         ...chatLogNew,
         { name:BOT_NAME, user: "gpt", role:SYSTEM_ROLE, message: message.message, type: "string" },
       ]);
-      playResponse(message.message);
+      playResponse(removeImageTags(message.message));
     }
     setTimeout(function() {document.getElementsByClassName("chatbox")[0].scrollTo( 0, document.getElementsByClassName("chat-log")[0].clientHeight);}, 200);}
     hideLoader();
@@ -215,7 +213,7 @@ function App() {
   }
 
   function clearChat() {
-    setChatLog([{name:"GPT", user:"gpt", role:SYSTEM_ROLE, message:"", type:"string"}]);
+    setChatLog([]);
     setUsages("");
   }
 
@@ -327,6 +325,10 @@ function App() {
     return tempDiv.innerHTML;
   }
 
+  function removeImageTags(message) {
+    return message.replace(/<img[^>]*>/g, '');
+  }
+
   //###################### Return HTML ########################
   return (
     <div className="App">
@@ -421,20 +423,6 @@ function App() {
             rows="1"
             step="0.1"
             value={frequencyPenalty}
-          />
-        </div>
-        <div>
-          <div className="tool-text">#COMPLETIONS</div>
-          <input
-            title="COMPLETIONS"
-            className="side-menu-button-input"
-            onChange={(e) => {setN(e.target.value); setBestOf(e.target.value);}}
-            type="number"
-            max="10"
-            min="1"
-            rows="1"
-            step="1"
-            value={n}
           />
         </div>
         <div>
