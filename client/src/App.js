@@ -1,13 +1,14 @@
 import "./App.css";
 import "./normal.css";
-import 'prismjs/themes/prism-okaidia.css';
+import "prismjs/themes/prism-okaidia.css";
 
 import React, { useEffect, useState } from "react";
 
-import Prism from 'prismjs';
-import { marked } from 'marked';
+import Prism from "prismjs";
+import { marked } from "marked";
 
-const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const speechRecognition =
+  window.SpeechRecognition || window.webkitSpeechRecognition;
 const mic = new speechRecognition();
 mic.continuous = true;
 mic.interimResults = true;
@@ -30,12 +31,16 @@ function App() {
   const DEFAULT_SEED = 0;
   const SEED_MAX = 2147483647;
   const ANTHROPIC_MODEL = {
-    id: "claude-3-opus-20240229"
+    id: "claude-3-opus-20240229",
   };
   const [input, setInput] = useState("");
   const [prefix, setPrefix] = useState("");
   const [suffix, setSuffix] = useState("");
-  const resolutions = [{ id: "1024x1024" }, { id: "1024x1792" }, { id: "1792x1024" }];
+  const resolutions = [
+    { id: "1024x1024" },
+    { id: "1024x1792" },
+    { id: "1792x1024" },
+  ];
   const styles = [{ id: "vivid" }, { id: "natural" }];
   const SIDE_X_IN = "0px";
   const SIDE_X_OUT = "-140px";
@@ -44,7 +49,6 @@ function App() {
   const [currentSeed, setSeed] = useState(DEFAULT_SEED);
   const [models, setModels] = useState([]);
   const [chatLog, setChatLog] = useState([]);
-  //setChatLog(null);
   // eslint-disable-next-line
   const [history, setHistory] = useState([]);
   const [currentModel, setCurrentModel] = useState(DEFAULT_MODEL);
@@ -54,27 +58,31 @@ function App() {
   const [presencePenalty, setPresencePenalty] = useState(0);
   const [frequencyPenalty, setFrequencyPenalty] = useState(0);
   // eslint-disable-next-line
-  useEffect(() => { getEngines(); }, []);
+  useEffect(() => {getEngines();}, []);
   const [isListening, setIsTranscribing] = useState(false);
   // eslint-disable-next-line
-  useEffect(() => { handleTranscriptSpeech(); }, [isListening]);
+  useEffect(() => {handleTranscriptSpeech();}, [isListening]);
   const [isSpeaking, toggleButtonSpeak] = useState(true);
   // eslint-disable-next-line
-  useEffect(() => { handleReadingButton(); }, [isSpeaking]);
+  useEffect(() => {handleReadingButton();}, [isSpeaking]);
   let controller;
 
   async function getEngines() {
     try {
-        const response = await fetch(`http://${IP_ADDRESS}:${HTTP_PORT}/models`);
-        const data = await response.json();
-        const filteredModels = data.models.filter((item) => item.id.startsWith("gpt"));
-        filteredModels.push(ANTHROPIC_MODEL);
-        setModels(filteredModels);
+      const response = await fetch(`http://${IP_ADDRESS}:${HTTP_PORT}/models`);
+      const data = await response.json();
+      const filteredModels = data.models.filter((item) =>
+        item.id.startsWith("gpt")
+      );
+      filteredModels.push(ANTHROPIC_MODEL);
+      setModels(filteredModels);
     } catch (error) {
-        console.log('Error fetching models:', error);
-        showWarning('Error fetching models:' + error);
+      console.log("Error fetching models:", error);
+      showWarning("Error fetching models:" + error);
     }
-    setTimeout(() => {document.getElementsByClassName("App")[0].style.left = SIDE_X_OUT;}, 4000);
+    setTimeout(() => {
+      document.getElementsByClassName("App")[0].style.left = SIDE_X_OUT;
+    }, 4000);
   }
 
   async function handleSubmitPrompt() {
@@ -83,25 +91,51 @@ function App() {
     let currentMessage = {
       name: USER_NAME,
       user: "user",
-      role:"user",
-      message: `${prefix + (prefix === "" ? "" : ".\n") + input + (suffix === "" ? "" : ".\n") + suffix + "."}`, type: "string"};
+      role: "user",
+      message: `${
+        prefix +
+        (prefix === "" ? "" : "\n") +
+        input +
+        (suffix === "" ? "" : "\n") +
+        suffix +
+        "."
+      }`,
+      type: "string",
+    };
     chatLogNew.push(currentMessage);
     history.push({ message: input });
     setChatLog(chatLogNew);
-    const messages = chatLogNew?.map((message) => message.message.startsWith("<img ") ? message.message.match(/<img src='(.*?)' className='images'\/>/)[1] : message.message ).join("\n");
+    const messages = chatLogNew
+      ?.map((message) =>
+        message.message.startsWith("<img ")
+          ? message.message.match(/<img src='(.*?)' className='images'\/>/)[1]
+          : message.message
+      )
+      .join("\n");
     setInput("");
     showLoader();
-    setTimeout(function() { document.getElementsByClassName("chatbox")[0].scrollTo(0, document.getElementsByClassName("chat-log")[0].clientHeight);}, 2);
+    setTimeout(function () {
+      document
+        .getElementsByClassName("chatbox")[0]
+        .scrollTo(
+          0,
+          document.getElementsByClassName("chat-log")[0].clientHeight
+        );
+    }, 2);
     let currentPrompt =
-    chatLogNew[chatLogNew.length - 1]
-      ?.message.toLowerCase().substring(0, 7) === "imagine"
-      ? chatLogNew[chatLogNew.length - 1]?.message
-      : "";
+      chatLogNew[chatLogNew.length - 1]?.message
+        .toLowerCase()
+        .substring(0, 7) === "imagine"
+        ? chatLogNew[chatLogNew.length - 1]?.message
+        : "";
     controller = new AbortController();
     const signal = controller.signal;
     const response = await fetch(`http://${IP_ADDRESS}:${HTTP_PORT}/`, {
       method: "POST",
-      headers: { "content-type": "application/json","Access-Control-Allow-Origin": "*" },
+      headers: {
+        "content-type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify({
         model: currentModel,
         messages: messages,
@@ -116,57 +150,100 @@ function App() {
         bestOf: 1,
         style: currentStyle,
         quality: DEFAULT_QUALITY,
-        seed: currentSeed
+        seed: currentSeed,
       }),
-      signal: signal
+      signal: signal,
     });
     const message = await response.json();
     if (message.error && message.error !== "") {
-      showWarning("response error "+message.error);
+      showWarning("response error " + message.error);
     } else {
-    if (currentPrompt !== ""){
-      setUsages("");
-      setChatLog([
-        ...chatLogNew,
-        { name:BOT_NAME, user: "gpt", role:SYSTEM_ROLE, message: "<img src='" + message.message + "' className='images'/>", type: "image" },
-      ]);
-      playResponse(`Here is the image for you ${USER_NAME}.`);
-    } else {
-      setUsages(message.usage ? message.usage : "");
-      setChatLog([
-        ...chatLogNew,
-        { name:BOT_NAME, user: "gpt", role:SYSTEM_ROLE, message: message.message, type: "string" },
-      ]);
-      playResponse(removeImageTags(message.message));
+      if (currentPrompt !== "") {
+        setUsages("");
+        setChatLog([
+          ...chatLogNew,
+          {
+            name: BOT_NAME,
+            user: "gpt",
+            role: SYSTEM_ROLE,
+            message: "<img src='" + message.message + "' className='images'/>",
+            type: "image",
+          },
+        ]);
+        playResponse(`Here is the image for you ${USER_NAME}.`);
+      } else {
+        setUsages(message.usage ? message.usage : "");
+        setChatLog([
+          ...chatLogNew,
+          {
+            name: BOT_NAME,
+            user: "gpt",
+            role: SYSTEM_ROLE,
+            message: message.message,
+            type: "string",
+          },
+        ]);
+        playResponse(removeImageTags(message.message));
+      }
+      setTimeout(function () {
+        document
+          .getElementsByClassName("chatbox")[0]
+          .scrollTo(
+            0,
+            document.getElementsByClassName("chat-log")[0].clientHeight
+          );
+      }, 200);
     }
-    setTimeout(function() {document.getElementsByClassName("chatbox")[0].scrollTo( 0, document.getElementsByClassName("chat-log")[0].clientHeight);}, 200);}
     hideLoader();
   }
 
-  function handleStopController(){
+  function handleStopController() {
     controller.abort();
     hideLoader();
   }
 
   async function playResponse(message) {
-    if (!isSpeaking)
-      return;
+    if (!isSpeaking) return;
     try {
-      const response = await fetch(`http://${IP_ADDRESS}:${HTTP_PORT}/generateSpeech?message=${encodeURIComponent(message)}`);
+      const response = await fetch(
+        `http://${IP_ADDRESS}:${HTTP_PORT}/generateSpeech?message=${encodeURIComponent(
+          message
+        )}`
+      );
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error("Network response was not ok");
       }
       const audioBlob = await response.blob();
-      if (!audioBlob.type.startsWith('audio/')) {
-        console.error('The fetched blob is not an audio file');
+      if (!audioBlob.type.startsWith("audio/")) {
+        console.error("The fetched blob is not an audio file");
         return;
       }
       const audio = new Audio(URL.createObjectURL(audioBlob));
-      audio.play().catch(function(error) {
-        console.log('Failed to play audio: ', error);
+      const audioContext = new AudioContext();
+      const source = audioContext.createMediaElementSource(audio);
+      const analyser = audioContext.createAnalyser();
+      source.connect(analyser);
+      analyser.connect(audioContext.destination);
+      const bars = document.querySelectorAll(".bar");
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      function updateEqualizer() {
+        analyser.getByteFrequencyData(dataArray);
+        for (let i = 0; i < bars.length; i++) {
+          const barHeight = dataArray[i] / 2;
+          bars[i].style.height = `${barHeight}px`;
+        }
+        requestAnimationFrame(updateEqualizer);
+      }
+      audio.play().catch(function (error) {
+        console.log("Failed to play audio: ", error);
       });
+      updateEqualizer();
     } catch (error) {
-      console.error('There has been a problem with your fetch audio response operation: ', error);
+      console.error(
+        "There has been a problem with your fetch audio response operation: ",
+        error
+      );
     }
   }
 
@@ -207,9 +284,11 @@ function App() {
     }
   };
 
-  function showWarning(error){
+  function showWarning(error) {
     document.getElementsByClassName("errors")[0].innerHTML = error;
-    setTimeout(function() {document.getElementsByClassName("errors")[0].innerHTML = "";}, 4000);
+    setTimeout(function () {
+      document.getElementsByClassName("errors")[0].innerHTML = "";
+    }, 4000);
   }
 
   function clearChat() {
@@ -250,16 +329,14 @@ function App() {
   }
 
   let keyTimer;
-  let keyEventHandler = function(event) {
+  let keyEventHandler = function (event) {
     clearTimeout(keyTimer);
-    keyTimer = setTimeout(function() {
+    keyTimer = setTimeout(function () {
       //console(event.keyCode);
       if (event.keyCode === 38) {
-        if(isPrefixFocus())
-          cycleHistory(-1);
+        if (isPrefixFocus()) cycleHistory(-1);
       } else if (event.keyCode === 40) {
-        if(isPrefixFocus())
-          cycleHistory(1);
+        if (isPrefixFocus()) cycleHistory(1);
       } else if (event.keyCode === 36) {
         setIsTranscribing((prevState) => !prevState);
       } else if (event.keyCode === 35) {
@@ -274,24 +351,38 @@ function App() {
   let mouseOutTimer;
   let chatbox = document.getElementsByClassName("chatbox")[0];
   let chatPost = document.getElementsByClassName("chat-message-center")[0];
-  document.addEventListener("mouseout", function(event) {
-    if (event.target.id === "sidemenu" && (event.relatedTarget === chatbox || event.relatedTarget === chatPost || event.relatedTarget === null)) {
+  document.addEventListener("mouseout", function (event) {
+    if (
+      event.target.id === "sidemenu" &&
+      (event.relatedTarget === chatbox ||
+        event.relatedTarget === chatPost ||
+        event.relatedTarget === null)
+    ) {
       clearTimeout(mouseOutTimer);
-      mouseOutTimer = setTimeout(function() {document.getElementsByClassName("App")[0].style.left = SIDE_X_OUT;}, 4000);
+      mouseOutTimer = setTimeout(function () {
+        document.getElementsByClassName("App")[0].style.left = SIDE_X_OUT;
+      }, 4000);
     }
   });
 
-  document.addEventListener("mouseover", function(event) {
-    if ((event.target.id === "sidemenu" && (event.relatedTarget === chatbox || event.relatedTarget === chatPost || event.relatedTarget === null))
-    || (event.target.id === "" && event.relatedTarget === null)
+  document.addEventListener("mouseover", function (event) {
+    if (
+      (event.target.id === "sidemenu" &&
+        (event.relatedTarget === chatbox ||
+          event.relatedTarget === chatPost ||
+          event.relatedTarget === null)) ||
+      (event.target.id === "" && event.relatedTarget === null)
     ) {
       clearTimeout(mouseOutTimer);
       document.getElementsByClassName("App")[0].style.left = SIDE_X_IN;
     }
   });
 
-  function isPrefixFocus(){
-    return document.activeElement === document.getElementsByClassName("chat-input-textarea-prefix")[0];
+  function isPrefixFocus() {
+    return (
+      document.activeElement ===
+      document.getElementsByClassName("chat-input-textarea-prefix")[0]
+    );
   }
 
   function cycleHistory(index) {
@@ -306,27 +397,37 @@ function App() {
   }
 
   function changeTextareaHeight() {
-    document.getElementsByClassName("chat-input-textarea")[0].style.height = "auto";
     document.getElementsByClassName("chat-input-textarea")[0].style.height =
-      document.getElementsByClassName("chat-input-textarea")[0].scrollHeight + "px";
+      "auto";
+    document.getElementsByClassName("chat-input-textarea")[0].style.height =
+      document.getElementsByClassName("chat-input-textarea")[0].scrollHeight +
+      "px";
   }
 
-  function setUsages(usage){
-    document.getElementsByClassName("usage")[0].innerHTML = usage && usage !== "" ? "Prompt Tokens : " + usage.prompt_tokens + " | Completion Tokens : " + usage.completion_tokens + " | Total Tokens : " + usage.total_tokens : "";
+  function setUsages(usage) {
+    document.getElementsByClassName("usage")[0].innerHTML =
+      usage && usage !== ""
+        ? "Prompt Tokens : " +
+          usage.prompt_tokens +
+          " | Completion Tokens : " +
+          usage.completion_tokens +
+          " | Total Tokens : " +
+          usage.total_tokens
+        : "";
   }
 
   function highlightMarkdownAndCode(message) {
     let htmlMessage = marked.parse(message.message);
-    const tempDiv = document.createElement('div');
+    const tempDiv = document.createElement("div");
     tempDiv.innerHTML = htmlMessage;
-    tempDiv.querySelectorAll('pre code').forEach((block) => {
+    tempDiv.querySelectorAll("pre code").forEach((block) => {
       Prism.highlightElement(block);
     });
     return tempDiv.innerHTML;
   }
 
   function removeImageTags(message) {
-    return message.replace(/<img[^>]*>/g, '');
+    return message.replace(/<img[^>]*>/g, "");
   }
 
   //###################### Return HTML ########################
@@ -335,7 +436,10 @@ function App() {
       <aside className="sidemenu" id="sidemenu">
         <div
           className="side-menu-button"
-          onClick={(e) => {clearChat(); focusTheTextArea();}}
+          onClick={(e) => {
+            clearChat();
+            focusTheTextArea();
+          }}
           title="Copy Input To Clipboard"
         >
           <span>+ </span>New Prompts
@@ -345,7 +449,10 @@ function App() {
           <select
             title="Model Selection"
             className="model-selection"
-            onChange={(e) => {setCurrentModel(e.target.value); clearChat();}}
+            onChange={(e) => {
+              setCurrentModel(e.target.value);
+              clearChat();
+            }}
             value={currentModel}
           >
             {models?.map((model, index) => (
@@ -388,7 +495,9 @@ function App() {
           <input
             title="SEED"
             className="side-menu-button-input"
-            onChange={(e) => {setSeed(e.target.value);}}
+            onChange={(e) => {
+              setSeed(e.target.value);
+            }}
             type="number"
             max={SEED_MAX}
             min="-1"
@@ -402,7 +511,9 @@ function App() {
           <input
             title="PRESENCE PENALTY"
             className="side-menu-button-input"
-            onChange={(e) => {setPresencePenalty(e.target.value);}}
+            onChange={(e) => {
+              setPresencePenalty(e.target.value);
+            }}
             type="number"
             max="2"
             min="-2"
@@ -416,7 +527,9 @@ function App() {
           <input
             title="FREQUENCY PENALTY"
             className="side-menu-button-input"
-            onChange={(e) => {setFrequencyPenalty(e.target.value);}}
+            onChange={(e) => {
+              setFrequencyPenalty(e.target.value);
+            }}
             type="number"
             max="2"
             min="-2"
@@ -430,7 +543,9 @@ function App() {
           <select
             title="RESOLUTION"
             className="selection"
-            onChange={(e) => {setResolution(e.target.value);}}
+            onChange={(e) => {
+              setResolution(e.target.value);
+            }}
             value={currentResolution}
           >
             {resolutions?.map((resolution, index) => (
@@ -445,7 +560,9 @@ function App() {
           <select
             title="STYLE"
             className="selection"
-            onChange={(e) => {setStyle(e.target.value);}}
+            onChange={(e) => {
+              setStyle(e.target.value);
+            }}
             value={currentStyle}
           >
             {styles?.map((style, index) => (
@@ -458,18 +575,66 @@ function App() {
       </aside>
       <section className="chatbox">
         <div className="chat-log">
-          {chatLog?.map((message, index) => (<ChatMessage key={index} message={message} htmlMessage={highlightMarkdownAndCode(message)}/>))}
+          {chatLog?.map((message, index) => (
+            <ChatMessage
+              key={index}
+              message={message}
+              htmlMessage={highlightMarkdownAndCode(message)}
+            />
+          ))}
         </div>
         <div className="chat-input-holder">
+          <div id="equalizer">
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+          </div>
           <div
             className="form1"
-            onKeyDown={(e) => {!e.getModifierState("Shift") && e.keyCode === 13 && handleSubmitPrompt() && e.preventDefault();}}
-            onInput={(e) => {changeTextareaHeight()}}
+            onKeyDown={(e) => {
+              !e.getModifierState("Shift") &&
+                e.keyCode === 13 &&
+                handleSubmitPrompt() &&
+                e.preventDefault();
+            }}
+            onInput={(e) => {
+              changeTextareaHeight();
+            }}
           >
             <textarea
               type="text"
               className="chat-input-textarea"
-              onChange={(e) => {setInput(e.target.value);}}
+              onChange={(e) => {
+                setInput(e.target.value);
+              }}
               placeholder="Prompt"
               autoFocus
               rows="1"
@@ -490,9 +655,13 @@ function App() {
           />
           <button
             className="send-button"
-            onClick={() => {handleSubmitPrompt();}}
+            onClick={() => {
+              handleSubmitPrompt();
+            }}
             tabIndex="-1"
-            onFocus={() => {focusTheTextArea();}}
+            onFocus={() => {
+              focusTheTextArea();
+            }}
             type="button"
             title="Send Prompt to GPT"
           >
@@ -502,14 +671,28 @@ function App() {
           </button>
           <button
             className="stop-button"
-            onClick={() => {handleStopController();}}
+            onClick={() => {
+              handleStopController();
+            }}
             tabIndex="-1"
-            onFocus={() => {focusTheTextArea();}}
+            onFocus={() => {
+              focusTheTextArea();
+            }}
             type="button"
             title="Stop request to GPT"
           >
-            <svg fill="#ffffff" viewBox="10 0 240 200" id="Flat" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="stop" strokeWidth="0"></g><g id="stop" strokeLinecap="round" strokeLinejoin="round"></g><g id="stop"> 
-              <path d="M212,58.90918V197.09082A14.92639,14.92639,0,0,1,197.09082,212H58.90918A14.92639,14.92639,0,0,1,44,197.09082V58.90918A14.92607,14.92607,0,0,1,58.90918,44H197.09082A14.92607,14.92607,0,0,1,212,58.90918Z"></path> </g>
+            <svg
+              fill="#ffffff"
+              viewBox="10 0 240 200"
+              id="Flat"
+              xmlns="http://www.w3.org/2000/svg"
+              stroke="#ffffff"
+            >
+              <g id="stop" strokeWidth="0"></g>
+              <g id="stop" strokeLinecap="round" strokeLinejoin="round"></g>
+              <g id="stop">
+                <path d="M212,58.90918V197.09082A14.92639,14.92639,0,0,1,197.09082,212H58.90918A14.92639,14.92639,0,0,1,44,197.09082V58.90918A14.92607,14.92607,0,0,1,58.90918,44H197.09082A14.92607,14.92607,0,0,1,212,58.90918Z"></path>{" "}
+              </g>
             </svg>
           </button>
           <button
@@ -530,7 +713,10 @@ function App() {
           </button>
           <button
             className="copy-button"
-            onClick={() => {navigator.clipboard.writeText(document.getElementsByClassName("chat-input-textarea")[0].value);
+            onClick={() => {
+              navigator.clipboard.writeText(
+                document.getElementsByClassName("chat-input-textarea")[0].value
+              );
             }}
             title="Copy Input To Clipboard"
           >
@@ -549,7 +735,9 @@ function App() {
           </button>
           <button
             className="read-button"
-            onClick={() => { toggleButtonSpeak((prevState) => !prevState); }}
+            onClick={() => {
+              toggleButtonSpeak((prevState) => !prevState);
+            }}
             title="Answers Read By AI - Shortcut : End"
             type="button"
           >
@@ -580,8 +768,12 @@ function App() {
           <div className="usage"></div>
           <button
             className="clear-button"
-            onClick={() => {setInput("");}}
-            onFocus={() => {focusTheTextArea();}}
+            onClick={() => {
+              setInput("");
+            }}
+            onFocus={() => {
+              focusTheTextArea();
+            }}
             type="button"
             title="Clear Input"
           >
@@ -597,8 +789,12 @@ function App() {
           </button>
           <button
             className="clear-button-prefix"
-            onClick={() => {setPrefix("");}}
-            onFocus={() => {focusTheTextArea();}}
+            onClick={() => {
+              setPrefix("");
+            }}
+            onFocus={() => {
+              focusTheTextArea();
+            }}
             type="button"
             title="Clear Prefix"
           >
@@ -614,8 +810,12 @@ function App() {
           </button>
           <button
             className="clear-button-suffix"
-            onClick={() => {setSuffix("");}}
-            onFocus={() => {focusTheTextArea();}}
+            onClick={() => {
+              setSuffix("");
+            }}
+            onFocus={() => {
+              focusTheTextArea();
+            }}
             type="button"
             title="Clear Suffix"
           >
@@ -659,29 +859,35 @@ const ChatMessage = ({ message, htmlMessage }) => {
           )}
           {message.user === "user" && <div className="you">ME</div>}
         </div>
-        { message.user !== "user" && <div className="gpt-box">
-          {message.user === "gpt" && message.type === "image" && (
-            <span
-              className="gpt-image"
-              dangerouslySetInnerHTML={{ __html: htmlMessage }}
-            ></span>
-          )}
-          {message.user === "gpt" && message.type === "string" && (
-            <span
-            className="gpt-message"
-            dangerouslySetInnerHTML={{ __html: htmlMessage }}
-          ></span>
-          )}
-        </div>}
-        {message.user !== "gpt" && <div className="user-box">
-          {message.user === "user" && (
-            <span className="user-message">{message.message}</span>
-          )}
-        </div>}
+        {message.user !== "user" && (
+          <div className="gpt-box">
+            {message.user === "gpt" && message.type === "image" && (
+              <span
+                className="gpt-image"
+                dangerouslySetInnerHTML={{ __html: htmlMessage }}
+              ></span>
+            )}
+            {message.user === "gpt" && message.type === "string" && (
+              <span
+                className="gpt-message"
+                dangerouslySetInnerHTML={{ __html: htmlMessage }}
+              ></span>
+            )}
+          </div>
+        )}
+        {message.user !== "gpt" && (
+          <div className="user-box">
+            {message.user === "user" && (
+              <span className="user-message">{message.message}</span>
+            )}
+          </div>
+        )}
         <button
           title="Copy Message To Clipboard"
           className="copy-current-button"
-          onClick={() => {navigator.clipboard.writeText(message.message);}}
+          onClick={() => {
+            navigator.clipboard.writeText(message.message);
+          }}
         >
           <svg width="16" height="16" fill="currentColor" viewBox="1 -3 19 19">
             <path d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z" />

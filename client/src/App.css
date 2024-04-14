@@ -109,7 +109,6 @@
   transition: ease 0.2s all;
   outline: 1px solid rgb(111, 111, 111);
   border-style: none;
-
   min-width: 90px;
   position: absolute;
   bottom: 5px;
@@ -533,13 +532,31 @@
   transition: ease 0.2s all;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
   visibility: hidden;
-
-
   position: absolute;
   right: 95px;
   bottom: 85px;
   width: 40px;
   height: 40px;
+}
+
+#equalizer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 20px;
+  margin-bottom: 10px;
+  position:relative;
+  left:center;
+  right:center;
+  bottom: 10px;
+}
+
+.bar {
+  width: 4px;
+  height: 10px;
+  background-color: #a8a8a8;
+  margin: 0 2px;
+  transition: height 0.05s;
 }
 
 @keyframes loader {
