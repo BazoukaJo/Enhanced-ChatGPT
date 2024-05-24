@@ -409,7 +409,24 @@
   border-style: none;
 }
 
+.history-selection {
+  background-color: #40414F;
+  /* border-radius: 8px; */
+  outline: 1px solid rgb(111, 111, 111);
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+  color: white;
+  height: 30px;
+  padding-left: 10px;
+  width: 100%;
+  border-style: none;
+}
+
 .model-selection:hover {
+  background-color: #222222;
+  transition: ease 0.2s all;
+}
+
+.history-selection:hover {
   background-color: #222222;
   transition: ease 0.2s all;
 }

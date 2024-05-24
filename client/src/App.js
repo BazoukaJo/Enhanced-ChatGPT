@@ -7,15 +7,13 @@ import React, { useEffect, useState } from "react";
 import Prism from "prismjs";
 import { marked } from "marked";
 
-const speechRecognition =
-  window.SpeechRecognition || window.webkitSpeechRecognition;
+const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const mic = new speechRecognition();
 mic.continuous = true;
 mic.interimResults = true;
 mic.lang = "en-US";
 
 function App() {
-  // TO BE MODIFY
   const HTTP_PORT = "3080";
   const IP_ADDRESS = "10.0.0.145";
   const MAX_TOKENS = 32768;
@@ -24,7 +22,7 @@ function App() {
   const SYSTEM_ROLE = "assistant";
   const USER_NAME = "John";
   let BOT_NAME = "Claude";
-  const DEFAULT_MODEL = "gpt-4-turbo-preview";
+  const DEFAULT_MODEL = "gpt-4o";
   const DEFAULT_RESOLUTION = "1024x1024";
   const DEFAULT_STYLE = "vivid";
   const DEFAULT_QUALITY = "hd";
@@ -51,6 +49,8 @@ function App() {
   const [chatLog, setChatLog] = useState([]);
   // eslint-disable-next-line
   const [history, setHistory] = useState([]);
+  //const [histories, setHistories] = useState([]);
+  //const [currentHistory, setCurrentHistory] = useState([]);
   const [currentModel, setCurrentModel] = useState(DEFAULT_MODEL);
   const [historyIndex, setHistoryIndex] = useState(0);
   const [temperature, setTemperature] = useState(DEFAULT_TEMPERATURE);
@@ -163,9 +163,9 @@ function App() {
         setChatLog([
           ...chatLogNew,
           {
-            name: BOT_NAME,
-            user: "gpt",
-            role: SYSTEM_ROLE,
+              name: BOT_NAME,
+              user: "gpt",
+              role: SYSTEM_ROLE,
             message: "<img src='" + message.message + "' className='images'/>",
             type: "image",
           },
@@ -180,7 +180,7 @@ function App() {
             user: "gpt",
             role: SYSTEM_ROLE,
             message: message.message,
-            type: "string",
+              type: "string",
           },
         ]);
         playResponse(removeImageTags(message.message));
@@ -444,6 +444,24 @@ function App() {
         >
           <span>+ </span>New Prompts
         </div>
+        {/* <div className="history">
+        <div className="tool-text">HISTORY</div>
+          <select
+            title="History Selection"
+            className="history-selection"
+            onChange={(e) => {
+              clearChat();
+              setCurrentHistory(e.target.value);
+            }}
+            value={currentHistory}
+          >
+            {histories?.map((history, index) => (
+              <option key={history.id} value={history.id}>
+                {history.id}
+              </option>
+            ))}
+          </select>
+        </div> */}
         <div className="models">
           <div className="tool-text">MODELS</div>
           <select

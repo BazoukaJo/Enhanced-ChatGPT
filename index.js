@@ -6,7 +6,6 @@ const cors = require('cors');
 
 const cache = new Map();
 
-// TO BE MODIFY
 const USER_NAME = 'John';
 const USER_ROLE = 'user';
 const HTTP_PORT = 3080;
